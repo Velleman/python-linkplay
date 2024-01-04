@@ -4,12 +4,12 @@ import async_timeout
 from aiohttp import ClientSession, ClientError
 from http import HTTPStatus
 
-from linkplay.consts import API_TIMEOUT
+from linkplay.consts import API_ENDPOINT, API_TIMEOUT
 from linkplay.exceptions import LinkPlayRequestException
 
 
 async def session_call_api(endpoint: str, session: ClientSession, command: str):
-    url = f"{endpoint}?command={command}"
+    url = API_ENDPOINT.format(endpoint, command)
 
     try:
         async with async_timeout.timeout(API_TIMEOUT):

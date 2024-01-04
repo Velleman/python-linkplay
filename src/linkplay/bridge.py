@@ -1,7 +1,7 @@
 from typing import Dict
 from aiohttp import ClientSession
 
-from linkplay.consts import LinkPlayCommand, DeviceStatus, PlayerStatus, API_ENDPOINT
+from linkplay.consts import LinkPlayCommand, DeviceStatus, PlayerStatus
 from linkplay.utils import session_call_api
 
 
@@ -19,7 +19,7 @@ class LinkPlayBridge():
 
     @property
     def endpoint(self) -> str:
-        return API_ENDPOINT.format(self.protocol, self.ip)
+        return f"{self.protocol}://{self.ip}"
 
     async def update_device_status(self, session: ClientSession):
         self.device_status = await session_call_api(self.endpoint, session, LinkPlayCommand.DEVICE_STATUS)

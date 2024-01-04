@@ -1,6 +1,6 @@
 from enum import StrEnum
 
-API_ENDPOINT: str = "{}://{}/httpapi.asp"
+API_ENDPOINT: str = "{}/httpapi.asp?command={}"
 API_TIMEOUT = 2
 
 
