@@ -29,6 +29,7 @@ class LinkPlayCommand(StrEnum):
     LOOP_MODE = "setPlayerCmd:loopmode:{}"
     SWITCH_MODE = "setPlayerCmd:switchmode:{}"
     M3U_PLAYLIST = "setPlayerCmd:m3u:play:{}"
+    MULTIROOM_LIST = "multiroom:getSlaveList"
 
 
 class SpeakerType(StrEnum):
@@ -256,3 +257,9 @@ class DeviceAttribute(StrEnum):
     ETH_MAC_ADDRESS = "ETH_MAC"
     SECURITY = "security"
     SECURITY_VERSION = "security_version"
+
+class MultiroomAttribute(StrEnum):
+    """Defines the player attributes."""
+    NUM_FOLLOWERS = "slaves"
+    FOLLOWER_LIST = "slave_list"
+    UUID = "uuid"

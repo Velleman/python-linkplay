@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Dict
+from typing import Dict, List
 
 from aiohttp import ClientSession
 
@@ -36,6 +36,11 @@ class LinkPlayDevice():
     async def reboot(self):
         """Reboot the device."""
         await self.bridge.request(LinkPlayCommand.REBOOT)
+
+    @property
+    def uuid(self) -> str:
+        """The UUID of the device."""
+        return self.properties[DeviceAttribute.UUID]
 
     @property
     def name(self) -> str:
@@ -223,3 +228,14 @@ class LinkPlayBridge():
     async def request(self, command: str) -> None:
         """Performs a GET request on the given command and verifies the result."""
         await session_call_api_ok(self.endpoint, self.session, command)
+
+
+class LinkPlayMultiroom():
+    """Represents a LinkPlay multiroom."""
+
+    leader: LinkPlayBridge
+    followers: List[LinkPlayBridge]
+
+    def __init__(self, leader: LinkPlayBridge, followers: List[LinkPlayBridge]):
+        self.leader = leader
+        self.followers = followers
