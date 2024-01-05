@@ -28,6 +28,7 @@ class LinkPlayCommand(StrEnum):
     EQUALIZER_MODE = "setPlayerCmd:equalizer:{}"
     LOOP_MODE = "setPlayerCmd:loopmode:{}"
     SWITCH_MODE = "setPlayerCmd:switchmode:{}"
+    M3U_PLAYLIST = "setPlayerCmd:m3u:play:{}"
 
 
 class SpeakerType(StrEnum):
@@ -78,13 +79,14 @@ class PlaybackMode(StrEnum):
     TALK = "60"
     SLAVE = "99"
 
+
 PLAYBACK_MODE_MAP: Dict[PlaybackMode, str] = {
     PlaybackMode.IDLE: 'Idle',
     PlaybackMode.NONE: 'Idle',
     PlaybackMode.AIRPLAY: 'Airplay',
     PlaybackMode.DLNA: 'DLNA',
     PlaybackMode.QPLAY: 'QPlay',
-    PlaybackMode.NETWORK: 'Network',
+    PlaybackMode.NETWORK: 'wifi',
     PlaybackMode.WIIMU_LOCAL: 'udisk',
     PlaybackMode.TF_CARD_1: 'TFcard',
     PlaybackMode.API: 'API',
