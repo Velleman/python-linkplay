@@ -1,4 +1,5 @@
-from enum import StrEnum
+from enum import StrEnum, IntFlag
+from typing import Dict
 
 API_ENDPOINT: str = "{}/httpapi.asp?command={}"
 API_TIMEOUT: int = 2
@@ -7,9 +8,11 @@ UPNP_DEVICE_TYPE = 'urn:schemas-upnp-org:device:MediaRenderer:1'
 
 
 class LinkPlayCommand(StrEnum):
+    """Defines the LinkPlay commands."""
     DEVICE_STATUS = "getStatus"
     SYSLOG = "getsyslog"
     UPDATE_SERVER = "GetUpdateServer"
+    REBOOT = "reboot"
     PLAYER_STATUS = "getPlayerStatus"
     NEXT = "setPlayerCmd:next"
     PREVIOUS = "setPlayerCmd:prev"
@@ -22,6 +25,9 @@ class LinkPlayCommand(StrEnum):
     PLAYLIST = "setPlayerCmd:playlist:uri:{}"
     PAUSE = "setPlayerCmd:pause"
     TOGGLE = "setPlayerCmd:onepause"
+    EQUALIZER_MODE = "setPlayerCmd:equalizer:{}"
+    LOOP_MODE = "setPlayerCmd:loopmode:{}"
+    SWITCH_MODE = "setPlayerCmd:switchmode:{}"
 
 
 class SpeakerType(StrEnum):
@@ -39,13 +45,71 @@ class ChannelType(StrEnum):
 
 class PlaybackMode(StrEnum):
     """Defines the playback mode."""
+    IDLE = "-1"
     NONE = "0"
-    WIIMU = "10"
-    HTTP = "20"
+    AIRPLAY = "1"
+    DLNA = "2"
+    QPLAY = "3",
+    NETWORK = "10"
+    WIIMU_LOCAL = "11"
+    WIIMU_STATION = "12"
+    WIIMU_RADIO = "13"
+    WIIMU_SONGLIST = "14"
+    TF_CARD_1 = "16"
+    WIIMU_MAX = "19"
+    API = "20"
+    UDISK = "21"
+    HTTP_MAX = "29"
+    ALARM = "30"
+    SPOTIFY = "31"
+    LINE_IN = "40"
+    BLUETOOTH = "41"
+    EXT_LOCAL = "42"
+    OPTICAL = "43"
+    RCA = "44"
+    CO_AXIAL = "45"
+    FM = "46"
+    LINE_IN_2 = "47"
+    XLR = "48"
+    HDMI = "49"
+    MIRROR = "50"
+    USB_DAC = "51"
+    TF_CARD_2 = "52"
+    TALK = "60"
+    SLAVE = "99"
+
+PLAYBACK_MODE_MAP: Dict[PlaybackMode, str] = {
+    PlaybackMode.IDLE: 'Idle',
+    PlaybackMode.NONE: 'Idle',
+    PlaybackMode.AIRPLAY: 'Airplay',
+    PlaybackMode.DLNA: 'DLNA',
+    PlaybackMode.QPLAY: 'QPlay',
+    PlaybackMode.NETWORK: 'Network',
+    PlaybackMode.WIIMU_LOCAL: 'udisk',
+    PlaybackMode.TF_CARD_1: 'TFcard',
+    PlaybackMode.API: 'API',
+    PlaybackMode.UDISK: 'udisk',
+    PlaybackMode.ALARM: 'Alarm',
+    PlaybackMode.SPOTIFY: 'Spotify',
+    PlaybackMode.LINE_IN: 'line-in',
+    PlaybackMode.BLUETOOTH: 'bluetooth',
+    PlaybackMode.OPTICAL: 'optical',
+    PlaybackMode.RCA: 'RCA',
+    PlaybackMode.CO_AXIAL: 'co-axial',
+    PlaybackMode.FM: 'FM',
+    PlaybackMode.LINE_IN_2: 'line-in2',
+    PlaybackMode.XLR: 'XLR',
+    PlaybackMode.HDMI: 'HDMI',
+    PlaybackMode.MIRROR: 'cd',
+    PlaybackMode.USB_DAC: 'USB DAC',
+    PlaybackMode.TF_CARD_2: 'TFcard',
+    PlaybackMode.TALK: 'Talk',
+    PlaybackMode.SLAVE: 'Idle'
+}
 
 
-class PlaylistMode(StrEnum):
-    """Defines the playlist mode."""
+class LoopMode(StrEnum):
+    """Defines the loop mode."""
     CONTINOUS_PLAY_ONE_SONG = "-1"
     PLAY_IN_ORDER = "0"
     CONTINUOUS_PLAYBACK = "1"
@@ -69,12 +133,27 @@ class PlayingStatus(StrEnum):
     STOPPED = "stop"
     PAUSED = "pause"
 
+
 class MuteMode(StrEnum):
+    """Defines the mute mode."""
     UNMUTED = "0"
     MUTED = "1"
 
 
-class PlayerStatus(StrEnum):
+class PlaymodeSupport(IntFlag):
+    """Defines which modes the player supports."""
+    LINE_IN = 1
+    BLUETOOTH = 2
+    USB = 4
+    OPTICAL = 8
+    UNKNOWN = 16
+    COAXIAL = 32
+    LINE_IN_2 = 64
+    USBDAC = 32768
+
+
+class PlayerAttribute(StrEnum):
+    """Defines the player attributes."""
     SPEAKER_TYPE = "type"
     CHANNEL_TYPE = "ch"
     PLAYBACK_MODE = "mode"
@@ -94,7 +173,8 @@ class PlayerStatus(StrEnum):
     MUTED = "mute"
 
 
-class DeviceStatus(StrEnum):
+class DeviceAttribute(StrEnum):
+    """Defines the device attributes."""
     UUID = "uuid"
     DEVICE_NAME = "DeviceName"
     GROUP_NAME = "GroupName"
@@ -145,7 +225,7 @@ class DeviceStatus(StrEnum):
     STREAMS_ALL = "streams_all"
     STREAMS = "streams"
     EXTERNAL = "external"
-    PLM_SUPPORT = "plm_support"
+    PLAYMODE_SUPPORT = "plm_support"
     PRESET_KEY = "preset_key"
     SPOTIFY_ACTIVE = "spotify_active"
     LBC_SUPPORT = "lbc_support"
