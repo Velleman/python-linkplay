@@ -50,7 +50,7 @@ class PlaybackMode(StrEnum):
     NONE = "0"
     AIRPLAY = "1"
     DLNA = "2"
-    QPLAY = "3",
+    QPLAY = "3"
     NETWORK = "10"
     WIIMU_LOCAL = "11"
     WIIMU_STATION = "12"
@@ -144,14 +144,14 @@ class MuteMode(StrEnum):
 
 class PlaymodeSupport(IntFlag):
     """Defines which modes the player supports."""
-    LINE_IN = 1
-    BLUETOOTH = 2
-    USB = 4
-    OPTICAL = 8
-    UNKNOWN = 16
-    COAXIAL = 32
-    LINE_IN_2 = 64
+    LINE_IN = 2
+    BLUETOOTH = 4
+    USB = 8
+    OPTICAL = 16
+    COAXIAL = 64
+    LINE_IN_2 = 256
     USBDAC = 32768
+    OPTICAL_2 = 262144
 
 
 class PlayerAttribute(StrEnum):

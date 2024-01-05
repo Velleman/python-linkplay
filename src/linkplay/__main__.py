@@ -2,13 +2,12 @@ import asyncio
 
 import aiohttp
 
-from linkplay.consts import EqualizerMode
-from linkplay.discovery import linkplay_factory_bridge
+from linkplay.discovery import discover_linkplay_devices
 
 
 async def main():
     async with aiohttp.ClientSession() as session:
-        pass
+        devices = await discover_linkplay_devices(session)
 
 if __name__ == "__main__":
     asyncio.run(main())

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List
 
 from aiohttp import ClientSession
 from async_upnp_client.search import async_search
@@ -9,7 +9,7 @@ from linkplay.bridge import LinkPlayBridge
 from linkplay.exceptions import LinkPlayRequestException
 
 
-async def linkplay_factory_bridge(ip_address: str, session: ClientSession) -> Optional[LinkPlayBridge]:
+async def linkplay_factory_bridge(ip_address: str, session: ClientSession) -> LinkPlayBridge | None:
     """Attempts to create a LinkPlayBridge from the given IP address.
     Returns None if the device is not an expected LinkPlay device."""
     bridge = LinkPlayBridge("http", ip_address, session)

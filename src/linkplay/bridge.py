@@ -4,6 +4,7 @@ from typing import Dict
 from aiohttp import ClientSession
 
 from linkplay.consts import (
+    ChannelType,
     LinkPlayCommand,
     DeviceAttribute,
     PlayerAttribute,
@@ -12,7 +13,9 @@ from linkplay.consts import (
     LoopMode,
     PlaybackMode,
     PLAYBACK_MODE_MAP,
-    PlaymodeSupport
+    PlayingStatus,
+    PlaymodeSupport,
+    SpeakerType
 )
 from linkplay.utils import session_call_api_json, session_call_api_ok, decode_hexstr
 
@@ -94,6 +97,7 @@ class LinkPlayPlayer():
     async def pause(self):
         """Pause the current playing track."""
         await self.bridge.request(LinkPlayCommand.PAUSE)
+        self.properties[PlayerAttribute.PLAYING_STATUS] = PlayingStatus.PAUSED
 
     async def toggle(self):
         """Start playing if the player is currently not playing. Stops playing if it is."""
@@ -143,6 +147,46 @@ class LinkPlayPlayer():
     def volume(self) -> int:
         """Returns the player volume, expressed in %."""
         return int(self.properties[PlayerAttribute.VOLUME])
+
+    @property
+    def current_position(self) -> int:
+        """Returns the current position of the track in milliseconds."""
+        return int(self.properties[PlayerAttribute.CURRENT_POSITION])
+
+    @property
+    def total_length(self) -> int:
+        """Returns the total length of the track in milliseconds."""
+        return int(self.properties[PlayerAttribute.TOTAL_LENGTH])
+
+    @property
+    def status(self) -> PlayingStatus:
+        """Returns the current playing status."""
+        return PlayingStatus(self.properties[PlayerAttribute.PLAYING_STATUS])
+
+    @property
+    def equalizer_mode(self) -> EqualizerMode:
+        """Returns the current equalizer mode."""
+        return EqualizerMode(self.properties[PlayerAttribute.EQUALIZER_MODE])
+
+    @property
+    def speaker_type(self) -> SpeakerType:
+        """Returns the current speaker the player is playing on."""
+        return SpeakerType(self.properties[PlayerAttribute.SPEAKER_TYPE])
+
+    @property
+    def channel_type(self) -> ChannelType:
+        """Returns the channel the player is playing on."""
+        return ChannelType(self.properties[PlayerAttribute.CHANNEL_TYPE])
+
+    @property
+    def playback_mode(self) -> PlaybackMode:
+        """Returns the channel the player is playing on."""
+        return PlaybackMode(self.properties[PlayerAttribute.PLAYBACK_MODE])
+
+    @property
+    def loop_mode(self) -> LoopMode:
+        """Returns the current playlist mode."""
+        return LoopMode(self.properties[PlayerAttribute.PLAYLIST_MODE])
 
 
 class LinkPlayBridge():
