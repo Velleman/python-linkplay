@@ -30,6 +30,12 @@ class LinkPlayCommand(StrEnum):
     SWITCH_MODE = "setPlayerCmd:switchmode:{}"
     M3U_PLAYLIST = "setPlayerCmd:m3u:play:{}"
     MULTIROOM_LIST = "multiroom:getSlaveList"
+    MULTIROOM_UNGROUP = "multiroom:ungroup"
+    MULTIROOM_KICK = "multiroom:SlaveKickout:{}"
+    MULTIROOM_VOL = "setPlayerCmd:slave_vol:{}"
+    MULTIROOM_MUTE = "setPlayerCmd:slave_mute:mute"
+    MULTIROOM_UNMUTE = "setPlayerCmd:slave_mute:unmute"
+    MULTIROOM_JOIN = "ConnectMasterAp:JoinGroupMaster:eth{}:wifi0.0.0.0"
 
 
 class SpeakerType(StrEnum):
@@ -257,6 +263,7 @@ class DeviceAttribute(StrEnum):
     ETH_MAC_ADDRESS = "ETH_MAC"
     SECURITY = "security"
     SECURITY_VERSION = "security_version"
+
 
 class MultiroomAttribute(StrEnum):
     """Defines the player attributes."""

@@ -52,6 +52,11 @@ class LinkPlayDevice():
         """Returns the player playmode support."""
         return PlaymodeSupport(int(self.properties[DeviceAttribute.PLAYMODE_SUPPORT], base=16))
 
+    @property
+    def eth(self) -> str:
+        """Returns the ethernet address."""
+        return self.properties[DeviceAttribute.ETH_DHCP]
+
 
 class LinkPlayPlayer():
     """Represents a LinkPlay player."""
@@ -119,14 +124,17 @@ class LinkPlayPlayer():
     async def set_equalizer_mode(self, mode: EqualizerMode):
         """Set the equalizer mode."""
         await self.bridge.request(LinkPlayCommand.EQUALIZER_MODE.format(mode))  # type: ignore[str-format]
+        self.properties[PlayerAttribute.EQUALIZER_MODE] = mode
 
     async def set_loop_mode(self, mode: LoopMode):
         """Set the loop mode."""
         await self.bridge.request(LinkPlayCommand.LOOP_MODE.format(mode))  # type: ignore[str-format]
+        self.properties[PlayerAttribute.PLAYLIST_MODE] = mode
 
     async def set_play_mode(self, mode: PlaybackMode):
         """Set the play mode."""
         await self.bridge.request(LinkPlayCommand.SWITCH_MODE.format(PLAYBACK_MODE_MAP[mode]))  # type: ignore[str-format]
+        self.properties[PlayerAttribute.PLAYBACK_MODE] = mode
 
     @property
     def muted(self) -> bool:
@@ -195,7 +203,7 @@ class LinkPlayPlayer():
 
 
 class LinkPlayBridge():
-    """Represents a LinkPlay device."""
+    """Represents a LinkPlay bridge to control the device and player attached to it."""
 
     protocol: str
     ip_address: str
@@ -231,7 +239,8 @@ class LinkPlayBridge():
 
 
 class LinkPlayMultiroom():
-    """Represents a LinkPlay multiroom."""
+    """Represents a LinkPlay multiroom group. Contains a leader and a list of followers.
+    The leader is the device that controls the group."""
 
     leader: LinkPlayBridge
     followers: List[LinkPlayBridge]
@@ -239,3 +248,35 @@ class LinkPlayMultiroom():
     def __init__(self, leader: LinkPlayBridge, followers: List[LinkPlayBridge]):
         self.leader = leader
         self.followers = followers
+
+    async def ungroup(self):
+        """Ungroups the multiroom group."""
+        await self.leader.request(LinkPlayCommand.MULTIROOM_UNGROUP)
+        self.followers = []
+
+    async def add_follower(self, follower: LinkPlayBridge):
+        """Adds a follower to the multiroom group."""
+        await follower.request(LinkPlayCommand.MULTIROOM_JOIN.format(self.leader.device.eth))  # type: ignore[str-format]
+        self.followers.append(follower)
+
+    async def remove_follower(self, follower: LinkPlayBridge):
+        """Removes a follower from the multiroom group."""
+        await self.leader.request(LinkPlayCommand.MULTIROOM_KICK.format(follower.device.eth))  # type: ignore[str-format]
+        self.followers.remove(follower)
+
+    async def set_volume(self, value: int):
+        """Sets the volume for the multiroom group."""
+        assert 0 < value <= 100
+        str_vol = str(value)
+        await self.leader.request(LinkPlayCommand.MULTIROOM_VOL.format(str_vol))  # type: ignore[str-format]
+
+        for bridge in [self.leader] + self.followers:
+            bridge.player.properties[PlayerAttribute.VOLUME] = str_vol
+
+    async def mute(self):
+        """Mutes the multiroom group."""
+        await self.leader.request(LinkPlayCommand.MULTIROOM_MUTE)
+
+    async def unmute(self):
+        """Unmutes the multiroom group."""
+        await self.leader.request(LinkPlayCommand.MULTIROOM_UNMUTE)
