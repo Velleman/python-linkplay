@@ -55,8 +55,7 @@ async def discover_multirooms(bridges: List[LinkPlayBridge]) -> List[LinkPlayMul
         followers: List[LinkPlayBridge] = []
         for follower in properties[MultiroomAttribute.FOLLOWER_LIST]:
             follower_uuid = follower[MultiroomAttribute.UUID]
-            follower_bridge = next((b for b in bridges if b.device.uuid == follower_uuid), None)
-            if follower_bridge:
+            if follower_bridge := next((b for b in bridges if b.device.uuid == follower_uuid), None):
                 followers.append(follower_bridge)
 
         multirooms.append(LinkPlayMultiroom(bridge, followers))
