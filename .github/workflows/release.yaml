@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Update version
         run: |
-          echo "__version__ = '"${{ github.event.inputs.version }}'" > src/linkplay/__version__.py
+          echo "__version__ = '${{ github.event.inputs.version }}'" > src/linkplay/__version__.py
       - uses: actions/setup-python@v5
         with:
           python-version: 3.11
