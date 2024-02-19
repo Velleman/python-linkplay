@@ -18,6 +18,7 @@ jobs:
       url: https://pypi.org/p/python-linkplay
     permissions:
       id-token: write
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - name: Update version
