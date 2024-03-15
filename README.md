@@ -1,7 +1,6 @@
 
 [![PyPI package](https://badge.fury.io/py/python-linkplay.svg)](https://pypi.org/project/python-linkplay/)
-
-[![Release](https://github.com/velleman/python-linkplay/actions/workflows/release/badge.svg)](https://github.com/velleman/python-linkplay/actions/workflows/release.yaml)
+[![Release](https://github.com/velleman/python-linkplay/actions/workflows/release.yaml/badge.svg)](https://github.com/velleman/python-linkplay/actions/workflows/release.yaml)
 
 # python-linkplay
 A Python Library for Seamless LinkPlay Device Control
