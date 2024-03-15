@@ -1,5 +1,4 @@
 from enum import StrEnum, IntFlag
-from typing import Dict
 
 API_ENDPOINT: str = "{}/httpapi.asp?command={}"
 API_TIMEOUT: int = 2
@@ -51,8 +50,8 @@ class ChannelType(StrEnum):
     RIGHT_CHANNEL = "2"
 
 
-class PlaybackMode(StrEnum):
-    """Defines the playback mode."""
+class PlayingMode(StrEnum):
+    """Defines a possible playing mode."""
     IDLE = "-1"
     NONE = "0"
     AIRPLAY = "1"
@@ -75,7 +74,7 @@ class PlaybackMode(StrEnum):
     EXT_LOCAL = "42"
     OPTICAL = "43"
     RCA = "44"
-    CO_AXIAL = "45"
+    COAXIAL = "45"
     FM = "46"
     LINE_IN_2 = "47"
     XLR = "48"
@@ -83,37 +82,39 @@ class PlaybackMode(StrEnum):
     MIRROR = "50"
     USB_DAC = "51"
     TF_CARD_2 = "52"
+    OPTICAL_2 = "56"
     TALK = "60"
     SLAVE = "99"
 
 
-PLAYBACK_MODE_MAP: Dict[PlaybackMode, str] = {
-    PlaybackMode.IDLE: 'Idle',
-    PlaybackMode.NONE: 'Idle',
-    PlaybackMode.AIRPLAY: 'Airplay',
-    PlaybackMode.DLNA: 'DLNA',
-    PlaybackMode.QPLAY: 'QPlay',
-    PlaybackMode.NETWORK: 'wifi',
-    PlaybackMode.WIIMU_LOCAL: 'udisk',
-    PlaybackMode.TF_CARD_1: 'TFcard',
-    PlaybackMode.API: 'API',
-    PlaybackMode.UDISK: 'udisk',
-    PlaybackMode.ALARM: 'Alarm',
-    PlaybackMode.SPOTIFY: 'Spotify',
-    PlaybackMode.LINE_IN: 'line-in',
-    PlaybackMode.BLUETOOTH: 'bluetooth',
-    PlaybackMode.OPTICAL: 'optical',
-    PlaybackMode.RCA: 'RCA',
-    PlaybackMode.CO_AXIAL: 'co-axial',
-    PlaybackMode.FM: 'FM',
-    PlaybackMode.LINE_IN_2: 'line-in2',
-    PlaybackMode.XLR: 'XLR',
-    PlaybackMode.HDMI: 'HDMI',
-    PlaybackMode.MIRROR: 'cd',
-    PlaybackMode.USB_DAC: 'USB DAC',
-    PlaybackMode.TF_CARD_2: 'TFcard',
-    PlaybackMode.TALK: 'Talk',
-    PlaybackMode.SLAVE: 'Idle'
+# Map between a play mode and how to activate the play mode
+PLAY_MODE_SEND_MAP: dict[PlayingMode, str] = {     # case sensitive!
+    PlayingMode.NONE: 'Idle',
+    PlayingMode.AIRPLAY: 'Airplay',
+    PlayingMode.DLNA: 'DLNA',
+    PlayingMode.QPLAY: 'QPlay',
+    PlayingMode.NETWORK: 'wifi',
+    PlayingMode.WIIMU_LOCAL: 'udisk',
+    PlayingMode.TF_CARD_1: 'TFcard',
+    PlayingMode.API: 'API',
+    PlayingMode.UDISK: 'udisk',
+    PlayingMode.ALARM: 'Alarm',
+    PlayingMode.SPOTIFY: 'Spotify',
+    PlayingMode.LINE_IN: 'line-in',
+    PlayingMode.BLUETOOTH: 'bluetooth',
+    PlayingMode.OPTICAL: 'optical',
+    PlayingMode.RCA: 'RCA',
+    PlayingMode.COAXIAL: 'co-axial',
+    PlayingMode.FM: 'FM',
+    PlayingMode.LINE_IN_2: 'line-in2',
+    PlayingMode.XLR: 'XLR',
+    PlayingMode.HDMI: 'HDMI',
+    PlayingMode.MIRROR: 'cd',
+    PlayingMode.USB_DAC: 'USB DAC',
+    PlayingMode.TF_CARD_2: 'TFcard',
+    PlayingMode.TALK: 'Talk',
+    PlayingMode.SLAVE: 'Idle',
+    PlayingMode.OPTICAL_2: 'optical2'
 }
 
 
@@ -124,6 +125,7 @@ class LoopMode(StrEnum):
     CONTINUOUS_PLAYBACK = "1"
     RANDOM_PLAYBACK = "2"
     LIST_CYCLE = "3"
+    FOUR = "4"
 
 
 class EqualizerMode(StrEnum):
@@ -149,16 +151,29 @@ class MuteMode(StrEnum):
     MUTED = "1"
 
 
-class PlaymodeSupport(IntFlag):
-    """Defines which modes the player supports."""
+class InputMode(IntFlag):
+    """Defines which inputs the player supports."""
     LINE_IN = 2
     BLUETOOTH = 4
     USB = 8
     OPTICAL = 16
     COAXIAL = 64
     LINE_IN_2 = 256
-    USBDAC = 32768
+    USB_DAC = 32768
     OPTICAL_2 = 262144
+
+
+# Map between the input modes and the play mode
+INPUT_MODE_MAP: dict[InputMode, PlayingMode] = {
+    InputMode.LINE_IN: PlayingMode.LINE_IN,
+    InputMode.BLUETOOTH: PlayingMode.BLUETOOTH,
+    InputMode.USB: PlayingMode.UDISK,
+    InputMode.OPTICAL: PlayingMode.OPTICAL,
+    InputMode.COAXIAL: PlayingMode.COAXIAL,
+    InputMode.LINE_IN_2: PlayingMode.LINE_IN_2,
+    InputMode.USB_DAC: PlayingMode.USB_DAC,
+    InputMode.OPTICAL_2: PlayingMode.OPTICAL_2
+}
 
 
 class PlayerAttribute(StrEnum):

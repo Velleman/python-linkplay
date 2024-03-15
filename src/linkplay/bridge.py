@@ -10,11 +10,12 @@ from linkplay.consts import (
     MuteMode,
     EqualizerMode,
     LoopMode,
-    PlaybackMode,
-    PLAYBACK_MODE_MAP,
+    PLAY_MODE_SEND_MAP,
     PlayingStatus,
-    PlaymodeSupport,
-    SpeakerType
+    InputMode,
+    SpeakerType,
+    PlayingMode,
+    INPUT_MODE_MAP
 )
 from linkplay.utils import session_call_api_json, session_call_api_ok, decode_hexstr
 
@@ -47,9 +48,11 @@ class LinkPlayDevice():
         return self.properties[DeviceAttribute.DEVICE_NAME]
 
     @property
-    def playmode_support(self) -> PlaymodeSupport:
+    def playmode_support(self) -> list[PlayingMode]:
         """Returns the player playmode support."""
-        return PlaymodeSupport(int(self.properties[DeviceAttribute.PLAYMODE_SUPPORT], base=16))
+
+        flags = InputMode(int(self.properties[DeviceAttribute.PLAYMODE_SUPPORT], base=16))
+        return [INPUT_MODE_MAP[flag] for flag in flags]
 
     @property
     def eth(self) -> str:
@@ -118,22 +121,18 @@ class LinkPlayPlayer():
             raise ValueError("Volume must be between 0 and 100.")
 
         await self.bridge.request(LinkPlayCommand.VOLUME.format(value))  # type: ignore[str-format]
-        self.properties[PlayerAttribute.VOLUME] = str(value)
 
     async def set_equalizer_mode(self, mode: EqualizerMode):
         """Set the equalizer mode."""
         await self.bridge.request(LinkPlayCommand.EQUALIZER_MODE.format(mode))  # type: ignore[str-format]
-        self.properties[PlayerAttribute.EQUALIZER_MODE] = mode
 
     async def set_loop_mode(self, mode: LoopMode):
         """Set the loop mode."""
         await self.bridge.request(LinkPlayCommand.LOOP_MODE.format(mode))  # type: ignore[str-format]
-        self.properties[PlayerAttribute.PLAYLIST_MODE] = mode
 
-    async def set_play_mode(self, mode: PlaybackMode):
+    async def set_play_mode(self, mode: PlayingMode):
         """Set the play mode."""
-        await self.bridge.request(LinkPlayCommand.SWITCH_MODE.format(PLAYBACK_MODE_MAP[mode]))  # type: ignore[str-format]
-        self.properties[PlayerAttribute.PLAYBACK_MODE] = mode
+        await self.bridge.request(LinkPlayCommand.SWITCH_MODE.format(PLAY_MODE_SEND_MAP[mode]))  # type: ignore[str-format]
 
     @property
     def muted(self) -> bool:
@@ -191,9 +190,9 @@ class LinkPlayPlayer():
         return ChannelType(self.properties[PlayerAttribute.CHANNEL_TYPE])
 
     @property
-    def playback_mode(self) -> PlaybackMode:
-        """Returns the channel the player is playing on."""
-        return PlaybackMode(self.properties[PlayerAttribute.PLAYBACK_MODE])
+    def play_mode(self) -> PlayingMode:
+        """Returns the current playing mode of the player."""
+        return PlayingMode(self.properties[PlayerAttribute.PLAYBACK_MODE])
 
     @property
     def loop_mode(self) -> LoopMode:

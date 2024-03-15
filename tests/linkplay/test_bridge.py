@@ -11,11 +11,11 @@ from linkplay.consts import (
     LinkPlayCommand,
     DeviceAttribute,
     LoopMode,
-    PlaybackMode,
+    PlayingMode,
     PlayerAttribute,
     MuteMode,
     PlayingStatus,
-    PLAYBACK_MODE_MAP
+    PLAY_MODE_SEND_MAP
 )
 
 
@@ -165,7 +165,6 @@ async def test_player_set_volume():
     await player.set_volume(100)
 
     bridge.request.assert_called_once_with(LinkPlayCommand.VOLUME.format(100))
-    assert player.volume == 100
 
 
 async def test_player_set_equalizer_mode():
@@ -177,7 +176,6 @@ async def test_player_set_equalizer_mode():
     await player.set_equalizer_mode(mode)
 
     bridge.request.assert_called_once_with(LinkPlayCommand.EQUALIZER_MODE.format(mode))
-    assert mode == player.equalizer_mode
 
 
 async def test_player_set_loop_mode():
@@ -189,20 +187,18 @@ async def test_player_set_loop_mode():
     await player.set_loop_mode(mode)
 
     bridge.request.assert_called_once_with(LinkPlayCommand.LOOP_MODE.format(mode))
-    assert mode == player.loop_mode
 
 
 async def test_player_set_play_mode():
     """Tests if the player set play mode is correctly called."""
     bridge = AsyncMock()
     player = LinkPlayPlayer(bridge)
-    mode = PlaybackMode.NETWORK
-    mode_conv = PLAYBACK_MODE_MAP[mode]
+    mode = PlayingMode.NETWORK
+    mode_conv = PLAY_MODE_SEND_MAP[mode]
 
     await player.set_play_mode(mode)
 
     bridge.request.assert_called_once_with(LinkPlayCommand.SWITCH_MODE.format(mode_conv))
-    assert mode == player.playback_mode
 
 
 async def test_multiroom_setup():
