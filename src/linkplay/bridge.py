@@ -33,7 +33,7 @@ class LinkPlayDevice():
         """Update the device status."""
         self.properties = await self.bridge.json_request(LinkPlayCommand.DEVICE_STATUS)  # type: ignore[assignment]
 
-    async def reboot(self):
+    async def reboot(self) -> None:
         """Reboot the device."""
         await self.bridge.request(LinkPlayCommand.REBOOT)
 
@@ -69,68 +69,68 @@ class LinkPlayPlayer():
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
 
-    async def update_status(self):
+    async def update_status(self) -> None:
         """Update the player status."""
         self.properties = await self.bridge.json_request(LinkPlayCommand.PLAYER_STATUS)  # type: ignore[assignment]
         self.properties[PlayerAttribute.TITLE] = decode_hexstr(self.title)
         self.properties[PlayerAttribute.ARTIST] = decode_hexstr(self.artist)
         self.properties[PlayerAttribute.ALBUM] = decode_hexstr(self.album)
 
-    async def next(self):
+    async def next(self) -> None:
         """Play the next song in the playlist."""
         await self.bridge.request(LinkPlayCommand.NEXT)
 
-    async def previous(self):
+    async def previous(self) -> None:
         """Play the previous song in the playlist."""
         await self.bridge.request(LinkPlayCommand.PREVIOUS)
 
-    async def play(self, value: str):
+    async def play(self, value: str) -> None:
         """Start playing the selected track."""
         await self.bridge.request(LinkPlayCommand.PLAY.format(value))  # type: ignore[str-format]
 
-    async def resume(self):
+    async def resume(self) -> None:
         """Resume playing the current track."""
         await self.bridge.request(LinkPlayCommand.RESUME)
 
-    async def mute(self):
+    async def mute(self) -> None:
         """Mute the player."""
         await self.bridge.request(LinkPlayCommand.MUTE)
         self.properties[PlayerAttribute.MUTED] = MuteMode.MUTED
 
-    async def unmute(self):
+    async def unmute(self) -> None:
         """Unmute the player."""
         await self.bridge.request(LinkPlayCommand.UNMUTE)
         self.properties[PlayerAttribute.MUTED] = MuteMode.UNMUTED
 
-    async def play_playlist(self, index: int):
+    async def play_playlist(self, index: int) -> None:
         """Start playing chosen playlist by index number."""
         await self.bridge.request(LinkPlayCommand.PLAYLIST.format(index))  # type: ignore[str-format]
 
-    async def pause(self):
+    async def pause(self) -> None:
         """Pause the current playing track."""
         await self.bridge.request(LinkPlayCommand.PAUSE)
         self.properties[PlayerAttribute.PLAYING_STATUS] = PlayingStatus.PAUSED
 
-    async def toggle(self):
+    async def toggle(self) -> None:
         """Start playing if the player is currently not playing. Stops playing if it is."""
         await self.bridge.request(LinkPlayCommand.TOGGLE)
 
-    async def set_volume(self, value: int):
+    async def set_volume(self, value: int) -> None:
         """Set the player volume."""
         if not 0 <= value <= 100:
             raise ValueError("Volume must be between 0 and 100.")
 
         await self.bridge.request(LinkPlayCommand.VOLUME.format(value))  # type: ignore[str-format]
 
-    async def set_equalizer_mode(self, mode: EqualizerMode):
+    async def set_equalizer_mode(self, mode: EqualizerMode) -> None:
         """Set the equalizer mode."""
         await self.bridge.request(LinkPlayCommand.EQUALIZER_MODE.format(mode))  # type: ignore[str-format]
 
-    async def set_loop_mode(self, mode: LoopMode):
+    async def set_loop_mode(self, mode: LoopMode) -> None:
         """Set the loop mode."""
         await self.bridge.request(LinkPlayCommand.LOOP_MODE.format(mode))  # type: ignore[str-format]
 
-    async def set_play_mode(self, mode: PlayingMode):
+    async def set_play_mode(self, mode: PlayingMode) -> None:
         """Set the play mode."""
         await self.bridge.request(LinkPlayCommand.SWITCH_MODE.format(PLAY_MODE_SEND_MAP[mode]))  # type: ignore[str-format]
 
@@ -247,22 +247,22 @@ class LinkPlayMultiroom():
         self.leader = leader
         self.followers = followers
 
-    async def ungroup(self):
+    async def ungroup(self) -> None:
         """Ungroups the multiroom group."""
         await self.leader.request(LinkPlayCommand.MULTIROOM_UNGROUP)
         self.followers = []
 
-    async def add_follower(self, follower: LinkPlayBridge):
+    async def add_follower(self, follower: LinkPlayBridge) -> None:
         """Adds a follower to the multiroom group."""
         await follower.request(LinkPlayCommand.MULTIROOM_JOIN.format(self.leader.device.eth))  # type: ignore[str-format]
         self.followers.append(follower)
 
-    async def remove_follower(self, follower: LinkPlayBridge):
+    async def remove_follower(self, follower: LinkPlayBridge) -> None:
         """Removes a follower from the multiroom group."""
         await self.leader.request(LinkPlayCommand.MULTIROOM_KICK.format(follower.device.eth))  # type: ignore[str-format]
         self.followers.remove(follower)
 
-    async def set_volume(self, value: int):
+    async def set_volume(self, value: int) -> None:
         """Sets the volume for the multiroom group."""
         assert 0 < value <= 100
         str_vol = str(value)
@@ -271,10 +271,10 @@ class LinkPlayMultiroom():
         for bridge in [self.leader] + self.followers:
             bridge.player.properties[PlayerAttribute.VOLUME] = str_vol
 
-    async def mute(self):
+    async def mute(self) -> None:
         """Mutes the multiroom group."""
         await self.leader.request(LinkPlayCommand.MULTIROOM_MUTE)
 
-    async def unmute(self):
+    async def unmute(self) -> None:
         """Unmutes the multiroom group."""
         await self.leader.request(LinkPlayCommand.MULTIROOM_UNMUTE)

@@ -10,7 +10,7 @@ from linkplay.consts import API_ENDPOINT, API_TIMEOUT
 from linkplay.exceptions import LinkPlayRequestException
 
 
-async def session_call_api(endpoint: str, session: ClientSession, command: str):
+async def session_call_api(endpoint: str, session: ClientSession, command: str) -> str:
     """Calls the LinkPlay API and returns the result as a string.
 
     Args:
@@ -46,7 +46,7 @@ async def session_call_api_json(endpoint: str, session: ClientSession,
     return json.loads(result)  # type: ignore
 
 
-async def session_call_api_ok(endpoint: str, session: ClientSession, command: str):
+async def session_call_api_ok(endpoint: str, session: ClientSession, command: str) -> None:
     """Calls the LinkPlay API and checks if the response is OK. Throws exception if not."""
     result = await session_call_api(endpoint, session, command)
 
