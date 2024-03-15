@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from aiohttp import ClientSession
 from async_upnp_client.search import async_search
@@ -21,9 +21,9 @@ async def linkplay_factory_bridge(ip_address: str, session: ClientSession) -> Li
     return bridge
 
 
-async def discover_linkplay_bridges(session: ClientSession) -> List[LinkPlayBridge]:
+async def discover_linkplay_bridges(session: ClientSession) -> list[LinkPlayBridge]:
     """Attempts to discover LinkPlay devices on the local network."""
-    devices: List[LinkPlayBridge] = []
+    devices: list[LinkPlayBridge] = []
 
     async def add_linkplay_device_to_list(upnp_device: CaseInsensitiveDict):
         ip_address: str | None = upnp_device.get('_host')
@@ -42,17 +42,17 @@ async def discover_linkplay_bridges(session: ClientSession) -> List[LinkPlayBrid
     return devices
 
 
-async def discover_multirooms(bridges: List[LinkPlayBridge]) -> List[LinkPlayMultiroom]:
+async def discover_multirooms(bridges: list[LinkPlayBridge]) -> list[LinkPlayMultiroom]:
     """Discovers multirooms through the list of provided bridges."""
-    multirooms: List[LinkPlayMultiroom] = []
+    multirooms: list[LinkPlayMultiroom] = []
 
     for bridge in bridges:
-        properties: Dict[Any, Any] = await bridge.json_request(LinkPlayCommand.MULTIROOM_LIST)
+        properties: dict[Any, Any] = await bridge.json_request(LinkPlayCommand.MULTIROOM_LIST)
 
         if int(properties[MultiroomAttribute.NUM_FOLLOWERS]) == 0:
             continue
 
-        followers: List[LinkPlayBridge] = []
+        followers: list[LinkPlayBridge] = []
         for follower in properties[MultiroomAttribute.FOLLOWER_LIST]:
             follower_uuid = follower[MultiroomAttribute.UUID]
             if follower_bridge := next((b for b in bridges if b.device.uuid == follower_uuid), None):

@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import Dict, List
 
 from aiohttp import ClientSession
 
@@ -24,7 +23,7 @@ class LinkPlayDevice():
     """Represents a LinkPlay device."""
 
     bridge: LinkPlayBridge
-    properties: Dict[DeviceAttribute, str] = dict.fromkeys(DeviceAttribute.__members__.values(), "")
+    properties: dict[DeviceAttribute, str] = dict.fromkeys(DeviceAttribute.__members__.values(), "")
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
@@ -62,7 +61,7 @@ class LinkPlayPlayer():
     """Represents a LinkPlay player."""
 
     bridge: LinkPlayBridge
-    properties: Dict[PlayerAttribute, str] = dict.fromkeys(PlayerAttribute.__members__.values(), "")
+    properties: dict[PlayerAttribute, str] = dict.fromkeys(PlayerAttribute.__members__.values(), "")
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
@@ -229,7 +228,7 @@ class LinkPlayBridge():
         """Returns the current player endpoint."""
         return f"{self.protocol}://{self.ip_address}"
 
-    async def json_request(self, command: str) -> Dict[str, str]:
+    async def json_request(self, command: str) -> dict[str, str]:
         """Performs a GET request on the given command and returns the result as a JSON object."""
         return await session_call_api_json(self.endpoint, self.session, command)
 
@@ -243,9 +242,9 @@ class LinkPlayMultiroom():
     The leader is the device that controls the group."""
 
     leader: LinkPlayBridge
-    followers: List[LinkPlayBridge]
+    followers: list[LinkPlayBridge]
 
-    def __init__(self, leader: LinkPlayBridge, followers: List[LinkPlayBridge]):
+    def __init__(self, leader: LinkPlayBridge, followers: list[LinkPlayBridge]):
         self.leader = leader
         self.followers = followers
 
