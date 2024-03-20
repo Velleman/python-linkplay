@@ -63,7 +63,7 @@ async def discover_multirooms(bridges: list[LinkPlayBridge]) -> list[LinkPlayMul
         followers: list[LinkPlayBridge] = []
         for follower in properties[MultiroomAttribute.FOLLOWER_LIST]:
             if follower[MultiroomAttribute.UUID] in bridges_dict:
-                followers.append(bridges_dict[MultiroomAttribute.UUID])
+                followers.append(bridges_dict[follower[MultiroomAttribute.UUID]])
 
         multirooms.append(LinkPlayMultiroom(bridge, followers))
 
