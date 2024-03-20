@@ -285,3 +285,4 @@ class MultiroomAttribute(StrEnum):
     NUM_FOLLOWERS = "slaves"
     FOLLOWER_LIST = "slave_list"
     UUID = "uuid"
+    IP = "ip"
