@@ -56,4 +56,7 @@ async def session_call_api_ok(endpoint: str, session: ClientSession, command: st
 
 def decode_hexstr(hexstr: str) -> str:
     """Decode a hex string."""
-    return bytes.fromhex(hexstr).decode("utf-8")
+    try:
+        return bytes.fromhex(hexstr).decode("utf-8")
+    except ValueError:
+        return hexstr
