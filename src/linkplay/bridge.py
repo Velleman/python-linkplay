@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from typing import Any
 from aiohttp import ClientSession
 
 from linkplay.consts import (
@@ -15,8 +15,10 @@ from linkplay.consts import (
     InputMode,
     SpeakerType,
     PlayingMode,
-    INPUT_MODE_MAP
+    INPUT_MODE_MAP,
+    MultiroomAttribute
 )
+
 from linkplay.utils import session_call_api_json, session_call_api_ok, decode_hexstr
 
 
@@ -243,9 +245,21 @@ class LinkPlayMultiroom():
     leader: LinkPlayBridge
     followers: list[LinkPlayBridge]
 
-    def __init__(self, leader: LinkPlayBridge, followers: list[LinkPlayBridge]):
+    def __init__(self, leader: LinkPlayBridge):
         self.leader = leader
-        self.followers = followers
+        self.followers = []
+
+    async def update_status(self, bridges: list[LinkPlayBridge]) -> None:
+        """Updates the multiroom status."""
+        properties: dict[Any, Any] = await self.leader.json_request(LinkPlayCommand.MULTIROOM_LIST)
+
+        self.followers = []
+        if int(properties[MultiroomAttribute.NUM_FOLLOWERS]) == 0:
+            return
+
+        follower_uuids = [follower[MultiroomAttribute.UUID] for follower in properties[MultiroomAttribute.FOLLOWER_LIST]]
+        new_followers = [bridge for bridge in bridges if bridge.device.uuid in follower_uuids]
+        self.followers.extend(new_followers)
 
     async def ungroup(self) -> None:
         """Ungroups the multiroom group."""
