@@ -16,7 +16,7 @@ class LinkPlayController():
         self.bridges = []
         self.multirooms = []
 
-    async def discover(self) -> None:
+    async def discover_bridges(self) -> None:
         """Attempts to discover LinkPlay devices on the local network."""
 
         # Discover new bridges
@@ -25,10 +25,30 @@ class LinkPlayController():
         new_bridges = [discovered_bridge for discovered_bridge in discovered_bridges if discovered_bridge.device.uuid not in current_bridges]
         self.bridges.extend(new_bridges)
 
-        # Create new multirooms
-        for new_bridge in new_bridges:
-            self.multirooms.append(LinkPlayMultiroom(new_bridge))
+    async def discover_multirooms(self) -> None:
+        """Attempts to discover multirooms on the local network."""
 
-        # Update multirooms
+        # Create new multirooms from new bridges
+        new_multirooms = []
+        for bridge in self.bridges:
+            has_multiroom = any(multiroom for multiroom in self.multirooms if multiroom.leader == bridge)
+
+            if has_multiroom:
+                continue
+
+            multiroom = LinkPlayMultiroom(bridge)
+            await multiroom.update_status(self.bridges)
+            if len(multiroom.followers) > 0:
+                new_multirooms.append(multiroom)
+
+        # Update existing multirooms
         for multiroom in self.multirooms:
             await multiroom.update_status(self.bridges)
+
+        # Remove multirooms if they have no followers
+        empty_multirooms = [multiroom for multiroom in self.multirooms if not multiroom.followers]
+        for empty_multiroom in empty_multirooms:
+            self.multirooms.remove(empty_multiroom)
+
+        # Add new multirooms
+        self.multirooms.extend(new_multirooms)
