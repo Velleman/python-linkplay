@@ -204,24 +204,35 @@ async def test_player_set_play_mode():
 async def test_multiroom_setup():
     """Tests if multiroom sets up correctly."""
     leader = AsyncMock()
-    followers = [AsyncMock(), AsyncMock()]
 
-    multiroom = LinkPlayMultiroom(leader, followers)
+    multiroom = LinkPlayMultiroom(leader)
 
     assert multiroom.leader == leader
-    assert multiroom.followers == followers
+    assert not multiroom.followers
+
+
+async def test_multiroom_update_status():
+    """Tests if MultiRoom update status works correctly."""
+    leader = AsyncMock()
+    bridges = [leader, AsyncMock()]
+    multiroom = LinkPlayMultiroom(leader)
+
+    await multiroom.update_status(bridges)
+
+    leader.json_request.assert_called_once_with(LinkPlayCommand.MULTIROOM_LIST)
+    assert multiroom.leader == leader
 
 
 async def test_multiroom_ungroup():
     """Tests if multiroom ungroup is correctly called on the leader."""
     leader = AsyncMock()
-    followers = [AsyncMock()]
-    multiroom = LinkPlayMultiroom(leader, followers)
+    multiroom = LinkPlayMultiroom(leader)
+    multiroom.followers = [AsyncMock()]
 
     await multiroom.ungroup()
 
     leader.request.assert_called_once_with(LinkPlayCommand.MULTIROOM_UNGROUP)
-    assert multiroom.followers == []
+    assert not multiroom.followers
 
 
 async def test_multiroom_add_follower():
@@ -229,7 +240,7 @@ async def test_multiroom_add_follower():
     leader = AsyncMock()
     leader.device.eth = "1.2.3.4"
     follower = AsyncMock()
-    multiroom = LinkPlayMultiroom(leader, [])
+    multiroom = LinkPlayMultiroom(leader)
 
     await multiroom.add_follower(follower)
 
@@ -242,18 +253,19 @@ async def test_multiroom_remove_follower():
     leader = AsyncMock()
     follower = AsyncMock()
     follower.device.eth = "1.2.3.4"
-    multiroom = LinkPlayMultiroom(leader, [follower])
+    multiroom = LinkPlayMultiroom(leader)
+    multiroom.followers = [follower]
 
     await multiroom.remove_follower(follower)
 
     leader.request.assert_called_once_with(LinkPlayCommand.MULTIROOM_KICK.format(follower.device.eth))
-    assert multiroom.followers == []
+    assert not multiroom.followers
 
 
 async def test_multiroom_mute():
     """Tests if multiroom mute is correctly called on the leader."""
     leader = AsyncMock()
-    multiroom = LinkPlayMultiroom(leader, [])
+    multiroom = LinkPlayMultiroom(leader)
 
     await multiroom.mute()
 
@@ -263,7 +275,7 @@ async def test_multiroom_mute():
 async def test_multiroom_unmute():
     """Tests if multiroom unmute is correctly called on the leader."""
     leader = AsyncMock()
-    multiroom = LinkPlayMultiroom(leader, [])
+    multiroom = LinkPlayMultiroom(leader)
 
     await multiroom.unmute()
 
@@ -273,7 +285,7 @@ async def test_multiroom_unmute():
 async def test_multiroom_set_volume():
     """Tests if multiroom set volume is correctly called on the leader."""
     leader = AsyncMock()
-    multiroom = LinkPlayMultiroom(leader, [AsyncMock()])
+    multiroom = LinkPlayMultiroom(leader)
 
     await multiroom.set_volume(100)
 
