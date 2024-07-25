@@ -16,5 +16,6 @@ async def main():
         for multiroom in controller.multirooms:
             print(multiroom.followers)
 
+
 if __name__ == "__main__":
     asyncio.run(main())
