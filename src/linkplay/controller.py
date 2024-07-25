@@ -4,7 +4,7 @@ from linkplay.bridge import LinkPlayBridge, LinkPlayMultiroom
 from linkplay.discovery import discover_linkplay_bridges
 
 
-class LinkPlayController():
+class LinkPlayController:
     """Represents a LinkPlay controller to manage the devices and multirooms."""
 
     session: ClientSession
@@ -22,7 +22,11 @@ class LinkPlayController():
         # Discover new bridges
         discovered_bridges = await discover_linkplay_bridges(self.session)
         current_bridges = [bridge.device.uuid for bridge in self.bridges]
-        new_bridges = [discovered_bridge for discovered_bridge in discovered_bridges if discovered_bridge.device.uuid not in current_bridges]
+        new_bridges = [
+            discovered_bridge
+            for discovered_bridge in discovered_bridges
+            if discovered_bridge.device.uuid not in current_bridges
+        ]
         self.bridges.extend(new_bridges)
 
     async def discover_multirooms(self) -> None:
@@ -31,7 +35,9 @@ class LinkPlayController():
         # Create new multirooms from new bridges
         new_multirooms = []
         for bridge in self.bridges:
-            has_multiroom = any(multiroom for multiroom in self.multirooms if multiroom.leader == bridge)
+            has_multiroom = any(
+                multiroom for multiroom in self.multirooms if multiroom.leader == bridge
+            )
 
             if has_multiroom:
                 continue
@@ -46,7 +52,9 @@ class LinkPlayController():
             await multiroom.update_status(self.bridges)
 
         # Remove multirooms if they have no followers
-        empty_multirooms = [multiroom for multiroom in self.multirooms if not multiroom.followers]
+        empty_multirooms = [
+            multiroom for multiroom in self.multirooms if not multiroom.followers
+        ]
         for empty_multiroom in empty_multirooms:
             self.multirooms.remove(empty_multiroom)
 

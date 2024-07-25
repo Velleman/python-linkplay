@@ -34,19 +34,24 @@ async def session_call_api(endpoint: str, session: ClientSession, command: str) 
         raise LinkPlayRequestException(f"Error requesting data from '{url}'") from error
 
     if response.status != HTTPStatus.OK:
-        raise LinkPlayRequestException(f"Unexpected HTTPStatus {response.status} received from '{url}'")
+        raise LinkPlayRequestException(
+            f"Unexpected HTTPStatus {response.status} received from '{url}'"
+        )
 
     return await response.text()
 
 
-async def session_call_api_json(endpoint: str, session: ClientSession,
-                                command: str) -> Dict[str, str]:
+async def session_call_api_json(
+    endpoint: str, session: ClientSession, command: str
+) -> Dict[str, str]:
     """Calls the LinkPlay API and returns the result as a JSON object."""
     result = await session_call_api(endpoint, session, command)
     return json.loads(result)  # type: ignore
 
 
-async def session_call_api_ok(endpoint: str, session: ClientSession, command: str) -> None:
+async def session_call_api_ok(
+    endpoint: str, session: ClientSession, command: str
+) -> None:
     """Calls the LinkPlay API and checks if the response is OK. Throws exception if not."""
     result = await session_call_api(endpoint, session, command)
 

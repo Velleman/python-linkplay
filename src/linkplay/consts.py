@@ -3,11 +3,12 @@ from enum import StrEnum, IntFlag
 API_ENDPOINT: str = "{}/httpapi.asp?command={}"
 API_TIMEOUT: int = 2
 UNKNOWN_TRACK_PLAYING: str = "Unknown"
-UPNP_DEVICE_TYPE = 'urn:schemas-upnp-org:device:MediaRenderer:1'
+UPNP_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaRenderer:1"
 
 
 class LinkPlayCommand(StrEnum):
     """Defines the LinkPlay commands."""
+
     DEVICE_STATUS = "getStatus"
     SYSLOG = "getsyslog"
     UPDATE_SERVER = "GetUpdateServer"
@@ -39,12 +40,14 @@ class LinkPlayCommand(StrEnum):
 
 class SpeakerType(StrEnum):
     """Defines the speaker type."""
+
     MAIN_SPEAKER = "0"
     SUB_SPEAKER = "1"
 
 
 class ChannelType(StrEnum):
     """Defines the channel type."""
+
     STEREO = "0"
     LEFT_CHANNEL = "1"
     RIGHT_CHANNEL = "2"
@@ -52,6 +55,7 @@ class ChannelType(StrEnum):
 
 class PlayingMode(StrEnum):
     """Defines a possible playing mode."""
+
     IDLE = "-1"
     NONE = "0"
     AIRPLAY = "1"
@@ -88,38 +92,39 @@ class PlayingMode(StrEnum):
 
 
 # Map between a play mode and how to activate the play mode
-PLAY_MODE_SEND_MAP: dict[PlayingMode, str] = {     # case sensitive!
-    PlayingMode.NONE: 'Idle',
-    PlayingMode.AIRPLAY: 'Airplay',
-    PlayingMode.DLNA: 'DLNA',
-    PlayingMode.QPLAY: 'QPlay',
-    PlayingMode.NETWORK: 'wifi',
-    PlayingMode.WIIMU_LOCAL: 'udisk',
-    PlayingMode.TF_CARD_1: 'TFcard',
-    PlayingMode.API: 'API',
-    PlayingMode.UDISK: 'udisk',
-    PlayingMode.ALARM: 'Alarm',
-    PlayingMode.SPOTIFY: 'Spotify',
-    PlayingMode.LINE_IN: 'line-in',
-    PlayingMode.BLUETOOTH: 'bluetooth',
-    PlayingMode.OPTICAL: 'optical',
-    PlayingMode.RCA: 'RCA',
-    PlayingMode.COAXIAL: 'co-axial',
-    PlayingMode.FM: 'FM',
-    PlayingMode.LINE_IN_2: 'line-in2',
-    PlayingMode.XLR: 'XLR',
-    PlayingMode.HDMI: 'HDMI',
-    PlayingMode.MIRROR: 'cd',
-    PlayingMode.USB_DAC: 'USB DAC',
-    PlayingMode.TF_CARD_2: 'TFcard',
-    PlayingMode.TALK: 'Talk',
-    PlayingMode.SLAVE: 'Idle',
-    PlayingMode.OPTICAL_2: 'optical2'
+PLAY_MODE_SEND_MAP: dict[PlayingMode, str] = {  # case sensitive!
+    PlayingMode.NONE: "Idle",
+    PlayingMode.AIRPLAY: "Airplay",
+    PlayingMode.DLNA: "DLNA",
+    PlayingMode.QPLAY: "QPlay",
+    PlayingMode.NETWORK: "wifi",
+    PlayingMode.WIIMU_LOCAL: "udisk",
+    PlayingMode.TF_CARD_1: "TFcard",
+    PlayingMode.API: "API",
+    PlayingMode.UDISK: "udisk",
+    PlayingMode.ALARM: "Alarm",
+    PlayingMode.SPOTIFY: "Spotify",
+    PlayingMode.LINE_IN: "line-in",
+    PlayingMode.BLUETOOTH: "bluetooth",
+    PlayingMode.OPTICAL: "optical",
+    PlayingMode.RCA: "RCA",
+    PlayingMode.COAXIAL: "co-axial",
+    PlayingMode.FM: "FM",
+    PlayingMode.LINE_IN_2: "line-in2",
+    PlayingMode.XLR: "XLR",
+    PlayingMode.HDMI: "HDMI",
+    PlayingMode.MIRROR: "cd",
+    PlayingMode.USB_DAC: "USB DAC",
+    PlayingMode.TF_CARD_2: "TFcard",
+    PlayingMode.TALK: "Talk",
+    PlayingMode.SLAVE: "Idle",
+    PlayingMode.OPTICAL_2: "optical2",
 }
 
 
 class LoopMode(StrEnum):
     """Defines the loop mode."""
+
     CONTINOUS_PLAY_ONE_SONG = "-1"
     PLAY_IN_ORDER = "0"
     CONTINUOUS_PLAYBACK = "1"
@@ -130,6 +135,7 @@ class LoopMode(StrEnum):
 
 class EqualizerMode(StrEnum):
     """Defines the equalizer mode."""
+
     NONE = "0"
     CLASSIC = "1"
     POP = "2"
@@ -139,6 +145,7 @@ class EqualizerMode(StrEnum):
 
 class PlayingStatus(StrEnum):
     """Defines the playing status."""
+
     PLAYING = "play"
     LOADING = "load"
     STOPPED = "stop"
@@ -147,12 +154,14 @@ class PlayingStatus(StrEnum):
 
 class MuteMode(StrEnum):
     """Defines the mute mode."""
+
     UNMUTED = "0"
     MUTED = "1"
 
 
 class InputMode(IntFlag):
     """Defines which inputs the player supports."""
+
     LINE_IN = 2
     BLUETOOTH = 4
     USB = 8
@@ -172,12 +181,13 @@ INPUT_MODE_MAP: dict[InputMode, PlayingMode] = {
     InputMode.COAXIAL: PlayingMode.COAXIAL,
     InputMode.LINE_IN_2: PlayingMode.LINE_IN_2,
     InputMode.USB_DAC: PlayingMode.USB_DAC,
-    InputMode.OPTICAL_2: PlayingMode.OPTICAL_2
+    InputMode.OPTICAL_2: PlayingMode.OPTICAL_2,
 }
 
 
 class PlayerAttribute(StrEnum):
     """Defines the player attributes."""
+
     SPEAKER_TYPE = "type"
     CHANNEL_TYPE = "ch"
     PLAYBACK_MODE = "mode"
@@ -199,6 +209,7 @@ class PlayerAttribute(StrEnum):
 
 class DeviceAttribute(StrEnum):
     """Defines the device attributes."""
+
     UUID = "uuid"
     DEVICE_NAME = "DeviceName"
     GROUP_NAME = "GroupName"
@@ -282,6 +293,7 @@ class DeviceAttribute(StrEnum):
 
 class MultiroomAttribute(StrEnum):
     """Defines the player attributes."""
+
     NUM_FOLLOWERS = "slaves"
     FOLLOWER_LIST = "slave_list"
     UUID = "uuid"
