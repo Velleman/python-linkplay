@@ -4,7 +4,7 @@ from linkplay.bridge import (
     LinkPlayBridge,
     LinkPlayDevice,
     LinkPlayPlayer,
-    LinkPlayMultiroom
+    LinkPlayMultiroom,
 )
 from linkplay.consts import (
     EqualizerMode,
@@ -15,7 +15,7 @@ from linkplay.consts import (
     PlayerAttribute,
     MuteMode,
     PlayingStatus,
-    PLAY_MODE_SEND_MAP
+    PLAY_MODE_SEND_MAP,
 )
 
 
@@ -53,7 +53,7 @@ async def test_player_update_status():
     bridge.json_request.return_value = {
         PlayerAttribute.TITLE: "556E6B6E6F776E",
         PlayerAttribute.ARTIST: "556E6B6E6F776E",
-        PlayerAttribute.ALBUM: "556E6B6E6F776E"
+        PlayerAttribute.ALBUM: "556E6B6E6F776E",
     }
     player = LinkPlayPlayer(bridge)
 
@@ -198,7 +198,9 @@ async def test_player_set_play_mode():
 
     await player.set_play_mode(mode)
 
-    bridge.request.assert_called_once_with(LinkPlayCommand.SWITCH_MODE.format(mode_conv))
+    bridge.request.assert_called_once_with(
+        LinkPlayCommand.SWITCH_MODE.format(mode_conv)
+    )
 
 
 async def test_multiroom_setup():
@@ -244,7 +246,9 @@ async def test_multiroom_add_follower():
 
     await multiroom.add_follower(follower)
 
-    follower.request.assert_called_once_with(LinkPlayCommand.MULTIROOM_JOIN.format(leader.device.eth))
+    follower.request.assert_called_once_with(
+        LinkPlayCommand.MULTIROOM_JOIN.format(leader.device.eth)
+    )
     assert multiroom.followers == [follower]
 
 
@@ -258,7 +262,9 @@ async def test_multiroom_remove_follower():
 
     await multiroom.remove_follower(follower)
 
-    leader.request.assert_called_once_with(LinkPlayCommand.MULTIROOM_KICK.format(follower.device.eth))
+    leader.request.assert_called_once_with(
+        LinkPlayCommand.MULTIROOM_KICK.format(follower.device.eth)
+    )
     assert not multiroom.followers
 
 
