@@ -130,7 +130,8 @@ class LoopMode(StrEnum):
     CONTINUOUS_PLAYBACK = "1"
     RANDOM_PLAYBACK = "2"
     LIST_CYCLE = "3"
-    FOUR = "4"
+    SHUFF_DISABLED_REPEAT_DISABLED = "4"
+    SHUFF_ENABLED_REPEAT_ENABLED_LOOP_ONCE = "5"
 
 
 class EqualizerMode(StrEnum):
