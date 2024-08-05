@@ -1,5 +1,7 @@
 import asyncio
+import contextlib
 import json
+import ssl
 from http import HTTPStatus
 from typing import Dict
 
@@ -28,7 +30,7 @@ async def session_call_api(endpoint: str, session: ClientSession, command: str) 
 
     try:
         async with async_timeout.timeout(API_TIMEOUT):
-            response = await session.get(url, ssl=False)
+            response = await session.get(url)
 
     except (asyncio.TimeoutError, ClientError, asyncio.CancelledError) as error:
         raise LinkPlayRequestException(f"Error requesting data from '{url}'") from error
@@ -65,3 +67,15 @@ def decode_hexstr(hexstr: str) -> str:
         return bytes.fromhex(hexstr).decode("utf-8")
     except ValueError:
         return hexstr
+
+
+def create_unverified_context() -> ssl.SSLContext:
+    """Creates an unverified SSL context."""
+    sslcontext: ssl.SSLContext = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    sslcontext.check_hostname = False
+    sslcontext.verify_mode = ssl.CERT_NONE
+    with contextlib.suppress(AttributeError):
+        # This only works for OpenSSL >= 1.0.0
+        sslcontext.options |= ssl.OP_NO_COMPRESSION
+    sslcontext.set_default_verify_paths()
+    return sslcontext
