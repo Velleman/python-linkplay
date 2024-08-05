@@ -22,7 +22,9 @@ from linkplay.endpoint import LinkPlayApiEndpoint
 
 def test_device_name():
     """Tests if the device name is correctly set up."""
-    endpoint: LinkPlayApiEndpoint = LinkPlayApiEndpoint(protocol="http", endpoint="1.2.3.4", session=None)
+    endpoint: LinkPlayApiEndpoint = LinkPlayApiEndpoint(
+        protocol="http", endpoint="1.2.3.4", session=None
+    )
     bridge: LinkPlayBridge = LinkPlayBridge(endpoint=endpoint)
     assert "( - http://1.2.3.4)" == repr(bridge)
 
