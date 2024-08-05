@@ -4,8 +4,8 @@ from aiohttp import ClientSession
 from async_upnp_client.search import async_search
 from async_upnp_client.utils import CaseInsensitiveDict
 
-from linkplay.consts import UPNP_DEVICE_TYPE, LinkPlayCommand, MultiroomAttribute
 from linkplay.bridge import LinkPlayBridge
+from linkplay.consts import UPNP_DEVICE_TYPE, LinkPlayCommand, MultiroomAttribute
 from linkplay.exceptions import LinkPlayRequestException
 
 

@@ -1,25 +1,26 @@
 from __future__ import annotations
+
 from typing import Any
+
 from aiohttp import ClientSession
 
 from linkplay.consts import (
-    ChannelType,
-    LinkPlayCommand,
-    DeviceAttribute,
-    PlayerAttribute,
-    MuteMode,
-    EqualizerMode,
-    LoopMode,
-    PLAY_MODE_SEND_MAP,
-    PlayingStatus,
-    InputMode,
-    SpeakerType,
-    PlayingMode,
     INPUT_MODE_MAP,
+    PLAY_MODE_SEND_MAP,
+    ChannelType,
+    DeviceAttribute,
+    EqualizerMode,
+    InputMode,
+    LinkPlayCommand,
+    LoopMode,
     MultiroomAttribute,
+    MuteMode,
+    PlayerAttribute,
+    PlayingMode,
+    PlayingStatus,
+    SpeakerType,
 )
-
-from linkplay.utils import session_call_api_json, session_call_api_ok, decode_hexstr
+from linkplay.utils import decode_hexstr, session_call_api_json, session_call_api_ok
 
 
 class LinkPlayDevice:
