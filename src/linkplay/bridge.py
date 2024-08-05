@@ -222,8 +222,11 @@ class LinkPlayBridge:
         self.device = LinkPlayDevice(self)
         self.player = LinkPlayPlayer(self)
 
-    def __repr__(self) -> str:
-        return f"({self.device.name} - {self.endpoint})"
+    def __str__(self) -> str:
+        if self.device.name == "":
+            return f"{self.endpoint}"
+
+        return self.device.name
 
     async def json_request(self, command: str) -> dict[str, str]:
         """Performs a GET request on the given command and returns the result as a JSON object."""
