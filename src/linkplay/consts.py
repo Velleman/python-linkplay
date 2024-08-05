@@ -1,4 +1,4 @@
-from enum import StrEnum, IntFlag
+from enum import IntFlag, StrEnum
 
 API_ENDPOINT: str = "{}/httpapi.asp?command={}"
 API_TIMEOUT: int = 2

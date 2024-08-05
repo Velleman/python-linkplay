@@ -1,10 +1,10 @@
 import asyncio
-from typing import Dict
 import json
 from http import HTTPStatus
+from typing import Dict
 
 import async_timeout
-from aiohttp import ClientSession, ClientError
+from aiohttp import ClientError, ClientSession
 
 from linkplay.consts import API_ENDPOINT, API_TIMEOUT
 from linkplay.exceptions import LinkPlayRequestException
