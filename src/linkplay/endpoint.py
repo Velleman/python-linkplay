@@ -18,11 +18,15 @@ class LinkPlayEndpoint(ABC):
 
 
 class LinkPlayApiEndpoint(LinkPlayEndpoint):
-    """Represents a LinkPlay HTTPAPI endpoint."""
+    """Represents a LinkPlay HTTP API endpoint."""
 
     def __init__(self, *, protocol: str, endpoint: str, session: ClientSession):
-        self._endpoint = f"{protocol}://{endpoint}"
-        self._session = session
+        assert protocol in [
+            "http",
+            "https",
+        ], "Protocol must be either 'http' or 'https'"
+        self._endpoint: str = f"{protocol}://{endpoint}"
+        self._session: ClientSession = session
 
     async def request(self, command: str) -> None:
         """Performs a GET request on the given command and verifies the result."""
@@ -32,5 +36,5 @@ class LinkPlayApiEndpoint(LinkPlayEndpoint):
         """Performs a GET request on the given command and returns the result as a JSON object."""
         return await session_call_api_json(self._endpoint, self._session, command)
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return self._endpoint

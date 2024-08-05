@@ -26,10 +26,10 @@ def test_device_name():
         protocol="http", endpoint="1.2.3.4", session=None
     )
     bridge: LinkPlayBridge = LinkPlayBridge(endpoint=endpoint)
-    assert "( - http://1.2.3.4)" == repr(bridge)
+    assert f"{bridge}" == "http://1.2.3.4"
 
-    bridge.device.properties[DeviceAttribute.DEVICE_NAME] = "Test"
-    assert "(Test - http://1.2.3.4)" == repr(bridge)
+    bridge.device.properties[DeviceAttribute.DEVICE_NAME] = "TestDevice"
+    assert f"{bridge}" == "TestDevice"
 
 
 async def test_device_update_status():
