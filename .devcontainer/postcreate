@@ -18,5 +18,5 @@ fi
 
 .devcontainer/poststart
 
-#pre-commit install
+pre-commit install
 uv pip install -e .
