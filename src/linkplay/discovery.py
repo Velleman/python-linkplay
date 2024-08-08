@@ -10,11 +10,11 @@ from linkplay.exceptions import LinkPlayRequestException
 
 
 async def linkplay_factory_bridge(
-    ip_address: str, session: ClientSession
+    ip_address: str, session: ClientSession, protocol: str = "http"
 ) -> LinkPlayBridge | None:
     """Attempts to create a LinkPlayBridge from the given IP address.
     Returns None if the device is not an expected LinkPlay device."""
-    bridge = LinkPlayBridge("http", ip_address, session)
+    bridge = LinkPlayBridge(protocol, ip_address, session)
     try:
         await bridge.device.update_status()
         await bridge.player.update_status()
