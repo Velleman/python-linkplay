@@ -1,0 +1,7 @@
+#!/bin/bash
+set -e
+
+cd "$(dirname "$0")/.."
+
+uv pip install -r requirements.txt --upgrade
+uv pip install -r requirements_dev.txt --upgrade
