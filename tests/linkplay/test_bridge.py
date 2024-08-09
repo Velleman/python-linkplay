@@ -3,19 +3,19 @@ from unittest.mock import AsyncMock
 from linkplay.bridge import (
     LinkPlayBridge,
     LinkPlayDevice,
-    LinkPlayPlayer,
     LinkPlayMultiroom,
+    LinkPlayPlayer,
 )
 from linkplay.consts import (
+    PLAY_MODE_SEND_MAP,
+    DeviceAttribute,
     EqualizerMode,
     LinkPlayCommand,
-    DeviceAttribute,
     LoopMode,
-    PlayingMode,
-    PlayerAttribute,
     MuteMode,
+    PlayerAttribute,
+    PlayingMode,
     PlayingStatus,
-    PLAY_MODE_SEND_MAP,
 )
 
 

@@ -1,4 +1,4 @@
-from enum import StrEnum, IntFlag
+from enum import IntFlag, StrEnum
 
 API_ENDPOINT: str = "{}/httpapi.asp?command={}"
 API_TIMEOUT: int = 2
@@ -9,11 +9,11 @@ UPNP_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaRenderer:1"
 class LinkPlayCommand(StrEnum):
     """Defines the LinkPlay commands."""
 
-    DEVICE_STATUS = "getStatus"
+    DEVICE_STATUS = "getStatusEx"
     SYSLOG = "getsyslog"
     UPDATE_SERVER = "GetUpdateServer"
     REBOOT = "reboot"
-    PLAYER_STATUS = "getPlayerStatus"
+    PLAYER_STATUS = "getPlayerStatusEx"
     NEXT = "setPlayerCmd:next"
     PREVIOUS = "setPlayerCmd:prev"
     UNMUTE = "setPlayerCmd:mute:0"
@@ -130,7 +130,8 @@ class LoopMode(StrEnum):
     CONTINUOUS_PLAYBACK = "1"
     RANDOM_PLAYBACK = "2"
     LIST_CYCLE = "3"
-    FOUR = "4"
+    SHUFF_DISABLED_REPEAT_DISABLED = "4"
+    SHUFF_ENABLED_REPEAT_ENABLED_LOOP_ONCE = "5"
 
 
 class EqualizerMode(StrEnum):
@@ -166,6 +167,7 @@ class InputMode(IntFlag):
     BLUETOOTH = 4
     USB = 8
     OPTICAL = 16
+    RCA = 32
     COAXIAL = 64
     LINE_IN_2 = 256
     USB_DAC = 32768
@@ -178,6 +180,7 @@ INPUT_MODE_MAP: dict[InputMode, PlayingMode] = {
     InputMode.BLUETOOTH: PlayingMode.BLUETOOTH,
     InputMode.USB: PlayingMode.UDISK,
     InputMode.OPTICAL: PlayingMode.OPTICAL,
+    InputMode.RCA: PlayingMode.RCA,
     InputMode.COAXIAL: PlayingMode.COAXIAL,
     InputMode.LINE_IN_2: PlayingMode.LINE_IN_2,
     InputMode.USB_DAC: PlayingMode.USB_DAC,

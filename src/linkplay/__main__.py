@@ -1,4 +1,5 @@
 import asyncio
+
 import aiohttp
 
 from linkplay.controller import LinkPlayController
