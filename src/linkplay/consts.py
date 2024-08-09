@@ -167,6 +167,7 @@ class InputMode(IntFlag):
     BLUETOOTH = 4
     USB = 8
     OPTICAL = 16
+    RCA = 32
     COAXIAL = 64
     LINE_IN_2 = 256
     USB_DAC = 32768
@@ -179,6 +180,7 @@ INPUT_MODE_MAP: dict[InputMode, PlayingMode] = {
     InputMode.BLUETOOTH: PlayingMode.BLUETOOTH,
     InputMode.USB: PlayingMode.UDISK,
     InputMode.OPTICAL: PlayingMode.OPTICAL,
+    InputMode.RCA: PlayingMode.RCA,
     InputMode.COAXIAL: PlayingMode.COAXIAL,
     InputMode.LINE_IN_2: PlayingMode.LINE_IN_2,
     InputMode.USB_DAC: PlayingMode.USB_DAC,
