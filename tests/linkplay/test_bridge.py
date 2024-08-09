@@ -17,12 +17,19 @@ from linkplay.consts import (
     PlayingMode,
     PlayingStatus,
 )
+from linkplay.endpoint import LinkPlayApiEndpoint
 
 
-def test_endpoint():
-    """Tests if the endpoint is correctly constructed."""
-    bridge = LinkPlayBridge("http", "1.2.3.4", None)
-    assert "http://1.2.3.4" == bridge.endpoint
+def test_device_name():
+    """Tests if the device name is correctly set up."""
+    endpoint: LinkPlayApiEndpoint = LinkPlayApiEndpoint(
+        protocol="http", endpoint="1.2.3.4", session=None
+    )
+    bridge: LinkPlayBridge = LinkPlayBridge(endpoint=endpoint)
+    assert f"{bridge}" == "http://1.2.3.4"
+
+    bridge.device.properties[DeviceAttribute.DEVICE_NAME] = "TestDevice"
+    assert f"{bridge}" == "TestDevice"
 
 
 async def test_device_update_status():
