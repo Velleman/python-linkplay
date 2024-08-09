@@ -2,12 +2,12 @@ name: release
 run-name: Creating releases/${{ inputs.version }}
 
 on:
-    workflow_dispatch:
-      inputs:
-        version:
-          description: 'Version'
-          required: true
-          type: string
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version"
+        required: true
+        type: string
 
 jobs:
   create_release:
@@ -29,8 +29,8 @@ jobs:
           python-version: 3.11
       - name: Install dependencies
         run: |
-            python -m pip install --upgrade pip
-            pip install build
+          python -m pip install --upgrade uv
+          uv pip install build
       - name: Build package
         run: python -m build
       - uses: pypa/gh-action-pypi-publish@release/v1
@@ -44,6 +44,7 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.version }}
+          tag_name: v${{ github.event.inputs.version }}
           generate_release_notes: true
           target_commitish: releases/${{ github.event.inputs.version }}
+          make_latest: true
