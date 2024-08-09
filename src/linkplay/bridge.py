@@ -217,13 +217,15 @@ class LinkPlayBridge:
     protocol: str
     ip_address: str
     session: ClientSession
+    use_ex_endpoints: bool
     device: LinkPlayDevice
     player: LinkPlayPlayer
 
-    def __init__(self, protocol: str, ip_address: str, session: ClientSession):
+    def __init__(self, protocol: str, ip_address: str, session: ClientSession, use_ex_endpoints: bool = False):
         self.protocol = protocol
         self.ip_address = ip_address
         self.session = session
+        self.use_ex_endpoints = use_ex_endpoints
         self.device = LinkPlayDevice(self)
         self.player = LinkPlayPlayer(self)
 
@@ -240,6 +242,13 @@ class LinkPlayBridge:
 
     async def json_request(self, command: str) -> dict[str, str]:
         """Performs a GET request on the given command and returns the result as a JSON object."""
+
+        if self.use_ex_endpoints:
+            if command == LinkPlayCommand.DEVICE_STATUS:
+                command = LinkPlayCommand.DEVICE_STATUS_EX
+            if command == LinkPlayCommand.PLAYER_STATUS:
+                command = LinkPlayCommand.PLAYER_STATUS_EX
+
         return await session_call_api_json(self.endpoint, self.session, command)
 
     async def request(self, command: str) -> None:

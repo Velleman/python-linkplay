@@ -1,5 +1,8 @@
-from unittest.mock import AsyncMock
+from http import HTTPStatus
+from unittest import mock
+from unittest.mock import AsyncMock, PropertyMock
 
+import pytest
 from linkplay.bridge import (
     LinkPlayBridge,
     LinkPlayDevice,
@@ -7,6 +10,7 @@ from linkplay.bridge import (
     LinkPlayPlayer,
 )
 from linkplay.consts import (
+    API_ENDPOINT,
     PLAY_MODE_SEND_MAP,
     DeviceAttribute,
     EqualizerMode,
@@ -296,3 +300,28 @@ async def test_multiroom_set_volume():
     await multiroom.set_volume(100)
 
     leader.request.assert_called_once_with(LinkPlayCommand.MULTIROOM_VOL.format(100))
+
+
+async def test_bridge_translates_required_ex_calls():
+    """Tests mapping to "Ex" commands if turned on."""
+    async def test_bridge_maps_ex_calls_correctly(use_ex_endpoints, initial_command, expected_command):
+        protocol = "https"
+        endpoint = "1.2.3.4"
+        expected_url = API_ENDPOINT.format(protocol + "://" + endpoint, expected_command)
+
+        response = AsyncMock()
+        response.text.return_value = "{ \"message\": \"Successful test\" }"
+        response.status = HTTPStatus.OK
+        session = AsyncMock()
+        session.get.return_value = response
+        
+        bridge = LinkPlayBridge(protocol, endpoint, session, use_ex_endpoints)
+        response = await bridge.json_request(initial_command)
+        session.get.assert_called_once_with(expected_url, ssl=False)
+
+        assert response['message'] == "Successful test"
+
+    await test_bridge_maps_ex_calls_correctly(False, LinkPlayCommand.DEVICE_STATUS, LinkPlayCommand.DEVICE_STATUS)
+    await test_bridge_maps_ex_calls_correctly(False, LinkPlayCommand.DEVICE_STATUS, LinkPlayCommand.DEVICE_STATUS)
+    await test_bridge_maps_ex_calls_correctly(True, LinkPlayCommand.DEVICE_STATUS, LinkPlayCommand.DEVICE_STATUS_EX)
+    await test_bridge_maps_ex_calls_correctly(True, LinkPlayCommand.PLAYER_STATUS, LinkPlayCommand.PLAYER_STATUS_EX)
