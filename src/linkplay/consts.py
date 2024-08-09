@@ -10,12 +10,10 @@ class LinkPlayCommand(StrEnum):
     """Defines the LinkPlay commands."""
 
     DEVICE_STATUS = "getStatus"
-    DEVICE_STATUS_EX = "getStatusEx"
     SYSLOG = "getsyslog"
     UPDATE_SERVER = "GetUpdateServer"
     REBOOT = "reboot"
     PLAYER_STATUS = "getPlayerStatus"
-    PLAYER_STATUS_EX = "getPlayerStatusEx"
     NEXT = "setPlayerCmd:next"
     PREVIOUS = "setPlayerCmd:prev"
     UNMUTE = "setPlayerCmd:mute:0"
