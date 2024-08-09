@@ -152,16 +152,22 @@ class LinkPlayPlayer:
     @property
     def title(self) -> str:
         """Returns if the currently playing title of the track."""
+        if not PlayerAttribute.TITLE in self.properties:
+            return ""
         return self.properties[PlayerAttribute.TITLE]
 
     @property
     def artist(self) -> str:
         """Returns if the currently playing artist."""
+        if not PlayerAttribute.ARTIST in self.properties:
+            return ""
         return self.properties[PlayerAttribute.ARTIST]
 
     @property
     def album(self) -> str:
         """Returns if the currently playing album."""
+        if not PlayerAttribute.ALBUM in self.properties:
+            return ""
         return self.properties[PlayerAttribute.ALBUM]
 
     @property
