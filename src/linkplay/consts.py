@@ -9,11 +9,11 @@ UPNP_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaRenderer:1"
 class LinkPlayCommand(StrEnum):
     """Defines the LinkPlay commands."""
 
-    DEVICE_STATUS = "getStatus"
+    DEVICE_STATUS = "getStatusEx"
     SYSLOG = "getsyslog"
     UPDATE_SERVER = "GetUpdateServer"
     REBOOT = "reboot"
-    PLAYER_STATUS = "getPlayerStatus"
+    PLAYER_STATUS = "getPlayerStatusEx"
     NEXT = "setPlayerCmd:next"
     PREVIOUS = "setPlayerCmd:prev"
     UNMUTE = "setPlayerCmd:mute:0"
