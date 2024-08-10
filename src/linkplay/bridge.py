@@ -45,12 +45,12 @@ class LinkPlayDevice:
     @property
     def uuid(self) -> str:
         """The UUID of the device."""
-        return self.properties[DeviceAttribute.UUID]
+        return self.properties.get(DeviceAttribute.UUID, '')
 
     @property
     def name(self) -> str:
         """The name of the device."""
-        return self.properties[DeviceAttribute.DEVICE_NAME]
+        return self.properties.get(DeviceAttribute.DEVICE_NAME, '')
 
     @property
     def playmode_support(self) -> list[PlayingMode]:
@@ -64,7 +64,7 @@ class LinkPlayDevice:
     @property
     def eth(self) -> str:
         """Returns the ethernet address."""
-        return self.properties[DeviceAttribute.ETH_DHCP]
+        return self.properties.get(DeviceAttribute.ETH_DHCP, '')
 
 
 class LinkPlayPlayer:
@@ -148,73 +148,67 @@ class LinkPlayPlayer:
     @property
     def muted(self) -> bool:
         """Returns if the player is muted."""
-        return self.properties[PlayerAttribute.MUTED] == MuteMode.MUTED
+        return self.properties.get(PlayerAttribute.MUTED, MuteMode.UNMUTED) == MuteMode.MUTED
 
     @property
     def title(self) -> str:
         """Returns if the currently playing title of the track."""
-        if not PlayerAttribute.TITLE in self.properties:
-            return ""
-        return self.properties[PlayerAttribute.TITLE]
+        return self.properties.get(PlayerAttribute.TITLE, "")
 
     @property
     def artist(self) -> str:
         """Returns if the currently playing artist."""
-        if not PlayerAttribute.ARTIST in self.properties:
-            return ""
-        return self.properties[PlayerAttribute.ARTIST]
+        return self.properties.get(PlayerAttribute.ARTIST, "")
 
     @property
     def album(self) -> str:
         """Returns if the currently playing album."""
-        if not PlayerAttribute.ALBUM in self.properties:
-            return ""
-        return self.properties[PlayerAttribute.ALBUM]
+        return self.properties.get(PlayerAttribute.ALBUM, "")
 
     @property
     def volume(self) -> int:
         """Returns the player volume, expressed in %."""
-        return int(self.properties[PlayerAttribute.VOLUME])
+        return int(self.properties.get(PlayerAttribute.VOLUME, -1))
 
     @property
     def current_position(self) -> int:
         """Returns the current position of the track in milliseconds."""
-        return int(self.properties[PlayerAttribute.CURRENT_POSITION])
+        return int(self.properties.get(PlayerAttribute.CURRENT_POSITION, -1))
 
     @property
     def total_length(self) -> int:
         """Returns the total length of the track in milliseconds."""
-        return int(self.properties[PlayerAttribute.TOTAL_LENGTH])
+        return int(self.properties.get(PlayerAttribute.TOTAL_LENGTH, -1))
 
     @property
     def status(self) -> PlayingStatus:
         """Returns the current playing status."""
-        return PlayingStatus(self.properties[PlayerAttribute.PLAYING_STATUS])
+        return PlayingStatus(self.properties.get(PlayerAttribute.PLAYING_STATUS, PlayingStatus.STOPPED))
 
     @property
     def equalizer_mode(self) -> EqualizerMode:
         """Returns the current equalizer mode."""
-        return EqualizerMode(self.properties[PlayerAttribute.EQUALIZER_MODE])
+        return EqualizerMode(self.properties.get(PlayerAttribute.EQUALIZER_MODE, EqualizerMode.CLASSIC))
 
     @property
     def speaker_type(self) -> SpeakerType:
         """Returns the current speaker the player is playing on."""
-        return SpeakerType(self.properties[PlayerAttribute.SPEAKER_TYPE])
+        return SpeakerType(self.properties.get(PlayerAttribute.SPEAKER_TYPE, SpeakerType.MAIN_SPEAKER))
 
     @property
     def channel_type(self) -> ChannelType:
         """Returns the channel the player is playing on."""
-        return ChannelType(self.properties[PlayerAttribute.CHANNEL_TYPE])
+        return ChannelType(self.properties.get(PlayerAttribute.CHANNEL_TYPE, ChannelType.STEREO))
 
     @property
     def play_mode(self) -> PlayingMode:
         """Returns the current playing mode of the player."""
-        return PlayingMode(self.properties[PlayerAttribute.PLAYBACK_MODE])
+        return PlayingMode(self.properties.get(PlayerAttribute.PLAYBACK_MODE, PlayingMode.IDLE))
 
     @property
     def loop_mode(self) -> LoopMode:
         """Returns the current playlist mode."""
-        return LoopMode(self.properties[PlayerAttribute.PLAYLIST_MODE])
+        return LoopMode(self.properties.get(PlayerAttribute.PLAYLIST_MODE, LoopMode.CONTINUOUS_PLAYBACK))
 
 
 class LinkPlayBridge:
