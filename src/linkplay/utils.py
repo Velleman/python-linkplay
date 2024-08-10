@@ -1,14 +1,16 @@
 import asyncio
 import contextlib
 import json
+import os
 import ssl
 from http import HTTPStatus
 from typing import Dict
 
 import async_timeout
 from aiohttp import ClientError, ClientSession
+from appdirs import AppDirs
 
-from linkplay.consts import API_ENDPOINT, API_TIMEOUT
+from linkplay.consts import API_ENDPOINT, API_TIMEOUT, MTLS_CERTIFICATE_CONTENTS
 from linkplay.exceptions import LinkPlayRequestException
 
 
@@ -33,7 +35,7 @@ async def session_call_api(endpoint: str, session: ClientSession, command: str) 
             response = await session.get(url)
 
     except (asyncio.TimeoutError, ClientError, asyncio.CancelledError) as error:
-        raise LinkPlayRequestException(f"Error requesting data from '{url}'") from error
+        raise LinkPlayRequestException(f"{error} error requesting data from '{url}'") from error
 
     if response.status != HTTPStatus.OK:
         raise LinkPlayRequestException(
@@ -71,7 +73,18 @@ def decode_hexstr(hexstr: str) -> str:
 
 def create_unverified_context() -> ssl.SSLContext:
     """Creates an unverified SSL context."""
-    sslcontext: ssl.SSLContext = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    dirs = AppDirs("python-linkplay")
+    mtls_certificate_path = os.path.join(dirs.user_data_dir, "linkplay.pem")
+
+    if not os.path.isdir(dirs.user_data_dir):
+        os.mkdir(dirs.user_data_dir)
+
+    if not os.path.isfile(mtls_certificate_path):
+        with open(mtls_certificate_path, "w") as file:
+            file.write(MTLS_CERTIFICATE_CONTENTS)
+
+    sslcontext: ssl.SSLContext = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
+    sslcontext.load_cert_chain(certfile=mtls_certificate_path)
     sslcontext.check_hostname = False
     sslcontext.verify_mode = ssl.CERT_NONE
     with contextlib.suppress(AttributeError):
