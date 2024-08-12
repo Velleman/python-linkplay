@@ -80,7 +80,7 @@ def create_unverified_context() -> ssl.SSLContext:
         os.makedirs(dirs.user_data_dir, exist_ok=True)
 
     if not os.path.isfile(mtls_certificate_path):
-        with open(mtls_certificate_path, "w") as file:
+        with open(mtls_certificate_path, "w", encoding="utf-8") as file:
             file.write(MTLS_CERTIFICATE_CONTENTS)
 
     sslcontext: ssl.SSLContext = ssl.create_default_context(purpose=ssl.Purpose.SERVER_AUTH)
