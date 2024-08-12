@@ -77,7 +77,7 @@ def create_unverified_context() -> ssl.SSLContext:
     mtls_certificate_path = os.path.join(dirs.user_data_dir, "linkplay.pem")
 
     if not os.path.isdir(dirs.user_data_dir):
-        os.mkdir(dirs.user_data_dir)
+        os.makedirs(dirs.user_data_dir, exist_ok=True)
 
     if not os.path.isfile(mtls_certificate_path):
         with open(mtls_certificate_path, "w") as file:
