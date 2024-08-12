@@ -109,10 +109,7 @@ class ChannelType(StrEnum):
 class PlayingMode(StrEnum):
     """Defines a possible playing mode."""
 
-    PHONO = "-99"  # Unmapped
-    ARC = "-97"  # Unmapped
     DAB = "-96"  # Unmapped
-
     IDLE = "-1"
     NONE = "0"
     AIRPLAY = "1"
@@ -132,7 +129,6 @@ class PlayingMode(StrEnum):
     SPOTIFY = "31"
     LINE_IN = "40"
     BLUETOOTH = "41"
-    EXTERN_BLUETOOTH = "42"
     OPTICAL = "43"
     RCA = "44"
     COAXIAL = "45"
@@ -143,8 +139,11 @@ class PlayingMode(StrEnum):
     CD = "50"
     USB_DAC = "51"
     TF_CARD_2 = "52"
+    EXTERN_BLUETOOTH = "53"
+    PHONO = "54"
     OPTICAL_2 = "56"
     COAXIAL_2 = "57"
+    ARC = "58"
     TALK = "60"
     FOLLOWER = "99"
 
@@ -375,6 +374,30 @@ class DeviceAttribute(StrEnum):
     ETH_MAC_ADDRESS = "ETH_MAC"
     SECURITY = "security"
     SECURITY_VERSION = "security_version"
+    FW_RELEASE_VERSION = "FW_Release_version"
+    PCB_VERSION = "PCB_version"
+    EXPIRED = "expired"
+    BT_MAC = "BT_MAC"
+    AP_MAC = "AP_MAC"
+    ETH0 = "eth0"
+    UPDATE_CHECK_COUNT = "update_check_count"
+    BLE_REMOTE_UPDATE_CHECKED_COUNTER = "BleRemote_update_checked_counter"
+    ALEXA_VER = "alexa_ver"
+    ALEXA_BETA_ENABLE = "alexa_beta_enable"
+    ALEXA_FORCE_BETA_CFG = "alexa_force_beta_cfg"
+    VOLUME_CONTROL = "volume_control"
+    WLAN_SNR = "wlanSnr"
+    WLAN_NOISE = "wlanNoise"
+    WLAN_FREQ = "wlanFreq"
+    WLAN_DATA_RATE = "wlanDataRate"
+    OTA_INTERFACE_VER = "ota_interface_ver"
+    EQ_SUPPORT = "EQ_support"
+    AUDIO_CHANNEL_CONFIG = "audio_channel_config"
+    APP_TIMEZONE_ID = "app_timezone_id"
+    AVS_TIMEZONE_ID = "avs_timezone_id"
+    TZ_INFO_VER = "tz_info_ver"
+    POWER_MODE = "power_mode"
+    SECURITY_CAPABILITIES = "security_capabilities"
 
 
 class MultiroomAttribute(StrEnum):
