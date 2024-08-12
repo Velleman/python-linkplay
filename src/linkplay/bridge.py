@@ -176,7 +176,7 @@ class LinkPlayPlayer:
     @property
     def current_position(self) -> int:
         """Returns the current position of the track in milliseconds."""
-        return int(self.properties.get(PlayerAttribute.CURRENT_POSITION, -1))
+        return int(self.properties.get(PlayerAttribute.CURRENT_POSITION, 0))
 
     @property
     def total_length(self) -> int:
