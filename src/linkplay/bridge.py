@@ -2,8 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from aiohttp import ClientSession
-
 from linkplay.consts import (
     INPUT_MODE_MAP,
     PLAY_MODE_SEND_MAP,
@@ -20,7 +18,8 @@ from linkplay.consts import (
     PlayingStatus,
     SpeakerType,
 )
-from linkplay.utils import decode_hexstr, session_call_api_json, session_call_api_ok
+from linkplay.endpoint import LinkPlayEndpoint
+from linkplay.utils import decode_hexstr
 
 
 class LinkPlayDevice:
@@ -45,12 +44,12 @@ class LinkPlayDevice:
     @property
     def uuid(self) -> str:
         """The UUID of the device."""
-        return self.properties.get(DeviceAttribute.UUID, '')
+        return self.properties.get(DeviceAttribute.UUID, "")
 
     @property
     def name(self) -> str:
         """The name of the device."""
-        return self.properties.get(DeviceAttribute.DEVICE_NAME, '')
+        return self.properties.get(DeviceAttribute.DEVICE_NAME, "")
 
     @property
     def playmode_support(self) -> list[PlayingMode]:
@@ -64,7 +63,11 @@ class LinkPlayDevice:
     @property
     def eth(self) -> str:
         """Returns the ethernet address."""
-        return self.properties.get(DeviceAttribute.ETH_DHCP, '')
+        return (
+            self.properties[DeviceAttribute.ETH_DHCP]
+            if DeviceAttribute.ETH_DHCP in self.properties
+            else self.properties[DeviceAttribute.ETH0]
+        )
 
 
 class LinkPlayPlayer:
@@ -214,37 +217,28 @@ class LinkPlayPlayer:
 class LinkPlayBridge:
     """Represents a LinkPlay bridge to control the device and player attached to it."""
 
-    protocol: str
-    ip_address: str
-    session: ClientSession
+    endpoint: LinkPlayEndpoint
     device: LinkPlayDevice
     player: LinkPlayPlayer
 
-    def __init__(self, protocol: str, ip_address: str, session: ClientSession):
-        self.protocol = protocol
-        self.ip_address = ip_address
-        self.session = session
+    def __init__(self, *, endpoint: LinkPlayEndpoint):
+        self.endpoint = endpoint
         self.device = LinkPlayDevice(self)
         self.player = LinkPlayPlayer(self)
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         if self.device.name == "":
-            return self.endpoint
+            return f"{self.endpoint}"
 
         return self.device.name
 
-    @property
-    def endpoint(self) -> str:
-        """Returns the current player endpoint."""
-        return f"{self.protocol}://{self.ip_address}"
-
     async def json_request(self, command: str) -> dict[str, str]:
         """Performs a GET request on the given command and returns the result as a JSON object."""
-        return await session_call_api_json(self.endpoint, self.session, command)
+        return await self.endpoint.json_request(command)
 
     async def request(self, command: str) -> None:
         """Performs a GET request on the given command and verifies the result."""
-        await session_call_api_ok(self.endpoint, self.session, command)
+        await self.endpoint.request(command)
 
 
 class LinkPlayMultiroom:

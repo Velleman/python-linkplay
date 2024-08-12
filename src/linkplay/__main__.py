@@ -1,12 +1,11 @@
 import asyncio
 
-import aiohttp
-
 from linkplay.controller import LinkPlayController
+from linkplay.utils import create_unverified_client_session
 
 
 async def main():
-    async with aiohttp.ClientSession() as session:
+    async with create_unverified_client_session() as session:
         controller = LinkPlayController(session)
 
         await controller.discover_bridges()

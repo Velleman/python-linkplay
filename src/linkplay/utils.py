@@ -1,12 +1,17 @@
 import asyncio
+import contextlib
 import json
+import os
+import socket
+import ssl
 from http import HTTPStatus
 from typing import Dict
 
 import async_timeout
-from aiohttp import ClientError, ClientSession
+from aiohttp import ClientError, ClientSession, TCPConnector
+from appdirs import AppDirs
 
-from linkplay.consts import API_ENDPOINT, API_TIMEOUT
+from linkplay.consts import API_ENDPOINT, API_TIMEOUT, MTLS_CERTIFICATE_CONTENTS
 from linkplay.exceptions import LinkPlayRequestException
 
 
@@ -28,10 +33,12 @@ async def session_call_api(endpoint: str, session: ClientSession, command: str) 
 
     try:
         async with async_timeout.timeout(API_TIMEOUT):
-            response = await session.get(url, ssl=False)
+            response = await session.get(url)
 
     except (asyncio.TimeoutError, ClientError, asyncio.CancelledError) as error:
-        raise LinkPlayRequestException(f"Error requesting data from '{url}'") from error
+        raise LinkPlayRequestException(
+            f"{error} error requesting data from '{url}'"
+        ) from error
 
     if response.status != HTTPStatus.OK:
         raise LinkPlayRequestException(
@@ -65,3 +72,35 @@ def decode_hexstr(hexstr: str) -> str:
         return bytes.fromhex(hexstr).decode("utf-8")
     except ValueError:
         return hexstr
+
+
+def create_unverified_context() -> ssl.SSLContext:
+    """Creates an unverified SSL context with the default mTLS certificate."""
+    dirs = AppDirs("python-linkplay")
+    mtls_certificate_path = os.path.join(dirs.user_data_dir, "linkplay.pem")
+
+    if not os.path.isdir(dirs.user_data_dir):
+        os.makedirs(dirs.user_data_dir, exist_ok=True)
+
+    if not os.path.isfile(mtls_certificate_path):
+        with open(mtls_certificate_path, "w", encoding="utf-8") as file:
+            file.write(MTLS_CERTIFICATE_CONTENTS)
+
+    sslcontext: ssl.SSLContext = ssl.create_default_context(
+        purpose=ssl.Purpose.SERVER_AUTH
+    )
+    sslcontext.load_cert_chain(certfile=mtls_certificate_path)
+    sslcontext.check_hostname = False
+    sslcontext.verify_mode = ssl.CERT_NONE
+    with contextlib.suppress(AttributeError):
+        # This only works for OpenSSL >= 1.0.0
+        sslcontext.options |= ssl.OP_NO_COMPRESSION
+    sslcontext.set_default_verify_paths()
+    return sslcontext
+
+
+def create_unverified_client_session() -> ClientSession:
+    """Creates a ClientSession using the default unverified SSL context"""
+    context: ssl.SSLContext = create_unverified_context()
+    connector: TCPConnector = TCPConnector(family=socket.AF_UNSPEC, ssl=context)
+    return ClientSession(connector=connector)
