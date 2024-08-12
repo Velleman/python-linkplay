@@ -110,10 +110,8 @@ class PlayingMode(StrEnum):
     """Defines a possible playing mode."""
 
     PHONO = "-99"  # Unmapped
-    COAXIAL_2 = "-98"  # Unmapped
     ARC = "-97"  # Unmapped
     DAB = "-96"  # Unmapped
-    PCUSB = "-95"
 
     IDLE = "-1"
     NONE = "0"
@@ -146,8 +144,9 @@ class PlayingMode(StrEnum):
     USB_DAC = "51"
     TF_CARD_2 = "52"
     OPTICAL_2 = "56"
+    COAXIAL_2 = "57"
     TALK = "60"
-    SLAVE = "99"
+    FOLLOWER = "99"
 
 
 # Map between a play mode and how to activate the play mode
@@ -173,17 +172,16 @@ PLAY_MODE_SEND_MAP: dict[PlayingMode, str] = {  # case sensitive!
     PlayingMode.XLR: "XLR",
     PlayingMode.HDMI: "HDMI",
     PlayingMode.CD: "cd",
-    PlayingMode.USB_DAC: "external_usb",  # plm_ext_usb
+    PlayingMode.USB_DAC: "PCUSB",
     PlayingMode.TF_CARD_2: "TFcard",
     PlayingMode.TALK: "Talk",
-    PlayingMode.SLAVE: "Idle",
+    PlayingMode.FOLLOWER: "Idle",
     PlayingMode.OPTICAL_2: "optical2",
     PlayingMode.PHONO: "phono",
     PlayingMode.COAXIAL_2: "co-axial2",
     PlayingMode.ARC: "ARC",
     PlayingMode.DAB: "DAB",
     PlayingMode.EXTERN_BLUETOOTH: "extern_bluetooth",
-    PlayingMode.PCUSB: "PCUSB",
 }
 
 
@@ -245,7 +243,7 @@ class InputMode(IntFlag):
     PHONO = 65536
     OPTICAL_2 = 262144
     COAXIAL_2 = 524288
-    SLAVE = 2097152  # unknown
+    FOLLOWER = 2097152  # unknown: is capable to follow leader?
     ARC = 4194304
 
 
@@ -268,7 +266,7 @@ INPUT_MODE_MAP: dict[InputMode, PlayingMode] = {
     InputMode.PHONO: PlayingMode.PHONO,
     InputMode.OPTICAL_2: PlayingMode.OPTICAL_2,
     InputMode.COAXIAL_2: PlayingMode.COAXIAL_2,
-    InputMode.SLAVE: PlayingMode.SLAVE,
+    InputMode.FOLLOWER: PlayingMode.FOLLOWER,
     InputMode.ARC: PlayingMode.ARC,
 }
 
