@@ -171,7 +171,7 @@ class LinkPlayPlayer:
     @property
     def volume(self) -> int:
         """Returns the player volume, expressed in %."""
-        return int(self.properties.get(PlayerAttribute.VOLUME, -1))
+        return int(self.properties.get(PlayerAttribute.VOLUME, 0))
 
     @property
     def current_position(self) -> int:
