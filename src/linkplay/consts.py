@@ -58,6 +58,7 @@ uc2m8y8O/hXPSfKd
 -----END CERTIFICATE-----
 """
 
+
 class LinkPlayCommand(StrEnum):
     """Defines the LinkPlay commands."""
 
