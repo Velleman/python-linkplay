@@ -181,7 +181,7 @@ class LinkPlayPlayer:
     @property
     def total_length(self) -> int:
         """Returns the total length of the track in milliseconds."""
-        return int(self.properties.get(PlayerAttribute.TOTAL_LENGTH, -1))
+        return int(self.properties.get(PlayerAttribute.TOTAL_LENGTH, 0))
 
     @property
     def status(self) -> PlayingStatus:
