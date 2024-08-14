@@ -97,7 +97,7 @@ async def async_create_unverified_context() -> ssl.SSLContext:
     ) as mtls_certificate:
         await mtls_certificate.write(MTLS_CERTIFICATE_CONTENTS)
         await mtls_certificate.flush()
-        return create_ssl_context(path=mtls_certificate.name)
+        return create_ssl_context(path=str(mtls_certificate.name))
 
 
 def create_ssl_context(path: str) -> ssl.SSLContext:
