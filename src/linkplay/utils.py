@@ -11,7 +11,6 @@ import aiofiles
 import async_timeout
 from aiohttp import ClientError, ClientSession, TCPConnector
 from appdirs import AppDirs
-from deprecated import deprecated
 
 from linkplay.consts import API_ENDPOINT, API_TIMEOUT, MTLS_CERTIFICATE_CONTENTS
 from linkplay.exceptions import LinkPlayRequestException
