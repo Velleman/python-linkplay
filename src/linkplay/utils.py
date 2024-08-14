@@ -7,6 +7,7 @@ import ssl
 from http import HTTPStatus
 from typing import Dict
 
+import aiofiles
 import async_timeout
 from aiohttp import ClientError, ClientSession, TCPConnector
 from appdirs import AppDirs
@@ -86,12 +87,25 @@ def create_unverified_context() -> ssl.SSLContext:
         with open(mtls_certificate_path, "w", encoding="utf-8") as file:
             file.write(MTLS_CERTIFICATE_CONTENTS)
 
-    sslcontext: ssl.SSLContext = ssl.create_default_context(
-        purpose=ssl.Purpose.SERVER_AUTH
-    )
-    sslcontext.load_cert_chain(certfile=mtls_certificate_path)
+    return create_ssl_context(path=mtls_certificate_path)
+
+
+async def async_create_unverified_context() -> ssl.SSLContext:
+    """Asynchronously creates an unverified SSL context with the default mTLS certificate."""
+    async with aiofiles.tempfile.NamedTemporaryFile(
+        "w", encoding="utf-8"
+    ) as mtls_certificate:
+        await mtls_certificate.write(MTLS_CERTIFICATE_CONTENTS)
+        await mtls_certificate.flush()
+        return create_ssl_context(path=str(mtls_certificate.name))
+
+
+def create_ssl_context(path: str) -> ssl.SSLContext:
+    """Creates an SSL context from given certificate file."""
+    sslcontext: ssl.SSLContext = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     sslcontext.check_hostname = False
     sslcontext.verify_mode = ssl.CERT_NONE
+    sslcontext.load_cert_chain(certfile=path)
     with contextlib.suppress(AttributeError):
         # This only works for OpenSSL >= 1.0.0
         sslcontext.options |= ssl.OP_NO_COMPRESSION
@@ -102,5 +116,12 @@ def create_unverified_context() -> ssl.SSLContext:
 def create_unverified_client_session() -> ClientSession:
     """Creates a ClientSession using the default unverified SSL context"""
     context: ssl.SSLContext = create_unverified_context()
+    connector: TCPConnector = TCPConnector(family=socket.AF_UNSPEC, ssl=context)
+    return ClientSession(connector=connector)
+
+
+async def async_create_unverified_client_session() -> ClientSession:
+    """Asynchronously creates a ClientSession using the default unverified SSL context"""
+    context: ssl.SSLContext = await async_create_unverified_context()
     connector: TCPConnector = TCPConnector(family=socket.AF_UNSPEC, ssl=context)
     return ClientSession(connector=connector)
