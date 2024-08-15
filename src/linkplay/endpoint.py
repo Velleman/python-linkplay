@@ -57,4 +57,4 @@ class LinkPlayTcpUartEndpoint(LinkPlayEndpoint):
         return await call_tcpuart_json(self._host, command)
     
     def __str__(self) -> str:
-        return self._endpoint
+        return self._host
