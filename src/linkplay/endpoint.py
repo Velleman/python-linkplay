@@ -50,8 +50,8 @@ class LinkPlayTcpUartEndpoint(LinkPlayEndpoint):
     def __init__(self, *, endpoint: str):
         self._host: str = endpoint
         
-    async def request(self, command: str) -> str | None:
-        return await call_tcpuart(self._host, command)
+    async def request(self, command: str) -> None:
+        await call_tcpuart(self._host, command)
     
     async def json_request(self, command: str) -> dict[str, str]:
         return await call_tcpuart_json(self._host, command)
