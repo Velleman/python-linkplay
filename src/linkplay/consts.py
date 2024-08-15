@@ -4,6 +4,7 @@ API_ENDPOINT: str = "{}/httpapi.asp?command={}"
 API_TIMEOUT: int = 2
 UNKNOWN_TRACK_PLAYING: str = "Unknown"
 UPNP_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaRenderer:1"
+TCPPORT = 8899
 
 MTLS_CERTIFICATE_CONTENTS = """
 -----BEGIN PRIVATE KEY-----
@@ -89,6 +90,16 @@ class LinkPlayCommand(StrEnum):
     MULTIROOM_MUTE = "setPlayerCmd:slave_mute:mute"
     MULTIROOM_UNMUTE = "setPlayerCmd:slave_mute:unmute"
     MULTIROOM_JOIN = "ConnectMasterAp:JoinGroupMaster:eth{}:wifi0.0.0.0"
+
+
+class LinkPlayTcpUartCommand(StrEnum):
+    """Defined LinkPlay TCPUART commands."""
+
+    GET_METADATA = "MCU+MEA+GET"
+    PRESET_PLAY = "MCU+KEY+{:03}"
+    PRESET_NEXT = "MCU+KEY+NXT"
+    INPUT_WIFI = "MCU+PLM+000"
+    INPUT_BLUETOOTH = "MCU+PLM+006"
 
 
 class SpeakerType(StrEnum):

@@ -2,7 +2,12 @@ from abc import ABC, abstractmethod
 
 from aiohttp import ClientSession
 
-from linkplay.utils import session_call_api_json, session_call_api_ok
+from linkplay.utils import (
+    call_tcpuart,
+    call_tcpuart_json,
+    session_call_api_json,
+    session_call_api_ok,
+)
 
 
 class LinkPlayEndpoint(ABC):
@@ -36,5 +41,20 @@ class LinkPlayApiEndpoint(LinkPlayEndpoint):
         """Performs a GET request on the given command and returns the result as a JSON object."""
         return await session_call_api_json(self._endpoint, self._session, command)
 
+    def __str__(self) -> str:
+        return self._endpoint
+
+class LinkPlayTcpUartEndpoint(LinkPlayEndpoint):
+    """Represents a LinkPlay TCPUART API endpoint."""
+    
+    def __init__(self, *, endpoint: str):
+        self._host: str = endpoint
+        
+    async def request(self, command: str) -> str | None:
+        return await call_tcpuart(self._host, command)
+    
+    async def json_request(self, command: str) -> dict[str, str]:
+        return await call_tcpuart_json(self._host, command)
+    
     def __str__(self) -> str:
         return self._endpoint
