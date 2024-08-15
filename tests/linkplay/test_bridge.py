@@ -210,6 +210,18 @@ async def test_player_set_play_mode():
     )
 
 
+async def test_player_play_preset():
+    bridge = AsyncMock()
+    player = LinkPlayPlayer(bridge)
+    preset_number = 2
+
+    await player.play_preset(preset_number)
+
+    bridge.request.assert_called_once_with(
+        LinkPlayCommand.PLAY_PRESET.format(preset_number)
+    )
+
+
 async def test_multiroom_setup():
     """Tests if multiroom sets up correctly."""
     leader = AsyncMock()
