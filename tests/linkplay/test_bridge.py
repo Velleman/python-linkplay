@@ -1,3 +1,5 @@
+"""Test bridge functionality."""
+
 from unittest.mock import AsyncMock
 
 from linkplay.bridge import (
