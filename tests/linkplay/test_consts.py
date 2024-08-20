@@ -1,4 +1,5 @@
 import pytest
+
 from linkplay.consts import INPUT_MODE_MAP, PLAY_MODE_SEND_MAP, InputMode, PlayingMode
 
 

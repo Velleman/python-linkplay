@@ -1,4 +1,5 @@
 import pytest
+
 from linkplay.endpoint import LinkPlayApiEndpoint
 
 
