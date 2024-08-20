@@ -1,3 +1,5 @@
+"""Test utility functions."""
+
 from linkplay.utils import decode_hexstr
 
 
