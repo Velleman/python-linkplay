@@ -13,12 +13,7 @@ import async_timeout
 from aiohttp import ClientError, ClientSession, TCPConnector
 from appdirs import AppDirs
 
-from linkplay.consts import (
-    API_ENDPOINT,
-    API_TIMEOUT,
-    MTLS_CERTIFICATE_CONTENTS,
-    TCPPORT,
-)
+from linkplay.consts import API_ENDPOINT, API_TIMEOUT, MTLS_CERTIFICATE_CONTENTS
 from linkplay.exceptions import LinkPlayRequestException
 
 _LOGGER = logging.getLogger(__name__)
@@ -75,46 +70,42 @@ async def session_call_api_ok(
         raise LinkPlayRequestException(f"Didn't receive expected OK from {endpoint}")
 
 
-async def call_tcpuart(host: str, cmd: str) -> str | None:
+async def call_tcpuart(
+    reader: asyncio.StreamReader, writer: asyncio.StreamWriter, cmd: str
+) -> str:
     """Get the latest data from TCP UART service."""
-    LENC = format(len(cmd), '02x')
-    HED1 = '18 96 18 20 '
-    HED2 = ' 00 00 00 c1 02 00 00 00 00 00 00 00 00 00 00 '
-    CMHX = ' '.join(hex(ord(c))[2:] for c in cmd)
+    payload_header = "18 96 18 20 "
+    payload_length = format(len(cmd), "02x")
+    payload_command_header = " 00 00 00 c1 02 00 00 00 00 00 00 00 00 00 00 "
+    payload_command_content = " ".join(hex(ord(c))[2:] for c in cmd)
     data = None
-    _LOGGER.debug("Sending to %s TCP UART command: %s", host, cmd)
-    try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.settimeout(API_TIMEOUT)
-            s.connect((host, TCPPORT))
-            s.send(bytes.fromhex(HED1 + LENC + HED2 + CMHX))
-            data = str(repr(s.recv(1024))).encode().decode("unicode-escape")
 
-        pos = data.find("AXX")
-        if pos == -1:
-            pos = data.find("MCU")
+    async with async_timeout.timeout(API_TIMEOUT):
+        writer.write(
+            bytes.fromhex(
+                payload_header
+                + payload_length
+                + payload_command_header
+                + payload_command_content
+            )
+        )
+        data = str(repr(await reader.read(1024))).encode().decode("unicode-escape")
 
-        data = data[pos:(len(data)-2)]
-        _LOGGER.debug(
-            "Received from %s TCP UART command result: %s", host, data)
-        try:
-            s.close()
-        except:
-            pass
-
-    except socket.error as ex:
-        _LOGGER.debug("Error sending TCP UART command: %s with %s", cmd, ex)
-        data = None
+    if not data:
+        raise LinkPlayRequestException("No data received from socket")
 
     return data
 
 
-async def call_tcpuart_json(host: str, cmd: str) -> dict[str, str]:
-    raw_response = await call_tcpuart(host, cmd)
+async def call_tcpuart_json(
+    reader: asyncio.StreamReader, writer: asyncio.StreamWriter, cmd: str
+) -> dict[str, str]:
+    """Get JSON data from TCPUART service."""
+    raw_response = await call_tcpuart(reader, writer, cmd)
     if not raw_response:
         return dict()
-    strip_start = raw_response.find('{')
-    strip_end = raw_response.find('}') + 1
+    strip_start = raw_response.find("{")
+    strip_end = raw_response.find("}", strip_start) + 1
     data = raw_response[strip_start:strip_end]
     return json.loads(data)  # type: ignore
 

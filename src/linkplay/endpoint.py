@@ -1,7 +1,9 @@
+import asyncio
 from abc import ABC, abstractmethod
 
 from aiohttp import ClientSession
 
+from linkplay.consts import TCPPORT
 from linkplay.utils import (
     call_tcpuart,
     call_tcpuart_json,
@@ -44,17 +46,37 @@ class LinkPlayApiEndpoint(LinkPlayEndpoint):
     def __str__(self) -> str:
         return self._endpoint
 
+
 class LinkPlayTcpUartEndpoint(LinkPlayEndpoint):
     """Represents a LinkPlay TCPUART API endpoint."""
-    
+
     def __init__(self, *, endpoint: str):
         self._host: str = endpoint
-        
+        self._port = TCPPORT
+        self._connection = None
+
     async def request(self, command: str) -> None:
-        await call_tcpuart(self._host, command)
-    
+        if self._connection is None:
+            self._connection = await asyncio.open_connection(self._host, self._port)
+        reader, writer = self._connection
+
+        await call_tcpuart(reader, writer, command)
+
     async def json_request(self, command: str) -> dict[str, str]:
-        return await call_tcpuart_json(self._host, command)
-    
+        if self._connection is None:
+            self._connection = await asyncio.open_connection(self._host, self._port)
+        reader, writer = self._connection
+        return await call_tcpuart_json(reader, writer, command)
+
+    async def close_connection(self) -> None:
+        """Closes a TCP connection."""
+        if self._connection is not None:
+            reader, writer = self._connection
+            writer.close()
+            await writer.wait_closed()
+            reader = None
+            writer = None
+            self._connection = None
+
     def __str__(self) -> str:
         return self._host
