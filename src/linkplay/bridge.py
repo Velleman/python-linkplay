@@ -80,6 +80,7 @@ class LinkPlayPlayer:
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
+        self.properties[PlayerAttribute.PLAYING_STATUS] = PlayingStatus.STOPPED
 
     async def update_status(self) -> None:
         """Update the player status."""
