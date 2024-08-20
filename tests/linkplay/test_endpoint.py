@@ -1,4 +1,7 @@
+"""Test endpoint functionality."""
+
 import pytest
+
 from linkplay.endpoint import LinkPlayApiEndpoint
 
 
