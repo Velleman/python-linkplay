@@ -150,6 +150,7 @@ class LinkPlayPlayer:
 
     async def play_preset(self, preset_number: int) -> None:
         """Play a preset."""
+        assert 0 < preset_number <= 10
         await self.bridge.request(LinkPlayCommand.PLAY_PRESET.format(preset_number))
 
     @property
