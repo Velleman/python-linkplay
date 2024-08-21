@@ -151,7 +151,10 @@ class LinkPlayPlayer:
     @property
     def muted(self) -> bool:
         """Returns if the player is muted."""
-        return self.properties.get(PlayerAttribute.MUTED, MuteMode.UNMUTED) == MuteMode.MUTED
+        return (
+            self.properties.get(PlayerAttribute.MUTED, MuteMode.UNMUTED)
+            == MuteMode.MUTED
+        )
 
     @property
     def title(self) -> str:
@@ -186,32 +189,46 @@ class LinkPlayPlayer:
     @property
     def status(self) -> PlayingStatus:
         """Returns the current playing status."""
-        return PlayingStatus(self.properties.get(PlayerAttribute.PLAYING_STATUS, PlayingStatus.STOPPED))
+        return PlayingStatus(
+            self.properties.get(PlayerAttribute.PLAYING_STATUS, PlayingStatus.STOPPED)
+        )
 
     @property
     def equalizer_mode(self) -> EqualizerMode:
         """Returns the current equalizer mode."""
-        return EqualizerMode(self.properties.get(PlayerAttribute.EQUALIZER_MODE, EqualizerMode.CLASSIC))
+        return EqualizerMode(
+            self.properties.get(PlayerAttribute.EQUALIZER_MODE, EqualizerMode.CLASSIC)
+        )
 
     @property
     def speaker_type(self) -> SpeakerType:
         """Returns the current speaker the player is playing on."""
-        return SpeakerType(self.properties.get(PlayerAttribute.SPEAKER_TYPE, SpeakerType.MAIN_SPEAKER))
+        return SpeakerType(
+            self.properties.get(PlayerAttribute.SPEAKER_TYPE, SpeakerType.MAIN_SPEAKER)
+        )
 
     @property
     def channel_type(self) -> ChannelType:
         """Returns the channel the player is playing on."""
-        return ChannelType(self.properties.get(PlayerAttribute.CHANNEL_TYPE, ChannelType.STEREO))
+        return ChannelType(
+            self.properties.get(PlayerAttribute.CHANNEL_TYPE, ChannelType.STEREO)
+        )
 
     @property
     def play_mode(self) -> PlayingMode:
         """Returns the current playing mode of the player."""
-        return PlayingMode(self.properties.get(PlayerAttribute.PLAYBACK_MODE, PlayingMode.IDLE))
+        return PlayingMode(
+            self.properties.get(PlayerAttribute.PLAYBACK_MODE, PlayingMode.IDLE)
+        )
 
     @property
     def loop_mode(self) -> LoopMode:
         """Returns the current playlist mode."""
-        return LoopMode(self.properties.get(PlayerAttribute.PLAYLIST_MODE, LoopMode.CONTINUOUS_PLAYBACK))
+        return LoopMode(
+            self.properties.get(
+                PlayerAttribute.PLAYLIST_MODE, LoopMode.CONTINUOUS_PLAYBACK
+            )
+        )
 
 
 class LinkPlayBridge:
@@ -292,7 +309,9 @@ class LinkPlayMultiroom:
 
     async def set_volume(self, value: int) -> None:
         """Sets the volume for the multiroom group."""
-        assert 0 < value <= 100
+        if not 0 <= value <= 100:
+            raise ValueError("Volume must be between 0 and 100")
+
         str_vol = str(value)
         await self.leader.request(LinkPlayCommand.MULTIROOM_VOL.format(str_vol))  # type: ignore[str-format]
 
