@@ -35,7 +35,10 @@ class LinkPlayDevice:
 
     async def update_status(self) -> None:
         """Update the device status."""
-        self.properties = await self.bridge.json_request(LinkPlayCommand.DEVICE_STATUS)  # type: ignore[assignment]
+        properties: dict[PlayerAttribute, str] = await self.bridge.json_request(
+            LinkPlayCommand.PLAYER_STATUS
+        )  # type: ignore[assignment]
+        self.properties = fixup_player_properties(properties)
 
     async def reboot(self) -> None:
         """Reboot the device."""
