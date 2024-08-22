@@ -1,6 +1,9 @@
 """Test bridge functionality."""
 
+from typing import Any
 from unittest.mock import AsyncMock
+
+import pytest
 
 from linkplay.bridge import (
     LinkPlayBridge,
@@ -166,14 +169,25 @@ async def test_player_toggle():
     bridge.request.assert_called_once_with(LinkPlayCommand.TOGGLE)
 
 
-async def test_player_set_volume():
+@pytest.mark.parametrize("volume", range(0, 101))
+async def test_player_set_volume(volume: int):
     """Tests if the player set volume is correctly called."""
     bridge = AsyncMock()
     player = LinkPlayPlayer(bridge)
 
-    await player.set_volume(100)
+    await player.set_volume(volume)
 
-    bridge.request.assert_called_once_with(LinkPlayCommand.VOLUME.format(100))
+    bridge.request.assert_called_once_with(LinkPlayCommand.VOLUME.format(volume))
+
+
+@pytest.mark.parametrize("volume", [-1, 101])
+async def test_player_set_volume_raises_value_error(volume: Any):
+    """Tests if the player set volume is correctly called."""
+    bridge = AsyncMock()
+    player = LinkPlayPlayer(bridge)
+
+    with pytest.raises(ValueError):
+        await player.set_volume(volume)
 
 
 async def test_player_set_equalizer_mode():
@@ -297,11 +311,22 @@ async def test_multiroom_unmute():
     leader.request.assert_called_once_with(LinkPlayCommand.MULTIROOM_UNMUTE)
 
 
-async def test_multiroom_set_volume():
+@pytest.mark.parametrize("volume", range(0, 101))
+async def test_multiroom_set_volume(volume: int):
     """Tests if multiroom set volume is correctly called on the leader."""
     leader = AsyncMock()
     multiroom = LinkPlayMultiroom(leader)
 
-    await multiroom.set_volume(100)
+    await multiroom.set_volume(volume)
 
-    leader.request.assert_called_once_with(LinkPlayCommand.MULTIROOM_VOL.format(100))
+    leader.request.assert_called_once_with(LinkPlayCommand.MULTIROOM_VOL.format(volume))
+
+
+@pytest.mark.parametrize("volume", [-1, 101])
+async def test_multiroom_set_volume_raises_value_error(volume: int):
+    """Tests if multiroom set volume is correctly called on the leader."""
+    leader = AsyncMock()
+    multiroom = LinkPlayMultiroom(leader)
+
+    with pytest.raises(ValueError):
+        await multiroom.set_volume(volume)
