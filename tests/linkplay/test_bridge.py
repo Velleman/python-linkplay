@@ -60,7 +60,7 @@ async def test_device_reboot():
 
 
 async def test_player_update_status():
-    """Tests if the player update status is correctly called."""
+    """Tests if the player update_status is correctly called."""
     bridge = AsyncMock()
     bridge.json_request.return_value = {}
     player = LinkPlayPlayer(bridge)
@@ -71,7 +71,7 @@ async def test_player_update_status():
 
 
 async def test_player_update_status_calls_fixup_player_properties():
-    """Tests if the player update status is correctly called."""
+    """Tests if the player update_status calls fixup_player_properties."""
 
     with patch("linkplay.bridge.fixup_player_properties") as fixup_mock:
         bridge = AsyncMock()
