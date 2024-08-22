@@ -85,7 +85,7 @@ class LinkPlayPlayer:
         """Update the player status."""
         properties: dict[PlayerAttribute, str] = await self.bridge.json_request(
             LinkPlayCommand.PLAYER_STATUS
-        )
+        )  # type: ignore[assignment]
 
         self.properties = fixup_player_properties(properties)
 
