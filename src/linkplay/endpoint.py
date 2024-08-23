@@ -50,33 +50,15 @@ class LinkPlayApiEndpoint(LinkPlayEndpoint):
 class LinkPlayTcpUartEndpoint(LinkPlayEndpoint):
     """Represents a LinkPlay TCPUART API endpoint."""
 
-    def __init__(self, *, endpoint: str):
-        self._host: str = endpoint
-        self._port = TCPPORT
-        self._connection: tuple[asyncio.StreamReader, asyncio.StreamWriter] | None = (
-            None
-        )
+    def __init__(
+        self, *, connection: tuple[asyncio.StreamReader, asyncio.StreamWriter]
+    ):
+        self._connection = connection
 
     async def request(self, command: str) -> None:
-        if self._connection is None:
-            self._connection = await asyncio.open_connection(self._host, self._port)
         reader, writer = self._connection
-
         await call_tcpuart(reader, writer, command)
 
     async def json_request(self, command: str) -> dict[str, str]:
-        if self._connection is None:
-            self._connection = await asyncio.open_connection(self._host, self._port)
         reader, writer = self._connection
         return await call_tcpuart_json(reader, writer, command)
-
-    async def close_connection(self) -> None:
-        """Closes a TCP connection."""
-        if self._connection is not None:
-            reader, writer = self._connection
-            writer.close()
-            await writer.wait_closed()
-            self._connection = None
-
-    def __str__(self) -> str:
-        return self._host
