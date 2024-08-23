@@ -1,8 +1,15 @@
+import asyncio
 from abc import ABC, abstractmethod
 
 from aiohttp import ClientSession
 
-from linkplay.utils import session_call_api_json, session_call_api_ok
+from linkplay.consts import TCPPORT
+from linkplay.utils import (
+    call_tcpuart,
+    call_tcpuart_json,
+    session_call_api_json,
+    session_call_api_ok,
+)
 
 
 class LinkPlayEndpoint(ABC):
@@ -38,3 +45,20 @@ class LinkPlayApiEndpoint(LinkPlayEndpoint):
 
     def __str__(self) -> str:
         return self._endpoint
+
+
+class LinkPlayTcpUartEndpoint(LinkPlayEndpoint):
+    """Represents a LinkPlay TCPUART API endpoint."""
+
+    def __init__(
+        self, *, connection: tuple[asyncio.StreamReader, asyncio.StreamWriter]
+    ):
+        self._connection = connection
+
+    async def request(self, command: str) -> None:
+        reader, writer = self._connection
+        await call_tcpuart(reader, writer, command)
+
+    async def json_request(self, command: str) -> dict[str, str]:
+        reader, writer = self._connection
+        return await call_tcpuart_json(reader, writer, command)
