@@ -5,6 +5,7 @@ API_TIMEOUT: int = 2
 UNKNOWN_TRACK_PLAYING: str = "Unknown"
 UPNP_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaRenderer:1"
 TCPPORT = 8899
+TCP_MESSAGE_LENGTH = 1024
 
 MTLS_CERTIFICATE_CONTENTS = """
 -----BEGIN PRIVATE KEY-----

@@ -18,6 +18,7 @@ from linkplay.consts import (
     API_ENDPOINT,
     API_TIMEOUT,
     MTLS_CERTIFICATE_CONTENTS,
+    TCP_MESSAGE_LENGTH,
     PlayerAttribute,
     PlayingStatus,
 )
@@ -95,12 +96,13 @@ async def call_tcpuart(
                 + payload_command_content
             )
         )
-        data = str(repr(await reader.read(1024))).encode().decode("unicode-escape")
 
-    if not data:
-        raise LinkPlayRequestException("No data received from socket")
+        data: bytes = await reader.read(TCP_MESSAGE_LENGTH)
 
-    return data
+        if data == b"":
+            raise LinkPlayRequestException("No data received from socket")
+
+        return str(repr(data))
 
 
 async def call_tcpuart_json(
