@@ -1,6 +1,5 @@
 import asyncio
 from abc import ABC, abstractmethod
-from typing import Tuple
 
 from aiohttp import ClientSession
 
@@ -54,7 +53,7 @@ class LinkPlayTcpUartEndpoint(LinkPlayEndpoint):
     def __init__(self, *, endpoint: str):
         self._host: str = endpoint
         self._port = TCPPORT
-        self._connection: Tuple[asyncio.StreamReader, asyncio.StreamWriter] | None = (
+        self._connection: tuple[asyncio.StreamReader, asyncio.StreamWriter] | None = (
             None
         )
 
