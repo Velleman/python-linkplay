@@ -233,6 +233,35 @@ async def test_player_set_play_mode():
     )
 
 
+@pytest.mark.parametrize("preset_number", range(1, 11))
+async def test_player_play_preset(preset_number: int):
+    """Tests if a player is able to play a preset."""
+    bridge = AsyncMock()
+    player = LinkPlayPlayer(bridge)
+
+    await player.play_preset(preset_number)
+
+    bridge.request.assert_called_once_with(
+        LinkPlayCommand.PLAY_PRESET.format(preset_number)
+    )
+
+
+@pytest.mark.parametrize(
+    "preset_number",
+    [
+        0,
+        11,
+    ],
+)
+async def test_player_play_preset_raises_value_error(preset_number: int):
+    """Tests that a player fails in an expected way if play preset input is incorrect."""
+    bridge = AsyncMock()
+    player = LinkPlayPlayer(bridge)
+
+    with pytest.raises(ValueError):
+        await player.play_preset(preset_number)
+
+
 async def test_multiroom_setup():
     """Tests if multiroom sets up correctly."""
     leader = AsyncMock()

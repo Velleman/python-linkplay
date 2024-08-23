@@ -149,6 +149,12 @@ class LinkPlayPlayer:
             LinkPlayCommand.SWITCH_MODE.format(PLAY_MODE_SEND_MAP[mode])
         )  # type: ignore[str-format]
 
+    async def play_preset(self, preset_number: int) -> None:
+        """Play a preset."""
+        if not 0 < preset_number <= 10:
+            raise ValueError("Preset must be between 1 and 10.")
+        await self.bridge.request(LinkPlayCommand.PLAY_PRESET.format(preset_number))
+
     @property
     def muted(self) -> bool:
         """Returns if the player is muted."""

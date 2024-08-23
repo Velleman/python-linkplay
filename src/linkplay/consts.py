@@ -89,6 +89,7 @@ class LinkPlayCommand(StrEnum):
     MULTIROOM_MUTE = "setPlayerCmd:slave_mute:mute"
     MULTIROOM_UNMUTE = "setPlayerCmd:slave_mute:unmute"
     MULTIROOM_JOIN = "ConnectMasterAp:JoinGroupMaster:eth{}:wifi0.0.0.0"
+    PLAY_PRESET = "MCUKeyShortClick:{}"
 
 
 class SpeakerType(StrEnum):
