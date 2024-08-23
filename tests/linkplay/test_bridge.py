@@ -253,7 +253,7 @@ async def test_player_play_preset(preset_number: int):
         11,
     ],
 )
-async def test_player_play_preset_raises_value_error(preset_number: Any):
+async def test_player_play_preset_raises_value_error(preset_number: int):
     """Tests that a player fails in an expected way if play preset input is incorrect."""
     bridge = AsyncMock()
     player = LinkPlayPlayer(bridge)
