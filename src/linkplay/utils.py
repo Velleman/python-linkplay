@@ -5,15 +5,22 @@ import logging
 import os
 import socket
 import ssl
+from concurrent.futures import ThreadPoolExecutor
 from http import HTTPStatus
-from typing import Dict
 
 import aiofiles
 import async_timeout
 from aiohttp import ClientError, ClientSession, TCPConnector
 from appdirs import AppDirs
+from deprecated import deprecated
 
-from linkplay.consts import API_ENDPOINT, API_TIMEOUT, MTLS_CERTIFICATE_CONTENTS
+from linkplay.consts import (
+    API_ENDPOINT,
+    API_TIMEOUT,
+    MTLS_CERTIFICATE_CONTENTS,
+    PlayerAttribute,
+    PlayingStatus,
+)
 from linkplay.exceptions import LinkPlayRequestException
 
 _LOGGER = logging.getLogger(__name__)
@@ -54,7 +61,7 @@ async def session_call_api(endpoint: str, session: ClientSession, command: str) 
 
 async def session_call_api_json(
     endpoint: str, session: ClientSession, command: str
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """Calls the LinkPlay API and returns the result as a JSON object."""
     result = await session_call_api(endpoint, session, command)
     return json.loads(result)  # type: ignore
@@ -118,6 +125,7 @@ def decode_hexstr(hexstr: str) -> str:
         return hexstr
 
 
+@deprecated(version="0.0.9", reason="Use async_create_unverified_context instead")
 def create_unverified_context() -> ssl.SSLContext:
     """Creates an unverified SSL context with the default mTLS certificate."""
     dirs = AppDirs("python-linkplay")
@@ -133,16 +141,38 @@ def create_unverified_context() -> ssl.SSLContext:
     return create_ssl_context(path=mtls_certificate_path)
 
 
-async def async_create_unverified_context() -> ssl.SSLContext:
+async def async_create_unverified_context(
+    executor: ThreadPoolExecutor | None = None,
+) -> ssl.SSLContext:
     """Asynchronously creates an unverified SSL context with the default mTLS certificate."""
     async with aiofiles.tempfile.NamedTemporaryFile(
         "w", encoding="utf-8"
     ) as mtls_certificate:
         await mtls_certificate.write(MTLS_CERTIFICATE_CONTENTS)
         await mtls_certificate.flush()
-        return create_ssl_context(path=str(mtls_certificate.name))
+        certfile: str = str(mtls_certificate.name)
+        return await async_create_ssl_context(certfile=certfile, executor=executor)
 
 
+async def async_create_ssl_context(
+    *, certfile: str, executor: ThreadPoolExecutor | None = None
+) -> ssl.SSLContext:
+    """Creates an SSL context from given certificate file."""
+    sslcontext: ssl.SSLContext = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+    sslcontext.check_hostname = False
+    sslcontext.verify_mode = ssl.CERT_NONE
+
+    loop = asyncio.get_running_loop()
+    await loop.run_in_executor(executor, sslcontext.load_cert_chain, certfile)
+
+    with contextlib.suppress(AttributeError):
+        # This only works for OpenSSL >= 1.0.0
+        sslcontext.options |= ssl.OP_NO_COMPRESSION
+    sslcontext.set_default_verify_paths()
+    return sslcontext
+
+
+@deprecated(version="0.0.9", reason="Use async_create_ssl_context instead")
 def create_ssl_context(path: str) -> ssl.SSLContext:
     """Creates an SSL context from given certificate file."""
     sslcontext: ssl.SSLContext = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
@@ -156,6 +186,9 @@ def create_ssl_context(path: str) -> ssl.SSLContext:
     return sslcontext
 
 
+@deprecated(
+    version="0.0.9", reason="Use async_create_unverified_client_session instead"
+)
 def create_unverified_client_session() -> ClientSession:
     """Creates a ClientSession using the default unverified SSL context"""
     context: ssl.SSLContext = create_unverified_context()
@@ -168,3 +201,27 @@ async def async_create_unverified_client_session() -> ClientSession:
     context: ssl.SSLContext = await async_create_unverified_context()
     connector: TCPConnector = TCPConnector(family=socket.AF_UNSPEC, ssl=context)
     return ClientSession(connector=connector)
+
+
+def fixup_player_properties(
+    properties: dict[PlayerAttribute, str],
+) -> dict[PlayerAttribute, str]:
+    """Fixes up PlayerAttribute in a dict."""
+    properties[PlayerAttribute.TITLE] = decode_hexstr(
+        properties.get(PlayerAttribute.TITLE, "")
+    )
+    properties[PlayerAttribute.ARTIST] = decode_hexstr(
+        properties.get(PlayerAttribute.ARTIST, "")
+    )
+    properties[PlayerAttribute.ALBUM] = decode_hexstr(
+        properties.get(PlayerAttribute.ALBUM, "")
+    )
+
+    # Fixup playing status "none" by setting it to "stopped"
+    if (
+        properties.get(PlayerAttribute.PLAYING_STATUS, "")
+        not in PlayingStatus.__members__.values()
+    ):
+        properties[PlayerAttribute.PLAYING_STATUS] = PlayingStatus.STOPPED
+
+    return properties

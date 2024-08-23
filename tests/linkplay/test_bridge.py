@@ -1,6 +1,9 @@
 """Test bridge functionality."""
 
-from unittest.mock import AsyncMock
+from typing import Any
+from unittest.mock import AsyncMock, patch
+
+import pytest
 
 from linkplay.bridge import (
     LinkPlayBridge,
@@ -57,19 +60,26 @@ async def test_device_reboot():
 
 
 async def test_player_update_status():
-    """Tests if the player update status is correctly called."""
+    """Tests if the player update_status is correctly called."""
     bridge = AsyncMock()
-    bridge.json_request.return_value = {
-        PlayerAttribute.TITLE: "556E6B6E6F776E",
-        PlayerAttribute.ARTIST: "556E6B6E6F776E",
-        PlayerAttribute.ALBUM: "556E6B6E6F776E",
-    }
+    bridge.json_request.return_value = {}
     player = LinkPlayPlayer(bridge)
 
     await player.update_status()
 
     bridge.json_request.assert_called_once_with(LinkPlayCommand.PLAYER_STATUS)
-    assert player.title == "Unknown"
+
+
+async def test_player_update_status_calls_fixup_player_properties():
+    """Tests if the player update_status calls fixup_player_properties."""
+
+    with patch("linkplay.bridge.fixup_player_properties") as fixup_mock:
+        bridge = AsyncMock()
+        player = LinkPlayPlayer(bridge)
+
+        await player.update_status()
+
+        fixup_mock.assert_called_once()
 
 
 async def test_player_next():
@@ -166,14 +176,25 @@ async def test_player_toggle():
     bridge.request.assert_called_once_with(LinkPlayCommand.TOGGLE)
 
 
-async def test_player_set_volume():
+@pytest.mark.parametrize("volume", range(0, 101))
+async def test_player_set_volume(volume: int):
     """Tests if the player set volume is correctly called."""
     bridge = AsyncMock()
     player = LinkPlayPlayer(bridge)
 
-    await player.set_volume(100)
+    await player.set_volume(volume)
 
-    bridge.request.assert_called_once_with(LinkPlayCommand.VOLUME.format(100))
+    bridge.request.assert_called_once_with(LinkPlayCommand.VOLUME.format(volume))
+
+
+@pytest.mark.parametrize("volume", [-1, 101])
+async def test_player_set_volume_raises_value_error(volume: Any):
+    """Tests if the player set volume is correctly called."""
+    bridge = AsyncMock()
+    player = LinkPlayPlayer(bridge)
+
+    with pytest.raises(ValueError):
+        await player.set_volume(volume)
 
 
 async def test_player_set_equalizer_mode():
@@ -297,11 +318,22 @@ async def test_multiroom_unmute():
     leader.request.assert_called_once_with(LinkPlayCommand.MULTIROOM_UNMUTE)
 
 
-async def test_multiroom_set_volume():
+@pytest.mark.parametrize("volume", range(0, 101))
+async def test_multiroom_set_volume(volume: int):
     """Tests if multiroom set volume is correctly called on the leader."""
     leader = AsyncMock()
     multiroom = LinkPlayMultiroom(leader)
 
-    await multiroom.set_volume(100)
+    await multiroom.set_volume(volume)
 
-    leader.request.assert_called_once_with(LinkPlayCommand.MULTIROOM_VOL.format(100))
+    leader.request.assert_called_once_with(LinkPlayCommand.MULTIROOM_VOL.format(volume))
+
+
+@pytest.mark.parametrize("volume", [-1, 101])
+async def test_multiroom_set_volume_raises_value_error(volume: int):
+    """Tests if multiroom set volume is correctly called on the leader."""
+    leader = AsyncMock()
+    multiroom = LinkPlayMultiroom(leader)
+
+    with pytest.raises(ValueError):
+        await multiroom.set_volume(volume)
