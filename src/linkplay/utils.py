@@ -81,11 +81,10 @@ async def call_tcpuart(
     reader: asyncio.StreamReader, writer: asyncio.StreamWriter, cmd: str
 ) -> str:
     """Get the latest data from TCP UART service."""
-    payload_header = "18 96 18 20 "
-    payload_length = format(len(cmd), "02x")
-    payload_command_header = " 00 00 00 c1 02 00 00 00 00 00 00 00 00 00 00 "
-    payload_command_content = " ".join(hex(ord(c))[2:] for c in cmd)
-    data = None
+    payload_header: str = "18 96 18 20 "
+    payload_length: str = format(len(cmd), "02x")
+    payload_command_header: str = " 00 00 00 c1 02 00 00 00 00 00 00 00 00 00 00 "
+    payload_command_content: str = " ".join(hex(ord(c))[2:] for c in cmd)
 
     async with async_timeout.timeout(API_TIMEOUT):
         writer.write(
@@ -108,7 +107,7 @@ async def call_tcpuart_json(
     reader: asyncio.StreamReader, writer: asyncio.StreamWriter, cmd: str
 ) -> dict[str, str]:
     """Get JSON data from TCPUART service."""
-    raw_response = await call_tcpuart(reader, writer, cmd)
+    raw_response: str = await call_tcpuart(reader, writer, cmd)
     strip_start = raw_response.find("{")
     strip_end = raw_response.find("}", strip_start) + 1
     data = raw_response[strip_start:strip_end]
