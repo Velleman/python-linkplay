@@ -6,7 +6,6 @@ import socket
 import ssl
 from concurrent.futures import ThreadPoolExecutor
 from http import HTTPStatus
-from typing import Dict
 
 import aiofiles
 import async_timeout
@@ -14,7 +13,13 @@ from aiohttp import ClientError, ClientSession, TCPConnector
 from appdirs import AppDirs
 from deprecated import deprecated
 
-from linkplay.consts import API_ENDPOINT, API_TIMEOUT, MTLS_CERTIFICATE_CONTENTS
+from linkplay.consts import (
+    API_ENDPOINT,
+    API_TIMEOUT,
+    MTLS_CERTIFICATE_CONTENTS,
+    PlayerAttribute,
+    PlayingStatus,
+)
 from linkplay.exceptions import LinkPlayRequestException
 
 
@@ -53,7 +58,7 @@ async def session_call_api(endpoint: str, session: ClientSession, command: str) 
 
 async def session_call_api_json(
     endpoint: str, session: ClientSession, command: str
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """Calls the LinkPlay API and returns the result as a JSON object."""
     result = await session_call_api(endpoint, session, command)
     return json.loads(result)  # type: ignore
@@ -153,3 +158,27 @@ async def async_create_unverified_client_session() -> ClientSession:
     context: ssl.SSLContext = await async_create_unverified_context()
     connector: TCPConnector = TCPConnector(family=socket.AF_UNSPEC, ssl=context)
     return ClientSession(connector=connector)
+
+
+def fixup_player_properties(
+    properties: dict[PlayerAttribute, str],
+) -> dict[PlayerAttribute, str]:
+    """Fixes up PlayerAttribute in a dict."""
+    properties[PlayerAttribute.TITLE] = decode_hexstr(
+        properties.get(PlayerAttribute.TITLE, "")
+    )
+    properties[PlayerAttribute.ARTIST] = decode_hexstr(
+        properties.get(PlayerAttribute.ARTIST, "")
+    )
+    properties[PlayerAttribute.ALBUM] = decode_hexstr(
+        properties.get(PlayerAttribute.ALBUM, "")
+    )
+
+    # Fixup playing status "none" by setting it to "stopped"
+    if (
+        properties.get(PlayerAttribute.PLAYING_STATUS, "")
+        not in PlayingStatus.__members__.values()
+    ):
+        properties[PlayerAttribute.PLAYING_STATUS] = PlayingStatus.STOPPED
+
+    return properties

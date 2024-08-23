@@ -19,7 +19,7 @@ from linkplay.consts import (
     SpeakerType,
 )
 from linkplay.endpoint import LinkPlayEndpoint
-from linkplay.utils import decode_hexstr
+from linkplay.utils import fixup_player_properties
 
 
 class LinkPlayDevice:
@@ -83,10 +83,11 @@ class LinkPlayPlayer:
 
     async def update_status(self) -> None:
         """Update the player status."""
-        self.properties = await self.bridge.json_request(LinkPlayCommand.PLAYER_STATUS)  # type: ignore[assignment]
-        self.properties[PlayerAttribute.TITLE] = decode_hexstr(self.title)
-        self.properties[PlayerAttribute.ARTIST] = decode_hexstr(self.artist)
-        self.properties[PlayerAttribute.ALBUM] = decode_hexstr(self.album)
+        properties: dict[PlayerAttribute, str] = await self.bridge.json_request(
+            LinkPlayCommand.PLAYER_STATUS
+        )  # type: ignore[assignment]
+
+        self.properties = fixup_player_properties(properties)
 
     async def next(self) -> None:
         """Play the next song in the playlist."""

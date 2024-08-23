@@ -1,7 +1,7 @@
 """Test bridge functionality."""
 
 from typing import Any
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -60,19 +60,26 @@ async def test_device_reboot():
 
 
 async def test_player_update_status():
-    """Tests if the player update status is correctly called."""
+    """Tests if the player update_status is correctly called."""
     bridge = AsyncMock()
-    bridge.json_request.return_value = {
-        PlayerAttribute.TITLE: "556E6B6E6F776E",
-        PlayerAttribute.ARTIST: "556E6B6E6F776E",
-        PlayerAttribute.ALBUM: "556E6B6E6F776E",
-    }
+    bridge.json_request.return_value = {}
     player = LinkPlayPlayer(bridge)
 
     await player.update_status()
 
     bridge.json_request.assert_called_once_with(LinkPlayCommand.PLAYER_STATUS)
-    assert player.title == "Unknown"
+
+
+async def test_player_update_status_calls_fixup_player_properties():
+    """Tests if the player update_status calls fixup_player_properties."""
+
+    with patch("linkplay.bridge.fixup_player_properties") as fixup_mock:
+        bridge = AsyncMock()
+        player = LinkPlayPlayer(bridge)
+
+        await player.update_status()
+
+        fixup_mock.assert_called_once()
 
 
 async def test_player_next():
