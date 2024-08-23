@@ -109,8 +109,6 @@ async def call_tcpuart_json(
 ) -> dict[str, str]:
     """Get JSON data from TCPUART service."""
     raw_response = await call_tcpuart(reader, writer, cmd)
-    if not raw_response:
-        return dict()
     strip_start = raw_response.find("{")
     strip_end = raw_response.find("}", strip_start) + 1
     data = raw_response[strip_start:strip_end]
