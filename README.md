@@ -7,7 +7,7 @@ A Python Library for Seamless LinkPlay Device Control
 
 ## Intro
 
-Welcome to python-linkplay, a powerful and user-friendly Python library designed to simplify the integration and control of LinkPlay-enabled devices in your projects. LinkPlay technology empowers a wide range of smart audio devices, making them interconnected and easily controllable. With python-linkpaly, you can harness this capability and seamlessly manage your LinkPlay devices from within your Python applications.
+Welcome to python-linkplay, a powerful and user-friendly Python library designed to simplify the integration and control of LinkPlay-enabled devices in your projects. LinkPlay technology empowers a wide range of smart audio devices, making them interconnected and easily controllable. With python-linkplay, you can harness this capability and seamlessly manage your LinkPlay devices from within your Python applications.
 
 ## Key features
 
