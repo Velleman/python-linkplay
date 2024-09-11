@@ -35,7 +35,7 @@ class LinkPlayController:
         # Add bridge
         current_bridges = [bridge.device.uuid for bridge in self.bridges]
         if bridge_to_add.device.uuid not in current_bridges:
-            self.bridges.extend(bridge_to_add)
+            self.bridges.append(bridge_to_add)
 
     async def discover_multirooms(self) -> None:
         """Attempts to discover multirooms on the local network."""
