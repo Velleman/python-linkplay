@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any
 
 from linkplay.consts import (
@@ -22,16 +23,16 @@ from linkplay.endpoint import LinkPlayEndpoint
 from linkplay.utils import fixup_player_properties
 
 
+@dataclass
 class LinkPlayDevice:
     """Represents a LinkPlay device."""
 
     bridge: LinkPlayBridge
-    properties: dict[DeviceAttribute, str] = dict.fromkeys(
-        DeviceAttribute.__members__.values(), ""
-    )
+    properties: dict[DeviceAttribute, str]
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
+        self.properties = dict.fromkeys(DeviceAttribute.__members__.values(), "")
 
     async def update_status(self) -> None:
         """Update the device status."""
@@ -70,16 +71,16 @@ class LinkPlayDevice:
         )
 
 
+@dataclass
 class LinkPlayPlayer:
     """Represents a LinkPlay player."""
 
     bridge: LinkPlayBridge
-    properties: dict[PlayerAttribute, str] = dict.fromkeys(
-        PlayerAttribute.__members__.values(), ""
-    )
+    properties: dict[PlayerAttribute, str]
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
+        self.properties = dict.fromkeys(PlayerAttribute.__members__.values(), "")
 
     async def update_status(self) -> None:
         """Update the player status."""

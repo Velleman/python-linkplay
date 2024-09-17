@@ -1,10 +1,10 @@
 """Test bridge functionality."""
 
+from dataclasses import asdict
 from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
-
 from linkplay.bridge import (
     LinkPlayBridge,
     LinkPlayDevice,
@@ -57,6 +57,14 @@ async def test_device_reboot():
     await device.reboot()
 
     bridge.request.assert_called_once_with(LinkPlayCommand.REBOOT)
+
+
+async def test_deserialize_device():
+    """Test the device to deserialize correctly."""
+    bridge = AsyncMock()
+    device = LinkPlayDevice(bridge)
+
+    asdict(device)
 
 
 async def test_player_update_status():
@@ -260,6 +268,14 @@ async def test_player_play_preset_raises_value_error(preset_number: int):
 
     with pytest.raises(ValueError):
         await player.play_preset(preset_number)
+
+
+async def test_deserialize_player():
+    """Test the player to deserialize correctly."""
+    bridge = AsyncMock()
+    player = LinkPlayPlayer(bridge)
+
+    asdict(player)
 
 
 async def test_multiroom_setup():

@@ -1,5 +1,6 @@
 import asyncio
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 from aiohttp import ClientSession
 
@@ -12,6 +13,7 @@ from linkplay.utils import (
 )
 
 
+@dataclass
 class LinkPlayEndpoint(ABC):
     """Represents an abstract LinkPlay endpoint."""
 
@@ -24,6 +26,7 @@ class LinkPlayEndpoint(ABC):
         """Performs a request on the given command and returns the result as a JSON object."""
 
 
+@dataclass
 class LinkPlayApiEndpoint(LinkPlayEndpoint):
     """Represents a LinkPlay HTTP API endpoint."""
 
