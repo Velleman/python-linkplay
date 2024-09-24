@@ -26,12 +26,15 @@ class LinkPlayDevice:
     """Represents a LinkPlay device."""
 
     bridge: LinkPlayBridge
-    properties: dict[DeviceAttribute, str] = dict.fromkeys(
-        DeviceAttribute.__members__.values(), ""
-    )
+    properties: dict[DeviceAttribute, str]
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
+        self.properties = dict.fromkeys(DeviceAttribute.__members__.values(), "")
+
+    def to_dict(self):
+        """Return the state of the LinkPlayDevice."""
+        return {"properties": self.properties}
 
     async def update_status(self) -> None:
         """Update the device status."""
@@ -74,12 +77,15 @@ class LinkPlayPlayer:
     """Represents a LinkPlay player."""
 
     bridge: LinkPlayBridge
-    properties: dict[PlayerAttribute, str] = dict.fromkeys(
-        PlayerAttribute.__members__.values(), ""
-    )
+    properties: dict[PlayerAttribute, str]
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
+        self.properties = dict.fromkeys(PlayerAttribute.__members__.values(), "")
+
+    def to_dict(self):
+        """Return the state of the LinkPlayPlayer."""
+        return {"properties": self.properties}
 
     async def update_status(self) -> None:
         """Update the player status."""
@@ -255,6 +261,14 @@ class LinkPlayBridge:
             return f"{self.endpoint}"
 
         return self.device.name
+
+    def to_dict(self):
+        """Return the state of the LinkPlayBridge."""
+        return {
+            "endpoint": self.endpoint.to_dict(),
+            "device": self.device.to_dict(),
+            "player": self.player.to_dict(),
+        }
 
     async def json_request(self, command: str) -> dict[str, str]:
         """Performs a GET request on the given command and returns the result as a JSON object."""
