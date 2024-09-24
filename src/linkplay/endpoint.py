@@ -1,10 +1,8 @@
 import asyncio
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 
 from aiohttp import ClientSession
 
-from linkplay.consts import TCPPORT
 from linkplay.utils import (
     call_tcpuart,
     call_tcpuart_json,
@@ -13,7 +11,6 @@ from linkplay.utils import (
 )
 
 
-@dataclass
 class LinkPlayEndpoint(ABC):
     """Represents an abstract LinkPlay endpoint."""
 
@@ -25,8 +22,11 @@ class LinkPlayEndpoint(ABC):
     async def json_request(self, command: str) -> dict[str, str]:
         """Performs a request on the given command and returns the result as a JSON object."""
 
+    @abstractmethod
+    def to_dict(self) -> dict[str, str]:
+        """Return the state of the LinkPlayEndpoint"""
 
-@dataclass
+
 class LinkPlayApiEndpoint(LinkPlayEndpoint):
     """Represents a LinkPlay HTTP API endpoint."""
 
@@ -37,6 +37,10 @@ class LinkPlayApiEndpoint(LinkPlayEndpoint):
         ], "Protocol must be either 'http' or 'https'"
         self._endpoint: str = f"{protocol}://{endpoint}"
         self._session: ClientSession = session
+
+    def to_dict(self):
+        """Return the state of the LinkPlayEndpoint"""
+        return {"endpoint": self._endpoint}
 
     async def request(self, command: str) -> None:
         """Performs a GET request on the given command and verifies the result."""
@@ -57,6 +61,10 @@ class LinkPlayTcpUartEndpoint(LinkPlayEndpoint):
         self, *, connection: tuple[asyncio.StreamReader, asyncio.StreamWriter]
     ):
         self._connection = connection
+
+    def to_dict(self):
+        """Return the state of the LinkPlayEndpoint"""
+        return {}
 
     async def request(self, command: str) -> None:
         reader, writer = self._connection

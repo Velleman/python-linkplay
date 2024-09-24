@@ -304,6 +304,12 @@ class PlayerAttribute(StrEnum):
     VOLUME = "vol"
     MUTED = "mute"
 
+    def __str__(self):
+        return self.value
+
+    def __repr__(self):
+        return self.value
+
 
 class DeviceAttribute(StrEnum):
     """Defines the device attributes."""
@@ -412,6 +418,12 @@ class DeviceAttribute(StrEnum):
     POWER_MODE = "power_mode"
     SECURITY_CAPABILITIES = "security_capabilities"
 
+    def __str__(self):
+        return self.value
+
+    def __repr__(self):
+        return self.value
+
 
 class MultiroomAttribute(StrEnum):
     """Defines the player attributes."""
@@ -420,3 +432,9 @@ class MultiroomAttribute(StrEnum):
     FOLLOWER_LIST = "slave_list"
     UUID = "uuid"
     IP = "ip"
+
+    def __str__(self):
+        return self.value
+
+    def __repr__(self):
+        return self.value

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Any
 
 from linkplay.consts import (
@@ -23,7 +22,6 @@ from linkplay.endpoint import LinkPlayEndpoint
 from linkplay.utils import fixup_player_properties
 
 
-@dataclass
 class LinkPlayDevice:
     """Represents a LinkPlay device."""
 
@@ -33,6 +31,10 @@ class LinkPlayDevice:
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
         self.properties = dict.fromkeys(DeviceAttribute.__members__.values(), "")
+
+    def to_dict(self):
+        """Return the state of the LinkPlayDevice."""
+        return {"properties": self.properties}
 
     async def update_status(self) -> None:
         """Update the device status."""
@@ -71,7 +73,6 @@ class LinkPlayDevice:
         )
 
 
-@dataclass
 class LinkPlayPlayer:
     """Represents a LinkPlay player."""
 
@@ -81,6 +82,10 @@ class LinkPlayPlayer:
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
         self.properties = dict.fromkeys(PlayerAttribute.__members__.values(), "")
+
+    def to_dict(self):
+        """Return the state of the LinkPlayPlayer."""
+        return {"properties": self.properties}
 
     async def update_status(self) -> None:
         """Update the player status."""
@@ -256,6 +261,14 @@ class LinkPlayBridge:
             return f"{self.endpoint}"
 
         return self.device.name
+
+    def to_dict(self):
+        """Return the state of the LinkPlayBridge."""
+        return {
+            "endpoint": self.endpoint.to_dict(),
+            "device": self.device.to_dict(),
+            "player": self.player.to_dict(),
+        }
 
     async def json_request(self, command: str) -> dict[str, str]:
         """Performs a GET request on the given command and returns the result as a JSON object."""
