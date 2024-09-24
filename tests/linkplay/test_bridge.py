@@ -1,6 +1,5 @@
 """Test bridge functionality."""
 
-from dataclasses import asdict
 from typing import Any
 from unittest.mock import AsyncMock, patch
 
@@ -64,7 +63,7 @@ async def test_deserialize_device():
     bridge = AsyncMock()
     device = LinkPlayDevice(bridge)
 
-    asdict(device)
+    device.to_dict()
 
 
 async def test_player_update_status():
@@ -275,7 +274,7 @@ async def test_deserialize_player():
     bridge = AsyncMock()
     player = LinkPlayPlayer(bridge)
 
-    asdict(player)
+    player.to_dict()
 
 
 async def test_multiroom_setup():
