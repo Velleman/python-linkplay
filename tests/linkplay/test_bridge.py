@@ -173,6 +173,17 @@ async def test_player_pause():
     assert player.status == PlayingStatus.PAUSED
 
 
+async def test_player_stop():
+    """Tests if the player stop is correctly called."""
+    bridge = AsyncMock()
+    player = LinkPlayPlayer(bridge)
+
+    await player.stop()
+
+    bridge.request.assert_called_once_with(LinkPlayCommand.STOP)
+    assert player.status == PlayingStatus.STOPPED
+
+
 async def test_player_toggle():
     """Tests if the player pause is correctly called."""
     bridge = AsyncMock()

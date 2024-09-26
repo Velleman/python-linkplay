@@ -130,6 +130,11 @@ class LinkPlayPlayer:
         await self.bridge.request(LinkPlayCommand.PAUSE)
         self.properties[PlayerAttribute.PLAYING_STATUS] = PlayingStatus.PAUSED
 
+    async def stop(self) -> None:
+        """Stop the current playing track and remove the selected source."""
+        await self.bridge.request(LinkPlayCommand.STOP)
+        self.properties[PlayerAttribute.PLAYING_STATUS] = PlayingStatus.STOPPED
+
     async def toggle(self) -> None:
         """Start playing if the player is currently not playing. Stops playing if it is."""
         await self.bridge.request(LinkPlayCommand.TOGGLE)
