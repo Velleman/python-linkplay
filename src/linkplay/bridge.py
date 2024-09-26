@@ -235,9 +235,12 @@ class LinkPlayPlayer:
     @property
     def play_mode(self) -> PlayingMode:
         """Returns the current playing mode of the player."""
-        return PlayingMode(
-            self.properties.get(PlayerAttribute.PLAYBACK_MODE, PlayingMode.IDLE)
-        )
+        try:
+            return PlayingMode(
+                self.properties.get(PlayerAttribute.PLAYBACK_MODE, PlayingMode.IDLE)
+            )
+        except ValueError:
+            return PlayingMode(PlayingMode.IDLE)
 
     @property
     def loop_mode(self) -> LoopMode:

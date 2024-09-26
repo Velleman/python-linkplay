@@ -215,6 +215,15 @@ async def test_player_set_volume_raises_value_error(volume: Any):
         await player.set_volume(volume)
 
 
+async def test_player_invalid_playmode():
+    """Tests if the player handles an invalid playmode correctly."""
+    bridge = AsyncMock()
+    player = LinkPlayPlayer(bridge)
+    player.properties[PlayerAttribute.PLAYBACK_MODE] = 33
+
+    assert player.play_mode == PlayingMode.IDLE
+
+
 async def test_player_set_equalizer_mode():
     """Tests if the player set equalizer mode is correctly called."""
     bridge = AsyncMock()
