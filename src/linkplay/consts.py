@@ -79,6 +79,7 @@ class LinkPlayCommand(StrEnum):
     VOLUME = "setPlayerCmd:vol:{}"
     PLAYLIST = "setPlayerCmd:playlist:uri:{}"
     PAUSE = "setPlayerCmd:pause"
+    STOP = "setPlayerCmd:stop"
     TOGGLE = "setPlayerCmd:onepause"
     EQUALIZER_MODE = "setPlayerCmd:equalizer:{}"
     LOOP_MODE = "setPlayerCmd:loopmode:{}"
