@@ -1,4 +1,7 @@
+import logging
 from enum import IntFlag, StrEnum
+
+LOGGER = logging.getLogger("linkplay")
 
 API_ENDPOINT: str = "{}/httpapi.asp?command={}"
 API_TIMEOUT: int = 2

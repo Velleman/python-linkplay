@@ -4,6 +4,7 @@ from typing import Any
 
 from linkplay.consts import (
     INPUT_MODE_MAP,
+    LOGGER,
     PLAY_MODE_SEND_MAP,
     ChannelType,
     DeviceAttribute,
@@ -280,10 +281,15 @@ class LinkPlayBridge:
 
     async def json_request(self, command: str) -> dict[str, str]:
         """Performs a GET request on the given command and returns the result as a JSON object."""
-        return await self.endpoint.json_request(command)
+        LOGGER.debug(str.format("Request command at {}: {}", self.endpoint, command))
+        response = await self.endpoint.json_request(command)
+        LOGGER.debug(str.format("Response command {}: {}", command, response))
+        return response
 
     async def request(self, command: str) -> None:
         """Performs a GET request on the given command and verifies the result."""
+
+        LOGGER.debug(str.format("Request command at {}: {}", self.endpoint, command))
         await self.endpoint.request(command)
 
 
