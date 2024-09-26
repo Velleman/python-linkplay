@@ -4,7 +4,6 @@ from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
-
 from linkplay.bridge import (
     LinkPlayBridge,
     LinkPlayDevice,
@@ -195,6 +194,15 @@ async def test_player_set_volume_raises_value_error(volume: Any):
 
     with pytest.raises(ValueError):
         await player.set_volume(volume)
+
+
+async def test_player_invalid_playmode():
+    """Tests if the player handles an invalid playmode correctly."""
+    bridge = AsyncMock()
+    player = LinkPlayPlayer(bridge)
+    player.properties[PlayerAttribute.PLAYBACK_MODE] = 33
+
+    assert player.play_mode == PlayingMode.IDLE
 
 
 async def test_player_set_equalizer_mode():
