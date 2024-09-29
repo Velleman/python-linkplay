@@ -281,9 +281,9 @@ class LinkPlayBridge:
 
     async def json_request(self, command: str) -> dict[str, str]:
         """Performs a GET request on the given command and returns the result as a JSON object."""
-        LOGGER.debug(str.format("Request command at {}: {}", self.endpoint, command))
+        LOGGER.debug(str.format("Request {} at {}", command, self.endpoint))
         response = await self.endpoint.json_request(command)
-        LOGGER.debug(str.format("Response command {}: {}", command, response))
+        LOGGER.debug(str.format("Response {}: {}", command, response))
         return response
 
     async def request(self, command: str) -> None:
