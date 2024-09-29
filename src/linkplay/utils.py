@@ -24,8 +24,6 @@ from linkplay.consts import (
 )
 from linkplay.exceptions import LinkPlayRequestException
 
-_LOGGER = logging.getLogger(__name__)
-
 
 async def session_call_api(endpoint: str, session: ClientSession, command: str) -> str:
     """Calls the LinkPlay API and returns the result as a string.
