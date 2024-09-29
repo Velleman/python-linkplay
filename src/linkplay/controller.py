@@ -48,7 +48,7 @@ class LinkPlayController:
             for follower in multiroom.followers:
                 follower.multiroom = None
             await multiroom.update_status(self.bridges)
-            if multiroom.followers > 0:
+            if len(multiroom.followers) > 0:
                 for follower in multiroom.followers:
                     follower.multiroom = multiroom
             else:
@@ -57,14 +57,12 @@ class LinkPlayController:
 
         # Create new multirooms from new bridges
         for bridge in self.bridges:
-            has_multiroom = bridge.multiroom
-
-            if has_multiroom:
+            if bridge.multiroom:
                 continue
 
             multiroom = LinkPlayMultiroom(bridge)
             await multiroom.update_status(self.bridges)
-            if multiroom.followers > 0:
+            if len(multiroom.followers) > 0:
                 multirooms.append(multiroom)
                 bridge.multiroom = multiroom
                 for follower in multiroom.followers:
