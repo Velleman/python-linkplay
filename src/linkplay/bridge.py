@@ -279,7 +279,7 @@ class LinkPlayBridge:
             "endpoint": self.endpoint.to_dict(),
             "device": self.device.to_dict(),
             "player": self.player.to_dict(),
-            "multiroom": self.multiroom.to_dict(),
+            "multiroom": self.multiroom.to_dict() if self.multiroom else None,
         }
 
     async def json_request(self, command: str) -> dict[str, str]:
