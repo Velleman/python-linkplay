@@ -40,31 +40,38 @@ class LinkPlayController:
     async def discover_multirooms(self) -> None:
         """Attempts to discover multirooms on the local network."""
 
+        # Find and update existing multirooms
+        multirooms = [bridge.multiroom for bridge in self.bridges if bridge.multiroom]
+
+        removed_multirooms = []
+        for multiroom in multirooms:
+            for follower in multiroom.followers:
+                follower.multiroom = None
+            await multiroom.update_status(self.bridges)
+            if multiroom.followers > 0:
+                for follower in multiroom.followers:
+                    follower.multiroom = multiroom
+            else:
+                multiroom.leader.multiroom = None
+                removed_multirooms.append(multiroom)
+
         # Create new multirooms from new bridges
-        new_multirooms = []
         for bridge in self.bridges:
-            has_multiroom = any(
-                multiroom for multiroom in self.multirooms if multiroom.leader == bridge
-            )
+            has_multiroom = bridge.multiroom
 
             if has_multiroom:
                 continue
 
             multiroom = LinkPlayMultiroom(bridge)
             await multiroom.update_status(self.bridges)
-            if len(multiroom.followers) > 0:
-                new_multirooms.append(multiroom)
+            if multiroom.followers > 0:
+                multirooms.append(multiroom)
+                bridge.multiroom = multiroom
+                for follower in multiroom.followers:
+                    follower.multiroom = multiroom
 
-        # Update existing multirooms
-        for multiroom in self.multirooms:
-            await multiroom.update_status(self.bridges)
+        # Remove multirooms with no followers
+        multirooms = [item for item in multirooms if item not in removed_multirooms]
 
-        # Remove multirooms if they have no followers
-        empty_multirooms = [
-            multiroom for multiroom in self.multirooms if not multiroom.followers
-        ]
-        for empty_multiroom in empty_multirooms:
-            self.multirooms.remove(empty_multiroom)
-
-        # Add new multirooms
-        self.multirooms.extend(new_multirooms)
+        # Update multirooms in controller
+        self.multirooms = multirooms

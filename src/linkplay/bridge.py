@@ -259,11 +259,13 @@ class LinkPlayBridge:
     endpoint: LinkPlayEndpoint
     device: LinkPlayDevice
     player: LinkPlayPlayer
+    multiroom: LinkPlayMultiroom | None
 
     def __init__(self, *, endpoint: LinkPlayEndpoint):
         self.endpoint = endpoint
         self.device = LinkPlayDevice(self)
         self.player = LinkPlayPlayer(self)
+        self.multiroom = None
 
     def __str__(self) -> str:
         if self.device.name == "":
@@ -277,6 +279,7 @@ class LinkPlayBridge:
             "endpoint": self.endpoint.to_dict(),
             "device": self.device.to_dict(),
             "player": self.player.to_dict(),
+            "multiroom": self.multiroom.to_dict(),
         }
 
     async def json_request(self, command: str) -> dict[str, str]:
@@ -303,6 +306,13 @@ class LinkPlayMultiroom:
     def __init__(self, leader: LinkPlayBridge):
         self.leader = leader
         self.followers = []
+
+    def to_dict(self):
+        """Return the state of the LinkPlayMultiroom."""
+        return {
+            "leader": self.leader.to_dict(),
+            "followers": [follower.to_dict() for follower in self.followers],
+        }
 
     async def update_status(self, bridges: list[LinkPlayBridge]) -> None:
         """Updates the multiroom status."""
