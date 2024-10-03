@@ -4,7 +4,7 @@ from enum import IntFlag, StrEnum
 LOGGER = logging.getLogger("linkplay")
 
 API_ENDPOINT: str = "{}/httpapi.asp?command={}"
-API_TIMEOUT: int = 2
+API_TIMEOUT: int = 5
 UNKNOWN_TRACK_PLAYING: str = "Unknown"
 UPNP_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaRenderer:1"
 TCPPORT = 8899
