@@ -41,7 +41,11 @@ class LinkPlayController:
         """Attempts to discover multirooms on the local network."""
 
         # Find and update existing multirooms
-        multirooms = [bridge.multiroom for bridge in self.bridges if bridge.multiroom]
+        multirooms = [
+            bridge.multiroom
+            for bridge in self.bridges
+            if bridge.multiroom and bridge.multiroom.leader is bridge
+        ]
 
         removed_multirooms = []
         for multiroom in multirooms:
