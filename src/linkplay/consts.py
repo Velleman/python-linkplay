@@ -96,6 +96,7 @@ class LinkPlayCommand(StrEnum):
     MULTIROOM_UNMUTE = "setPlayerCmd:slave_mute:unmute"
     MULTIROOM_JOIN = "ConnectMasterAp:JoinGroupMaster:eth{}:wifi0.0.0.0"
     PLAY_PRESET = "MCUKeyShortClick:{}"
+    TIMESYNC = "timeSync:{}"
 
 
 class LinkPlayTcpUartCommand(StrEnum):

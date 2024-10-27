@@ -167,6 +167,12 @@ class LinkPlayPlayer:
             raise ValueError("Preset must be between 1 and 10.")
         await self.bridge.request(LinkPlayCommand.PLAY_PRESET.format(preset_number))
 
+    async def timesync(self) -> None:
+        """Sync the time."""
+        import time
+        timestamp = time.strftime('%Y%m%d%H%M%S')
+        await self.bridge.request(LinkPlayCommand.TIMESYNC.format(timestamp))
+
     @property
     def muted(self) -> bool:
         """Returns if the player is muted."""
