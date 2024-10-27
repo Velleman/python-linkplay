@@ -284,16 +284,23 @@ class LinkPlayBridge:
 
     async def json_request(self, command: str) -> dict[str, str]:
         """Performs a GET request on the given command and returns the result as a JSON object."""
-        LOGGER.debug(str.format("Request {} at {}", command, self.endpoint))
-        response = await self.endpoint.json_request(command)
+        endpoint = self.endpoint
+        if self.multiroom:
+            endpoint = self.multiroom.leader.endpoint
+        
+        LOGGER.debug(str.format("Request {} at {}", command, endpoint))
+        response = await endpoint.json_request(command)
         LOGGER.debug(str.format("Response {}: {}", command, response))
         return response
 
     async def request(self, command: str) -> None:
         """Performs a GET request on the given command and verifies the result."""
+        endpoint = self.endpoint
+        if self.multiroom:
+            endpoint = self.multiroom.leader.endpoint
 
-        LOGGER.debug(str.format("Request command at {}: {}", self.endpoint, command))
-        await self.endpoint.request(command)
+        LOGGER.debug(str.format("Request command at {}: {}", endpoint, command))
+        await endpoint.request(command)
 
 
 class LinkPlayMultiroom:
