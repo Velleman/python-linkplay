@@ -62,7 +62,10 @@ class LinkPlayDevice:
         flags = InputMode(
             int(self.properties[DeviceAttribute.PLAYMODE_SUPPORT], base=16)
         )
-        return [INPUT_MODE_MAP[flag] for flag in flags]
+
+        playing_modes = [INPUT_MODE_MAP[flag] for flag in flags]
+        playing_modes.insert(0, PlayingMode.NETWORK) # always supported
+        return playing_modes
 
     @property
     def eth(self) -> str:
