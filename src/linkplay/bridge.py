@@ -71,11 +71,10 @@ class LinkPlayDevice:
     def eth(self) -> str:
         """Returns the ethernet address."""
         return (
-            self.properties[DeviceAttribute.ETH_DHCP]
+            self.properties[DeviceAttribute.ETH2]
             if DeviceAttribute.ETH_DHCP in self.properties
-            else self.properties[DeviceAttribute.ETH0]
+            else self.properties[DeviceAttribute.APCLI0]
         )
-
 
 class LinkPlayPlayer:
     """Represents a LinkPlay player."""
