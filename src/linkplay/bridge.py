@@ -64,17 +64,15 @@ class LinkPlayDevice:
         )
 
         playing_modes = [INPUT_MODE_MAP[flag] for flag in flags]
-        playing_modes.insert(0, PlayingMode.NETWORK) # always supported
+        playing_modes.insert(0, PlayingMode.NETWORK)  # always supported
         return playing_modes
 
     @property
-    def eth(self) -> str:
+    def eth(self) -> str | None:
         """Returns the ethernet address."""
-        return (
-            self.properties[DeviceAttribute.ETH2]
-            if DeviceAttribute.ETH_DHCP in self.properties
-            else self.properties[DeviceAttribute.APCLI0]
-        )
+        eth2 = self.properties.get(DeviceAttribute.ETH2)
+        return eth2 if eth2 else self.properties.get(DeviceAttribute.APCLI0)
+
 
 class LinkPlayPlayer:
     """Represents a LinkPlay player."""
@@ -177,7 +175,8 @@ class LinkPlayPlayer:
     async def timesync(self) -> None:
         """Sync the time."""
         import time
-        timestamp = time.strftime('%Y%m%d%H%M%S')
+
+        timestamp = time.strftime("%Y%m%d%H%M%S")
         await self.bridge.request(LinkPlayCommand.TIMESYNC.format(timestamp))
 
     @property
