@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from typing import Any
 
 from linkplay.consts import (
@@ -73,6 +74,11 @@ class LinkPlayDevice:
         """Returns the ethernet address."""
         eth2 = self.properties.get(DeviceAttribute.ETH2)
         return eth2 if eth2 else self.properties.get(DeviceAttribute.APCLI0)
+
+    async def timesync(self) -> None:
+        """Sync the time."""
+        timestamp = time.strftime("%Y%m%d%H%M%S")
+        await self.bridge.request(LinkPlayCommand.TIMESYNC.format(timestamp))
 
 
 class LinkPlayPlayer:
@@ -172,13 +178,6 @@ class LinkPlayPlayer:
                 f"Preset must be between 1 and {max_number_of_presets_allowed}."
             )
         await self.bridge.request(LinkPlayCommand.PLAY_PRESET.format(preset_number))
-
-    async def timesync(self) -> None:
-        """Sync the time."""
-        import time
-
-        timestamp = time.strftime("%Y%m%d%H%M%S")
-        await self.bridge.request(LinkPlayCommand.TIMESYNC.format(timestamp))
 
     @property
     def muted(self) -> bool:
