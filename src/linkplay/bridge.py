@@ -180,6 +180,11 @@ class LinkPlayPlayer:
         timestamp = time.strftime("%Y%m%d%H%M%S")
         await self.bridge.request(LinkPlayCommand.TIMESYNC.format(timestamp))
 
+    async def seek(self, position: int) -> None:
+        """Seek to a position."""
+        if self.total_length_in_seconds > 0 and position >= 0 and position <= self.total_length_in_seconds:
+            await self.bridge.request(LinkPlayCommand.SEEK.format(position))
+
     @property
     def muted(self) -> bool:
         """Returns if the player is muted."""
@@ -217,6 +222,16 @@ class LinkPlayPlayer:
     def total_length(self) -> int:
         """Returns the total length of the track in milliseconds."""
         return int(self.properties.get(PlayerAttribute.TOTAL_LENGTH, 0))
+
+    @property
+    def current_position_in_seconds(self) -> int:
+        """Returns the current position of the track in seconds."""
+        return int(self.properties.get(PlayerAttribute.CURRENT_POSITION, 0)) / 1000
+
+    @property
+    def total_length_in_seconds(self) -> int:
+        """Returns the total length of the track in seconds."""
+        return int(self.properties.get(PlayerAttribute.TOTAL_LENGTH, 0)) / 1000
 
     @property
     def status(self) -> PlayingStatus:
