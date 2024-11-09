@@ -22,7 +22,7 @@ from linkplay.consts import (
     PlayerAttribute,
     PlayingStatus,
 )
-from linkplay.exceptions import LinkPlayRequestException
+from linkplay.exceptions import LinkPlayInvalidDataException, LinkPlayRequestException
 
 
 async def session_call_api(endpoint: str, session: ClientSession, command: str) -> str:
@@ -61,9 +61,28 @@ async def session_call_api(endpoint: str, session: ClientSession, command: str) 
 async def session_call_api_json(
     endpoint: str, session: ClientSession, command: str
 ) -> dict[str, str]:
-    """Calls the LinkPlay API and returns the result as a JSON object."""
-    result = await session_call_api(endpoint, session, command)
-    return json.loads(result)  # type: ignore
+    """Calls the LinkPlay API and returns the result as a JSON object
+
+    Args:
+        endpoint (str): The endpoint to use.
+        session (ClientSession): The client session to use.
+        command (str): The command to use.
+
+    Raises:
+        LinkPlayRequestException: Thrown when the request fails (timeout, error http status).
+        LinkPlayInvalidDataException: Thrown when the request has succeeded with invalid json.
+
+    Returns:
+        str: The response of the API call.
+    """
+    try:
+        result = await session_call_api(endpoint, session, command)
+        return json.loads(result)  # type: ignore
+    except json.JSONDecodeError as jsonexc:
+        url = API_ENDPOINT.format(endpoint, command)
+        raise LinkPlayInvalidDataException(
+            f"Unexpected JSON ({result}) received from '{url}'"
+        ) from jsonexc
 
 
 async def session_call_api_ok(

@@ -1,7 +1,9 @@
 from aiohttp import ClientSession
 
 from linkplay.bridge import LinkPlayBridge, LinkPlayMultiroom
+from linkplay.consts import LOGGER
 from linkplay.discovery import discover_linkplay_bridges
+from linkplay.exceptions import LinkPlayInvalidDataException
 
 
 class LinkPlayController:
@@ -51,26 +53,32 @@ class LinkPlayController:
         for multiroom in multirooms:
             for follower in multiroom.followers:
                 follower.multiroom = None
-            await multiroom.update_status(self.bridges)
-            if len(multiroom.followers) > 0:
-                for follower in multiroom.followers:
-                    follower.multiroom = multiroom
-            else:
-                multiroom.leader.multiroom = None
-                removed_multirooms.append(multiroom)
+            try:
+                await multiroom.update_status(self.bridges)
+                if len(multiroom.followers) > 0:
+                    for follower in multiroom.followers:
+                        follower.multiroom = multiroom
+                else:
+                    multiroom.leader.multiroom = None
+                    removed_multirooms.append(multiroom)
+            except LinkPlayInvalidDataException as exc:
+                LOGGER.exception(exc)
 
         # Create new multirooms from new bridges
         for bridge in self.bridges:
             if bridge.multiroom:
                 continue
 
-            multiroom = LinkPlayMultiroom(bridge)
-            await multiroom.update_status(self.bridges)
-            if len(multiroom.followers) > 0:
-                multirooms.append(multiroom)
-                bridge.multiroom = multiroom
-                for follower in multiroom.followers:
-                    follower.multiroom = multiroom
+            try:
+                multiroom = LinkPlayMultiroom(bridge)
+                await multiroom.update_status(self.bridges)
+                if len(multiroom.followers) > 0:
+                    multirooms.append(multiroom)
+                    bridge.multiroom = multiroom
+                    for follower in multiroom.followers:
+                        follower.multiroom = multiroom
+            except LinkPlayInvalidDataException as exc:
+                LOGGER.exception(exc)
 
         # Remove multirooms with no followers
         multirooms = [item for item in multirooms if item not in removed_multirooms]

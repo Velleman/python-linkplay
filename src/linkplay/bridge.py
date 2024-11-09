@@ -20,6 +20,7 @@ from linkplay.consts import (
     SpeakerType,
 )
 from linkplay.endpoint import LinkPlayEndpoint
+from linkplay.exceptions import LinkPlayInvalidDataException
 from linkplay.utils import fixup_player_properties
 
 
@@ -328,22 +329,23 @@ class LinkPlayMultiroom:
 
     async def update_status(self, bridges: list[LinkPlayBridge]) -> None:
         """Updates the multiroom status."""
-        properties: dict[Any, Any] = await self.leader.json_request(
-            LinkPlayCommand.MULTIROOM_LIST
-        )
+        try:
+            properties = await self.leader.json_request(LinkPlayCommand.MULTIROOM_LIST)
 
-        self.followers = []
-        if int(properties[MultiroomAttribute.NUM_FOLLOWERS]) == 0:
-            return
+            self.followers = []
+            if int(properties[MultiroomAttribute.NUM_FOLLOWERS]) == 0:
+                return
 
-        follower_uuids = [
-            follower[MultiroomAttribute.UUID]
-            for follower in properties[MultiroomAttribute.FOLLOWER_LIST]
-        ]
-        new_followers = [
-            bridge for bridge in bridges if bridge.device.uuid in follower_uuids
-        ]
-        self.followers.extend(new_followers)
+            follower_uuids = [
+                follower[MultiroomAttribute.UUID]
+                for follower in properties[MultiroomAttribute.FOLLOWER_LIST]
+            ]
+            new_followers = [
+                bridge for bridge in bridges if bridge.device.uuid in follower_uuids
+            ]
+            self.followers.extend(new_followers)
+        except LinkPlayInvalidDataException as exc:
+            LOGGER.exception(exc)
 
     async def ungroup(self) -> None:
         """Ungroups the multiroom group."""
