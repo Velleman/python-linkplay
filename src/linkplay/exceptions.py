@@ -4,3 +4,7 @@ class LinkPlayException(Exception):
 
 class LinkPlayRequestException(LinkPlayException):
     pass
+
+
+class LinkPlayInvalidDataException(LinkPlayException):
+    pass

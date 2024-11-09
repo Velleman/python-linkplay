@@ -8,7 +8,7 @@ from deprecated import deprecated
 from linkplay.bridge import LinkPlayBridge
 from linkplay.consts import UPNP_DEVICE_TYPE, LinkPlayCommand, MultiroomAttribute
 from linkplay.endpoint import LinkPlayApiEndpoint, LinkPlayEndpoint
-from linkplay.exceptions import LinkPlayRequestException
+from linkplay.exceptions import LinkPlayInvalidDataException, LinkPlayRequestException
 
 
 @deprecated(
@@ -98,21 +98,24 @@ async def discover_bridges_through_multiroom(
     bridge: LinkPlayBridge, session: ClientSession
 ) -> list[LinkPlayBridge]:
     """Discovers bridges through the multiroom of the provided bridge."""
-    properties: dict[Any, Any] = await bridge.json_request(
-        LinkPlayCommand.MULTIROOM_LIST
-    )
+    try:
+        properties: dict[Any, Any] = await bridge.json_request(
+            LinkPlayCommand.MULTIROOM_LIST
+        )
 
-    if int(properties[MultiroomAttribute.NUM_FOLLOWERS]) == 0:
+        if int(properties[MultiroomAttribute.NUM_FOLLOWERS]) == 0:
+            return []
+
+        followers: list[LinkPlayBridge] = []
+        for follower in properties[MultiroomAttribute.FOLLOWER_LIST]:
+            try:
+                new_bridge = await linkplay_factory_httpapi_bridge(
+                    follower[MultiroomAttribute.IP], session
+                )
+                followers.append(new_bridge)
+            except LinkPlayRequestException:
+                pass
+
+        return followers
+    except LinkPlayInvalidDataException:
         return []
-
-    followers: list[LinkPlayBridge] = []
-    for follower in properties[MultiroomAttribute.FOLLOWER_LIST]:
-        try:
-            new_bridge = await linkplay_factory_httpapi_bridge(
-                follower[MultiroomAttribute.IP], session
-            )
-            followers.append(new_bridge)
-        except LinkPlayRequestException:
-            pass
-
-    return followers
