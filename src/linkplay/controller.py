@@ -51,9 +51,10 @@ class LinkPlayController:
 
         removed_multirooms = []
         for multiroom in multirooms:
-            for follower in multiroom.followers:
-                follower.multiroom = None
             try:
+                for follower in multiroom.followers:
+                    follower.multiroom = None
+
                 await multiroom.update_status(self.bridges)
                 if len(multiroom.followers) > 0:
                     for follower in multiroom.followers:

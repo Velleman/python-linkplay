@@ -330,7 +330,9 @@ class LinkPlayMultiroom:
     async def update_status(self, bridges: list[LinkPlayBridge]) -> None:
         """Updates the multiroom status."""
         try:
-            properties = await self.leader.json_request(LinkPlayCommand.MULTIROOM_LIST)
+            properties: dict[Any, Any] = await self.leader.json_request(
+                LinkPlayCommand.MULTIROOM_LIST
+            )
 
             self.followers = []
             if int(properties[MultiroomAttribute.NUM_FOLLOWERS]) == 0:
