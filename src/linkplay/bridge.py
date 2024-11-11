@@ -73,7 +73,17 @@ class LinkPlayDevice:
     def eth(self) -> str | None:
         """Returns the ethernet address."""
         eth2 = self.properties.get(DeviceAttribute.ETH2)
-        return eth2 if eth2 else self.properties.get(DeviceAttribute.APCLI0)
+        eth0 = self.properties.get(DeviceAttribute.ETH0)
+        for eth in [eth2, eth0]:
+            if eth == "0.0.0.0":
+                eth = None
+        return (
+            eth2
+            if eth2
+            else eth0
+            if eth0
+            else self.properties.get(DeviceAttribute.APCLI0)
+        )
 
     async def timesync(self) -> None:
         """Sync the time."""
@@ -370,6 +380,8 @@ class LinkPlayMultiroom:
     async def ungroup(self) -> None:
         """Ungroups the multiroom group."""
         await self.leader.request(LinkPlayCommand.MULTIROOM_UNGROUP)
+        for follewer in self.followers:
+            follewer.multiroom = None
         self.followers = []
 
     async def add_follower(self, follower: LinkPlayBridge) -> None:
@@ -377,14 +389,18 @@ class LinkPlayMultiroom:
         await follower.request(
             LinkPlayCommand.MULTIROOM_JOIN.format(self.leader.device.eth)
         )  # type: ignore[str-format]
-        self.followers.append(follower)
+        if follower not in self.followers:
+            follower.multiroom = self
+            self.followers.append(follower)
 
     async def remove_follower(self, follower: LinkPlayBridge) -> None:
         """Removes a follower from the multiroom group."""
         await self.leader.request(
             LinkPlayCommand.MULTIROOM_KICK.format(follower.device.eth)
         )  # type: ignore[str-format]
-        self.followers.remove(follower)
+        if follower in self.followers:
+            follower.multiroom = None
+            self.followers.remove(follower)
 
     async def set_volume(self, value: int) -> None:
         """Sets the volume for the multiroom group."""
