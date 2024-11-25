@@ -30,12 +30,14 @@ class LinkPlayEndpoint(ABC):
 class LinkPlayApiEndpoint(LinkPlayEndpoint):
     """Represents a LinkPlay HTTP API endpoint."""
 
-    def __init__(self, *, protocol: str, endpoint: str, session: ClientSession):
+    def __init__(
+        self, *, protocol: str, port: int, endpoint: str, session: ClientSession
+    ):
         assert protocol in [
             "http",
             "https",
         ], "Protocol must be either 'http' or 'https'"
-        self._endpoint: str = f"{protocol}://{endpoint}"
+        self._endpoint: str = f"{protocol}://{endpoint}:{port}"
         self._session: ClientSession = session
 
     def to_dict(self):

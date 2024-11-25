@@ -21,7 +21,7 @@ async def linkplay_factory_bridge(
     """Attempts to create a LinkPlayBridge from the given IP address.
     Returns None if the device is not an expected LinkPlay device."""
     endpoint: LinkPlayApiEndpoint = LinkPlayApiEndpoint(
-        protocol="http", endpoint=ip_address, session=session
+        protocol="http", port=80, endpoint=ip_address, session=session
     )
     try:
         return await linkplay_factory_bridge_endpoint(endpoint)
@@ -48,16 +48,22 @@ async def linkplay_factory_httpapi_bridge(
     Attempts to use HTTPS first, then falls back to HTTP.
     Raises LinkPlayRequestException if the device is not an expected LinkPlay device."""
 
-    https_endpoint: LinkPlayApiEndpoint = LinkPlayApiEndpoint(
-        protocol="https", endpoint=ip_address, session=session
-    )
-    try:
-        return await linkplay_factory_bridge_endpoint(https_endpoint)
-    except LinkPlayRequestException:
-        http_endpoint: LinkPlayApiEndpoint = LinkPlayApiEndpoint(
-            protocol="http", endpoint=ip_address, session=session
+    protocol_port_pairs = [("https", 443), ("https", 4443)]
+
+    for protocol, port in protocol_port_pairs:
+        endpoint: LinkPlayApiEndpoint = LinkPlayApiEndpoint(
+            protocol=protocol, port=port, endpoint=ip_address, session=session
         )
-        return await linkplay_factory_bridge_endpoint(http_endpoint)
+
+        try:
+            return await linkplay_factory_bridge_endpoint(endpoint)
+        except LinkPlayRequestException:
+            pass
+
+    http_endpoint: LinkPlayApiEndpoint = LinkPlayApiEndpoint(
+        protocol="http", port=80, endpoint=ip_address, session=session
+    )
+    return await linkplay_factory_bridge_endpoint(http_endpoint)
 
 
 async def discover_linkplay_bridges(
