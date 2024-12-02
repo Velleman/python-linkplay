@@ -4,6 +4,7 @@ from typing import Any
 from unittest.mock import AsyncMock, patch
 
 import pytest
+
 from linkplay.bridge import (
     LinkPlayBridge,
     LinkPlayDevice,
@@ -27,10 +28,10 @@ from linkplay.endpoint import LinkPlayApiEndpoint
 def test_device_name():
     """Tests if the device name is correctly set up."""
     endpoint: LinkPlayApiEndpoint = LinkPlayApiEndpoint(
-        protocol="http", endpoint="1.2.3.4", session=None
+        protocol="http", port=80, endpoint="1.2.3.4", session=None
     )
     bridge: LinkPlayBridge = LinkPlayBridge(endpoint=endpoint)
-    assert f"{bridge}" == "http://1.2.3.4"
+    assert f"{bridge}" == "http://1.2.3.4:80"
 
     bridge.device.properties[DeviceAttribute.DEVICE_NAME] = "TestDevice"
     assert f"{bridge}" == "TestDevice"

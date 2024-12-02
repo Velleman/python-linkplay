@@ -10,4 +10,4 @@ def test_api_endpoint_protocol_raises_assertion_error() -> None:
     with an invalid protocol raises an AssertionError."""
 
     with pytest.raises(AssertionError):
-        LinkPlayApiEndpoint(protocol="ftp", endpoint="1.2.3.4", session=None)
+        LinkPlayApiEndpoint(protocol="ftp", port=21, endpoint="1.2.3.4", session=None)
