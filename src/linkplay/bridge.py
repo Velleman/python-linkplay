@@ -74,9 +74,9 @@ class LinkPlayDevice:
         """Returns the ethernet address."""
         eth = self.properties.get(DeviceAttribute.ETH2)
         if eth == "0.0.0.0" or eth is None:
-          eth = self.properties.get(DeviceAttribute.ETH0)
+            eth = self.properties.get(DeviceAttribute.ETH0)
         if eth == "0.0.0.0" or eth is None:
-          eth = self.properties.get(DeviceAttribute.APCLI0)
+            eth = self.properties.get(DeviceAttribute.APCLI0)
         return eth
 
     async def timesync(self) -> None:
