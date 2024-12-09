@@ -72,18 +72,12 @@ class LinkPlayDevice:
     @property
     def eth(self) -> str | None:
         """Returns the ethernet address."""
-        eth2 = self.properties.get(DeviceAttribute.ETH2)
-        eth0 = self.properties.get(DeviceAttribute.ETH0)
-        for eth in [eth2, eth0]:
-            if eth == "0.0.0.0":
-                eth = None
-        return (
-            eth2
-            if eth2
-            else eth0
-            if eth0
-            else self.properties.get(DeviceAttribute.APCLI0)
-        )
+        eth = self.properties.get(DeviceAttribute.ETH2)
+        if eth == "0.0.0.0" or eth is None:
+          eth = self.properties.get(DeviceAttribute.ETH0)
+        if eth == "0.0.0.0" or eth is None:
+          eth = self.properties.get(DeviceAttribute.APCLI0)
+        return eth
 
     async def timesync(self) -> None:
         """Sync the time."""
