@@ -37,7 +37,12 @@ class LinkPlayApiEndpoint(LinkPlayEndpoint):
             "http",
             "https",
         ], "Protocol must be either 'http' or 'https'"
-        self._endpoint: str = f"{protocol}://{endpoint}:{port}"
+        include_port = (protocol == "http" and port != 80) or (
+            protocol == "https" and port != 443
+        )
+        port_suffix = f":{port}" if include_port else ""
+        self._endpoint: str = f"{protocol}://{endpoint}{port_suffix}"
+
         self._session: ClientSession = session
 
     def to_dict(self):
