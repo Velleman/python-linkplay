@@ -31,6 +31,13 @@ class LinkPlayController:
         ]
         self.bridges.extend(new_bridges)
 
+    async def find_bridge(self, bridge_uuid: str) -> LinkPlayBridge:
+        """Find a LinkPlay device by its bridge uuid."""
+
+        for bridge in self.bridges:
+            if bridge.device.uuid == bridge_uuid:
+                return bridge
+
     async def add_bridge(self, bridge_to_add: LinkPlayBridge) -> None:
         """Add given LinkPlay device if not already added."""
 
@@ -38,6 +45,14 @@ class LinkPlayController:
         current_bridges = [bridge.device.uuid for bridge in self.bridges]
         if bridge_to_add.device.uuid not in current_bridges:
             self.bridges.append(bridge_to_add)
+
+    async def remove_bridge(self, bridge_to_remove: LinkPlayBridge) -> None:
+        """Remove given LinkPlay device if not already deleted."""
+
+        # Remove bridge
+        current_bridges = [bridge.device.uuid for bridge in self.bridges]
+        if bridge_to_remove.device.uuid in current_bridges:
+            self.bridges.remove(bridge_to_remove)
 
     async def discover_multirooms(self) -> None:
         """Attempts to discover multirooms on the local network."""
