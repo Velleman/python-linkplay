@@ -31,7 +31,7 @@ class LinkPlayController:
         ]
         self.bridges.extend(new_bridges)
 
-    async def find_bridge(self, bridge_uuid: str) -> LinkPlayBridge:
+    async def find_bridge(self, bridge_uuid: str) -> LinkPlayBridge | None:
         """Find a LinkPlay device by its bridge uuid."""
 
         for bridge in self.bridges:
