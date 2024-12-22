@@ -38,6 +38,8 @@ class LinkPlayController:
             if bridge.device.uuid == bridge_uuid:
                 return bridge
 
+        return None
+
     async def add_bridge(self, bridge_to_add: LinkPlayBridge) -> None:
         """Add given LinkPlay device if not already added."""
 
