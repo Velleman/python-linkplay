@@ -70,6 +70,16 @@ class LinkPlayDevice:
         return playing_modes
 
     @property
+    def mac(self) -> str | None:
+        """Returns the mac address."""
+        mac = self.properties.get(DeviceAttribute.ETH_MAC)
+        if mac == "00:00:00:00:00:00" or mac is None:
+            mac = self.properties.get(DeviceAttribute.STA_MAC)
+        if mac == "00:00:00:00:00:00" or mac is None:
+            mac = self.properties.get(DeviceAttribute.MAC)
+        return mac
+
+    @property
     def eth(self) -> str | None:
         """Returns the ethernet address."""
         eth = self.properties.get(DeviceAttribute.ETH2)
