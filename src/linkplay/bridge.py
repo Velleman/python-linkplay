@@ -72,11 +72,11 @@ class LinkPlayDevice:
     @property
     def mac(self) -> str | None:
         """Returns the mac address."""
-        mac = self.properties.get(DeviceAttribute.ETH_MAC)
+        mac = self.properties.get(DeviceAttribute.ETH_MAC_ADDRESS)
         if mac == "00:00:00:00:00:00" or mac is None:
-            mac = self.properties.get(DeviceAttribute.STA_MAC)
+            mac = self.properties.get(DeviceAttribute.STA_MAC_ADDRESS)
         if mac == "00:00:00:00:00:00" or mac is None:
-            mac = self.properties.get(DeviceAttribute.MAC)
+            mac = self.properties.get(DeviceAttribute.MAC_ADDRESS)
         return mac
 
     @property
