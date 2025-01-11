@@ -83,9 +83,9 @@ class LinkPlayDevice:
     def eth(self) -> str | None:
         """Returns the ethernet address."""
         eth = self.properties.get(DeviceAttribute.ETH2)
-        if eth == "0.0.0.0" or eth is None:
+        if eth == "0.0.0.0" or eth == "" or eth is None:
             eth = self.properties.get(DeviceAttribute.ETH0)
-        if eth == "0.0.0.0" or eth is None:
+        if eth == "0.0.0.0" or eth == "" or eth is None:
             eth = self.properties.get(DeviceAttribute.APCLI0)
         return eth
 
