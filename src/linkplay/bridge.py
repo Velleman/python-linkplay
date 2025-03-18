@@ -204,7 +204,7 @@ class LinkPlayPlayer:
             await self.bridge.request(LinkPlayCommand.SEEK.format(position))
             
     async def wiim_eq_load(self, eq: str) -> None:
-        """Play a preset."""
+        """Set a WiiM-predefined Equalizer Mode."""
         if eq not in WIIM_EQUALIZER_MODES:
             raise ValueError(
                 f"EQ value must be one of: {WIIM_EQUALIZER_MODES}."
