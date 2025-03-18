@@ -91,8 +91,8 @@ async def session_call_api_ok(
     """Calls the LinkPlay API and checks if the response is OK. Throws exception if not."""
     result = await session_call_api(endpoint, session, command)
 
-    if result != "OK":
-        raise LinkPlayRequestException(f"Didn't receive expected OK from {endpoint}")
+    if result != "OK" and str(result)[0] not in ['[','{']:
+        raise LinkPlayRequestException(f"Didn't receive expected OK, list or dict as response from {endpoint} but : {result}")
 
 
 async def call_tcpuart(

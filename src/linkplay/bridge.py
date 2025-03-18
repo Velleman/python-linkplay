@@ -19,6 +19,7 @@ from linkplay.consts import (
     PlayingMode,
     PlayingStatus,
     SpeakerType,
+    WIIM_EQUALIZER_MODES,
 )
 from linkplay.endpoint import LinkPlayEndpoint
 from linkplay.exceptions import LinkPlayInvalidDataException
@@ -201,6 +202,14 @@ class LinkPlayPlayer:
             and position <= self.total_length_in_seconds
         ):
             await self.bridge.request(LinkPlayCommand.SEEK.format(position))
+            
+    async def wiim_eq_load(self, eq: str) -> None:
+        """Play a preset."""
+        if eq not in WIIM_EQUALIZER_MODES:
+            raise ValueError(
+                f"EQ value must be one of: {WIIM_EQUALIZER_MODES}."
+            )
+        await self.bridge.request(LinkPlayCommand.WIIM_EQ_LOAD.format(eq))            
 
     @property
     def muted(self) -> bool:

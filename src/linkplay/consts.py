@@ -63,7 +63,6 @@ uc2m8y8O/hXPSfKd
 -----END CERTIFICATE-----
 """
 
-
 class LinkPlayCommand(StrEnum):
     """Defines the LinkPlay commands."""
 
@@ -97,6 +96,7 @@ class LinkPlayCommand(StrEnum):
     MULTIROOM_JOIN = "ConnectMasterAp:JoinGroupMaster:eth{}:wifi0.0.0.0"
     PLAY_PRESET = "MCUKeyShortClick:{}"
     TIMESYNC = "timeSync:{}"
+    WIIM_EQ_LOAD = "EQLoad:{}"
 
 
 class LinkPlayTcpUartCommand(StrEnum):
@@ -445,3 +445,7 @@ class MultiroomAttribute(StrEnum):
 
     def __repr__(self):
         return self.value
+
+# predefined-equalizer values that can be fed to WiiM via EQLoad
+WIIM_EQUALIZER_MODES = ["Flat", "Acoustic", "Bass Booster", "Bass Reducer", "Classical", "Dance", "Deep", "Electronic", 
+"Hip-Hop", "Jazz", "Latin", "Loudness", "Lounge", "Piano", "Pop", "R&B", "Rock", "Small Speakers", "Spoken Word", "Treble Booster", "Treble Reducer", "Vocal Booster"]
