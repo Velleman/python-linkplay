@@ -1,8 +1,8 @@
-
 [![PyPI package](https://badge.fury.io/py/python-linkplay.svg)](https://pypi.org/project/python-linkplay/)
 [![Release](https://github.com/velleman/python-linkplay/actions/workflows/release.yaml/badge.svg)](https://github.com/velleman/python-linkplay/actions/workflows/release.yaml)
 
 # python-linkplay
+
 A Python Library for Seamless LinkPlay Device Control
 
 ## Intro
@@ -27,6 +27,9 @@ Welcome to python-linkplay, a powerful and user-friendly Python library designed
 - https://developer.arylic.com/httpapi/
 - http://airscope-audio.net/core2/pdf/airscope-module-http.pdf
 - https://www.wiimhome.com/pdf/HTTP%20API%20for%20WiiM%20Mini.pdf
+- https://www.wiimhome.com/pdf/HTTP%20API%20for%20WiiM%20Products.pdf
+- https://github.com/DanBrezeanu/wiim-extended-http-api
+- https://github.com/cvdlinden/wiim-httpapi
 
 ## Multiroom
 
