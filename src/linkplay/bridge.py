@@ -22,6 +22,7 @@ from linkplay.consts import (
 )
 from linkplay.endpoint import LinkPlayEndpoint
 from linkplay.exceptions import LinkPlayInvalidDataException
+from linkplay.manufacturers import MANUFACTURER_WIIM, get_info_from_project
 from linkplay.utils import fixup_player_properties
 
 
@@ -56,6 +57,22 @@ class LinkPlayDevice:
     def name(self) -> str:
         """The name of the device."""
         return self.properties.get(DeviceAttribute.DEVICE_NAME, "")
+
+    @property
+    def manufacturer(self) -> str:
+        """The manufacturer of the device."""
+        manufacturer, _ = get_info_from_project(
+            self.properties.get(DeviceAttribute.PROJECT, "")
+        )
+        return manufacturer
+
+    @property
+    def model(self) -> str:
+        """The model of the device."""
+        _, model = get_info_from_project(
+            self.properties.get(DeviceAttribute.PROJECT, "")
+        )
+        return model
 
     @property
     def playmode_support(self) -> list[PlayingMode]:
