@@ -174,11 +174,11 @@ class LinkPlayPlayer:
         await self.bridge.request(LinkPlayCommand.EQUALIZER_MODE.format(mode))  # type: ignore[str-format]
     
     async def set_equalizer_on(self) -> None:
-        """Set the equalizer mode."""
+        """Set the equalizer on."""
         await self.bridge.request(LinkPlayCommand.EQUALIZER_ON)
         
     async def set_equalizer_off(self) -> None:
-        """Set the equalizer mode."""
+        """Set the equalizer off."""
         await self.bridge.request(LinkPlayCommand.EQUALIZER_OFF)        
     
     async def set_loop_mode(self, mode: LoopMode) -> None:
@@ -217,7 +217,11 @@ class LinkPlayPlayer:
             raise ValueError(
                 f"EQ value must be one of: {EQUALIZER_MODES}."
             )
-        await self.bridge.request(LinkPlayCommand.EQ_LOAD.format(eq))            
+        await self.bridge.request(LinkPlayCommand.EQ_LOAD.format(eq))    
+
+    async def get_meta_info(self) -> None:
+        """Get metdata of current track."""
+        await self.bridge.request(LinkPlayCommand.META_INFO)          
 
     @property
     def muted(self) -> bool:
