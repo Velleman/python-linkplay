@@ -85,7 +85,7 @@ class LinkPlayCommand(StrEnum):
     TOGGLE = "setPlayerCmd:onepause"
     EQUALIZER_MODE = "setPlayerCmd:equalizer:{}"
     EQUALIZER_ON = "EQOn"
-    EQUALIZER_ON = "EQOff"
+    EQUALIZER_OFF = "EQOff"
     LOOP_MODE = "setPlayerCmd:loopmode:{}"
     SWITCH_MODE = "setPlayerCmd:switchmode:{}"
     M3U_PLAYLIST = "setPlayerCmd:m3u:play:{}"
