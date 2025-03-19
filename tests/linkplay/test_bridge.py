@@ -232,7 +232,8 @@ async def test_player_set_equalizer_mode():
 
     await player.set_equalizer_mode(mode)
 
-    bridge.request.assert_called_once_with(LinkPlayCommand.EQUALIZER_MODE.format(mode))
+    # Equalizer.Jazz is to be mapped to 3
+    bridge.request.assert_called_once_with(LinkPlayCommand.EQUALIZER_MODE.format(3))
 
 
 async def test_player_set_loop_mode():
