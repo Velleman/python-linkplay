@@ -19,7 +19,7 @@ from linkplay.consts import (
     PlayingMode,
     PlayingStatus,
     SpeakerType,
-    WIIM_EQUALIZER_MODES,
+    EQUALIZER_MODES,
 )
 from linkplay.endpoint import LinkPlayEndpoint
 from linkplay.exceptions import LinkPlayInvalidDataException
@@ -172,7 +172,15 @@ class LinkPlayPlayer:
     async def set_equalizer_mode(self, mode: EqualizerMode) -> None:
         """Set the equalizer mode."""
         await self.bridge.request(LinkPlayCommand.EQUALIZER_MODE.format(mode))  # type: ignore[str-format]
-
+    
+    async def set_equalizer_on(self) -> None:
+        """Set the equalizer mode."""
+        await self.bridge.request(LinkPlayCommand.EQUALIZER_ON)
+        
+    async def set_equalizer_off(self) -> None:
+        """Set the equalizer mode."""
+        await self.bridge.request(LinkPlayCommand.EQUALIZER_OFF)        
+    
     async def set_loop_mode(self, mode: LoopMode) -> None:
         """Set the loop mode."""
         await self.bridge.request(LinkPlayCommand.LOOP_MODE.format(mode))  # type: ignore[str-format]
@@ -203,13 +211,13 @@ class LinkPlayPlayer:
         ):
             await self.bridge.request(LinkPlayCommand.SEEK.format(position))
             
-    async def wiim_eq_load(self, eq: str) -> None:
-        """Set a WiiM-predefined Equalizer Mode."""
-        if eq not in WIIM_EQUALIZER_MODES:
+    async def eq_load(self, eq: str) -> None:
+        """Set a predefined Equalizer Mode."""
+        if eq not in EQUALIZER_MODES:
             raise ValueError(
-                f"EQ value must be one of: {WIIM_EQUALIZER_MODES}."
+                f"EQ value must be one of: {EQUALIZER_MODES}."
             )
-        await self.bridge.request(LinkPlayCommand.WIIM_EQ_LOAD.format(eq))            
+        await self.bridge.request(LinkPlayCommand.EQ_LOAD.format(eq))            
 
     @property
     def muted(self) -> bool:

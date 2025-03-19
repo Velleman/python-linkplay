@@ -84,6 +84,8 @@ class LinkPlayCommand(StrEnum):
     STOP = "setPlayerCmd:stop"
     TOGGLE = "setPlayerCmd:onepause"
     EQUALIZER_MODE = "setPlayerCmd:equalizer:{}"
+    EQUALIZER_ON = "EQOn"
+    EQUALIZER_ON = "EQOff"
     LOOP_MODE = "setPlayerCmd:loopmode:{}"
     SWITCH_MODE = "setPlayerCmd:switchmode:{}"
     M3U_PLAYLIST = "setPlayerCmd:m3u:play:{}"
@@ -96,7 +98,7 @@ class LinkPlayCommand(StrEnum):
     MULTIROOM_JOIN = "ConnectMasterAp:JoinGroupMaster:eth{}:wifi0.0.0.0"
     PLAY_PRESET = "MCUKeyShortClick:{}"
     TIMESYNC = "timeSync:{}"
-    WIIM_EQ_LOAD = "EQLoad:{}"
+    EQ_LOAD = "EQLoad:{}"
 
 
 class LinkPlayTcpUartCommand(StrEnum):
@@ -446,6 +448,6 @@ class MultiroomAttribute(StrEnum):
     def __repr__(self):
         return self.value
 
-# predefined-equalizer values that can be fed to WiiM via EQLoad
-WIIM_EQUALIZER_MODES = ["Flat", "Acoustic", "Bass Booster", "Bass Reducer", "Classical", "Dance", "Deep", "Electronic", 
+# predefined-equalizer values that can be fed via EQLoad
+EQUALIZER_MODES = ["Flat", "Acoustic", "Bass Booster", "Bass Reducer", "Classical", "Dance", "Deep", "Electronic", 
 "Hip-Hop", "Jazz", "Latin", "Loudness", "Lounge", "Piano", "Pop", "R&B", "Rock", "Small Speakers", "Spoken Word", "Treble Booster", "Treble Reducer", "Vocal Booster"]
