@@ -303,7 +303,7 @@ class LinkPlayPlayer:
     @property
     def available_equalizer_modes(self) -> list[EqualizerMode]:
         """Returns the available equalizer modes."""
-        return [equalizer_mode.value for equalizer_mode in EqualizerMode]
+        return [equalizer_mode for equalizer_mode in EqualizerMode]
 
     @property
     def speaker_type(self) -> SpeakerType:
