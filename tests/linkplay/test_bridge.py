@@ -236,6 +236,22 @@ async def test_player_set_equalizer_mode():
     bridge.request.assert_called_once_with(LinkPlayCommand.EQUALIZER_MODE.format(3))
 
 
+async def test_player_get_available_equalizer_modes():
+    """Tests if the player get available equalizer modes is correctly called."""
+    bridge = AsyncMock()
+    player = LinkPlayPlayer(bridge)
+
+    equalizer_modes = player.available_equalizer_modes
+
+    assert equalizer_modes == [
+        EqualizerMode.NONE,
+        EqualizerMode.CLASSIC,
+        EqualizerMode.POP,
+        EqualizerMode.JAZZ,
+        EqualizerMode.VOCAL,
+    ]
+
+
 async def test_player_set_loop_mode():
     """Tests if the player set loop mode is correctly called."""
     bridge = AsyncMock()
