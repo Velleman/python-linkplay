@@ -223,9 +223,9 @@ class LinkPlayPlayer:
         """Get metdata of current track."""
         LOGGER.debug("Key: %s", key)
         resp1 = await self.bridge.request(LinkPlayCommand.META_INFO)
-        resp2 = await self.bridge.request(LinkPlayCommand.META_INFO).get(key,None)
+        resp2 = resp1.get(key,None)
         LOGGER.debug("MetaInfo: %s, keyvalue: %s", resp1, resp2)
-        await self.bridge.request(LinkPlayCommand.META_INFO).get(key,None)          
+        await self.bridge.request(LinkPlayCommand.META_INFO)         
 
     @property
     def muted(self) -> bool:
