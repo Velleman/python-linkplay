@@ -219,9 +219,9 @@ class LinkPlayPlayer:
             )
         await self.bridge.request(LinkPlayCommand.EQ_LOAD.format(eq))    
 
-    async def get_meta_info(self) -> None:
+    async def get_meta_info(self, key: str) -> None:
         """Get metdata of current track."""
-        await self.bridge.request(LinkPlayCommand.META_INFO)          
+        await self.bridge.request(LinkPlayCommand.META_INFO.get(key,None))          
 
     @property
     def muted(self) -> bool:
