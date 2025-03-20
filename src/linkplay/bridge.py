@@ -221,10 +221,7 @@ class LinkPlayPlayer:
 
     async def get_meta_info(self, key: str) -> None:
         """Get metdata of current track."""
-        LOGGER.debug("Key: %s", key)
-        resp1 = await self.bridge.request(LinkPlayCommand.META_INFO)
-        LOGGER.debug("MetaInfo: %s, keyvalue: %s", resp1)
-        await self.bridge.request(LinkPlayCommand.META_INFO)         
+        await self.bridge.json_request(LinkPlayCommand.META_INFO)         
 
     @property
     def muted(self) -> bool:
