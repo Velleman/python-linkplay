@@ -118,6 +118,7 @@ class LinkPlayPlayer:
 
     bridge: LinkPlayBridge
     properties: dict[PlayerAttribute, str]
+    metainfo: dict[str,str]
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
@@ -132,6 +133,8 @@ class LinkPlayPlayer:
         properties: dict[PlayerAttribute, str] = await self.bridge.json_request(
             LinkPlayCommand.PLAYER_STATUS
         )  # type: ignore[assignment]
+        metainfo: dict[str, str] = await self.bridge.json_request(LinkPlayCommand.META_INFO)
+        self.metainfo = metainfo
 
         self.properties = fixup_player_properties(properties)
 
@@ -234,11 +237,7 @@ class LinkPlayPlayer:
             raise ValueError(
                 f"EQ value must be one of: {EQUALIZER_MODES}."
             )
-        await self.bridge.request(LinkPlayCommand.EQ_LOAD.format(eq))    
-
-    async def get_meta_info(self, key: str) -> None:
-        """Get metdata of current track."""
-        await self.bridge.json_request(LinkPlayCommand.META_INFO)         
+        await self.bridge.request(LinkPlayCommand.EQ_LOAD.format(eq))     
 
     @property
     def muted(self) -> bool:
@@ -334,6 +333,11 @@ class LinkPlayPlayer:
                 PlayerAttribute.PLAYLIST_MODE, LoopMode.CONTINUOUS_PLAYBACK
             )
         )
+
+    @property
+    def meta_info(self) -> dict:
+        """Returns the channel the player is playing on."""
+        return self.metainfo
 
 
 class LinkPlayBridge:
