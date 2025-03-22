@@ -100,7 +100,6 @@ class LinkPlayCommand(StrEnum):
     PLAY_PRESET = "MCUKeyShortClick:{}"
     TIMESYNC = "timeSync:{}"
     WIIM_EQ_LOAD = "EQLoad:{}"
-    META_INFO = "getMetaInfo"
 
 
 class LinkPlayTcpUartCommand(StrEnum):

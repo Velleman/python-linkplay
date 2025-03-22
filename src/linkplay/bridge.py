@@ -117,7 +117,6 @@ class LinkPlayPlayer:
 
     bridge: LinkPlayBridge
     properties: dict[PlayerAttribute, str]
-    metainfo: dict[str, str]
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
@@ -132,10 +131,6 @@ class LinkPlayPlayer:
         properties: dict[PlayerAttribute, str] = await self.bridge.json_request(
             LinkPlayCommand.PLAYER_STATUS
         )  # type: ignore[assignment]
-        metainfo: dict[str, str] = await self.bridge.json_request(
-            LinkPlayCommand.META_INFO
-        )
-        self.metainfo = metainfo
 
         self.properties = fixup_player_properties(properties)
 
@@ -401,11 +396,6 @@ class LinkPlayPlayer:
                 PlayerAttribute.PLAYLIST_MODE, LoopMode.CONTINUOUS_PLAYBACK
             )
         )
-
-    @property
-    def meta_info(self) -> dict:
-        """Returns the channel the player is playing on."""
-        return self.metainfo
 
 
 class LinkPlayBridge:
