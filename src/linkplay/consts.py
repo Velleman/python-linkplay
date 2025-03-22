@@ -222,11 +222,11 @@ class LoopMode(StrEnum):
 class EqualizerMode(StrEnum):
     """Defines the equalizer mode."""
 
-    NONE = "0"
-    CLASSIC = "1"
-    POP = "2"
-    JAZZ = "3"
-    VOCAL = "4"
+    NONE = "None"
+    CLASSIC = "Classic"
+    POP = "Pop"
+    JAZZ = "Jazz"
+    VOCAL = "Vocal"
 
 
 class PlayingStatus(StrEnum):

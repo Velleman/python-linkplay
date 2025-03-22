@@ -191,7 +191,26 @@ class LinkPlayPlayer:
 
     async def set_equalizer_mode(self, mode: EqualizerMode) -> None:
         """Set the equalizer mode."""
-        await self.bridge.request(LinkPlayCommand.EQUALIZER_MODE.format(mode))  # type: ignore[str-format]
+        equalizer_mode_as_number = None
+        match mode:
+            case EqualizerMode.NONE:
+                equalizer_mode_as_number = "0"
+            case EqualizerMode.CLASSIC:
+                equalizer_mode_as_number = "1"
+            case EqualizerMode.POP:
+                equalizer_mode_as_number = "2"
+            case EqualizerMode.JAZZ:
+                equalizer_mode_as_number = "3"
+            case EqualizerMode.VOCAL:
+                equalizer_mode_as_number = "4"
+        if equalizer_mode_as_number is None:
+            raise ValueError(
+                f"Invalid equalizer mode {mode}. Allowed equalizer modes are {self.available_equalizer_modes()}."
+            )
+
+        await self.bridge.request(
+            LinkPlayCommand.EQUALIZER_MODE.format(equalizer_mode_as_number)
+        )
     
     async def set_equalizer_on(self) -> None:
         """Set the equalizer on."""
@@ -200,7 +219,7 @@ class LinkPlayPlayer:
     async def set_equalizer_off(self) -> None:
         """Set the equalizer off."""
         await self.bridge.request(LinkPlayCommand.EQUALIZER_OFF)        
-    
+
     async def set_loop_mode(self, mode: LoopMode) -> None:
         """Set the loop mode."""
         await self.bridge.request(LinkPlayCommand.LOOP_MODE.format(mode))  # type: ignore[str-format]
@@ -300,6 +319,11 @@ class LinkPlayPlayer:
         return EqualizerMode(
             self.properties.get(PlayerAttribute.EQUALIZER_MODE, EqualizerMode.CLASSIC)
         )
+
+    @property
+    def available_equalizer_modes(self) -> list[EqualizerMode]:
+        """Returns the available equalizer modes."""
+        return [equalizer_mode for equalizer_mode in EqualizerMode]
 
     @property
     def speaker_type(self) -> SpeakerType:
