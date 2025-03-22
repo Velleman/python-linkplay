@@ -63,6 +63,7 @@ uc2m8y8O/hXPSfKd
 -----END CERTIFICATE-----
 """
 
+
 class LinkPlayCommand(StrEnum):
     """Defines the LinkPlay commands."""
 
@@ -84,8 +85,8 @@ class LinkPlayCommand(StrEnum):
     STOP = "setPlayerCmd:stop"
     TOGGLE = "setPlayerCmd:onepause"
     EQUALIZER_MODE = "setPlayerCmd:equalizer:{}"
-    EQUALIZER_ON = "EQOn"
-    EQUALIZER_OFF = "EQOff"
+    WIIM_EQUALIZER_ON = "EQOn"
+    WIIM_EQUALIZER_OFF = "EQOff"
     LOOP_MODE = "setPlayerCmd:loopmode:{}"
     SWITCH_MODE = "setPlayerCmd:switchmode:{}"
     M3U_PLAYLIST = "setPlayerCmd:m3u:play:{}"
@@ -98,7 +99,7 @@ class LinkPlayCommand(StrEnum):
     MULTIROOM_JOIN = "ConnectMasterAp:JoinGroupMaster:eth{}:wifi0.0.0.0"
     PLAY_PRESET = "MCUKeyShortClick:{}"
     TIMESYNC = "timeSync:{}"
-    EQ_LOAD = "EQLoad:{}"
+    WIIM_EQ_LOAD = "EQLoad:{}"
     META_INFO = "getMetaInfo"
 
 
@@ -227,6 +228,28 @@ class EqualizerMode(StrEnum):
     POP = "Pop"
     JAZZ = "Jazz"
     VOCAL = "Vocal"
+
+    # Custom equalizer modes specificly for WiiM devices
+    FLAT = "Flat"
+    ACOUSTIC = "Acoustic"
+    BASS_BOOSTER = "Bass Booster"
+    BASS_REDUCER = "Bass Reducer"
+    CLASSICAL = "Classical"
+    DANCE = "Dance"
+    DEEP = "Deep"
+    ELECTRONIC = "Electronic"
+    HIP_HOP = "Hip-Hop"
+    LATIN = "Latin"
+    LOUDNESS = "Loudness"
+    LOUNGE = "Lounge"
+    PIANO = "Piano"
+    R_B = "R&B"
+    ROCK = "Rock"
+    SMALL_SPEAKERS = "Small Speakers"
+    SPOKEN_WORD = "Spoken Word"
+    TREBLE_BOOSTER = "Treble Booster"
+    TREBLE_REDUCER = "Treble Reducer"
+    VOCAL_BOOSTER = "Vocal Booster"
 
 
 class PlayingStatus(StrEnum):
@@ -448,7 +471,3 @@ class MultiroomAttribute(StrEnum):
 
     def __repr__(self):
         return self.value
-
-# predefined-equalizer values that can be fed via EQLoad
-EQUALIZER_MODES = ["Flat", "Acoustic", "Bass Booster", "Bass Reducer", "Classical", "Dance", "Deep", "Electronic", 
-"Hip-Hop", "Jazz", "Latin", "Loudness", "Lounge", "Piano", "Pop", "R&B", "Rock", "Small Speakers", "Spoken Word", "Treble Booster", "Treble Reducer", "Vocal Booster"]
