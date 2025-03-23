@@ -244,7 +244,8 @@ def fixup_player_properties(
     return properties
 
 
-def equalizer_mode_to_number_mapping(equalizer_mode: EqualizerMode) -> str:
+def equalizer_mode_to_number_mapping(equalizer_mode: EqualizerMode) -> str | None:
+    """Converts EqualizerMode to a number mapping."""
     match equalizer_mode:
         case EqualizerMode.NONE:
             return "0"
@@ -259,7 +260,8 @@ def equalizer_mode_to_number_mapping(equalizer_mode: EqualizerMode) -> str:
     return None
 
 
-def equalizer_mode_from_number_mapping(value: str) -> EqualizerMode | None:
+def equalizer_mode_from_number_mapping(value: str | None) -> EqualizerMode | None:
+    """Converts a number mapping to EqualizerMode."""
     match value:
         case "0":
             return EqualizerMode.NONE
