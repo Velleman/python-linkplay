@@ -23,7 +23,11 @@ from linkplay.consts import (
 from linkplay.endpoint import LinkPlayEndpoint
 from linkplay.exceptions import LinkPlayInvalidDataException
 from linkplay.manufacturers import MANUFACTURER_WIIM, get_info_from_project
-from linkplay.utils import fixup_player_properties
+from linkplay.utils import (
+    equalizer_mode_from_number_mapping,
+    equalizer_mode_to_number_mapping,
+    fixup_player_properties,
+)
 
 
 class LinkPlayDevice:
@@ -117,10 +121,12 @@ class LinkPlayPlayer:
 
     bridge: LinkPlayBridge
     properties: dict[PlayerAttribute, str]
+    custom_properties: dict[PlayerAttribute, str]
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
         self.properties = dict.fromkeys(PlayerAttribute.__members__.values(), "")
+        self.custom_properties = dict.fromkeys(PlayerAttribute.__members__.values(), "")
 
     def to_dict(self):
         """Return the state of the LinkPlayPlayer."""
@@ -188,38 +194,28 @@ class LinkPlayPlayer:
     async def set_equalizer_mode(self, mode: EqualizerMode) -> None:
         """Set the equalizer mode."""
         if self.bridge.device.manufacturer == MANUFACTURER_WIIM:
-            # WiiM devices have a different equalizer mode handling
-            # and don't support the general equalizer mode command
-            if mode not in self.available_equalizer_modes:
-                raise ValueError(
-                    f"Invalid equalizer mode {mode}. Allowed equalizer modes are {self.available_equalizer_modes}."
-                )
-
-            if mode == EqualizerMode.NONE:
-                await self.bridge.json_request(LinkPlayCommand.WIIM_EQUALIZER_OFF)
-            else:
-                await self.bridge.json_request(
-                    LinkPlayCommand.WIIM_EQ_LOAD.format(mode)
-                )
-            # WiiM doesn't update the property after setting it
-            self.properties[PlayerAttribute.EQUALIZER_MODE] = mode
+            await self._set_wiim_equalizer_mode(mode)
         else:
             await self._set_normal_equalizer_mode(mode)
 
+    async def _set_wiim_equalizer_mode(self, mode: EqualizerMode) -> None:
+        # WiiM devices have a different equalizer mode handling
+        # and don't support the general equalizer mode command
+        if mode not in self.available_equalizer_modes:
+            raise ValueError(
+                f"Invalid equalizer mode {mode}. Allowed equalizer modes are {self.available_equalizer_modes}."
+            )
+
+        if mode == EqualizerMode.NONE:
+            await self.bridge.json_request(LinkPlayCommand.WIIM_EQUALIZER_OFF)
+        else:
+            await self.bridge.json_request(LinkPlayCommand.WIIM_EQ_LOAD.format(mode))
+        # WiiM doesn't update the property after setting it
+        self.custom_properties[PlayerAttribute.EQUALIZER_MODE] = mode
+
     async def _set_normal_equalizer_mode(self, mode: EqualizerMode) -> None:
         """Set the equalizer mode."""
-        equalizer_mode_as_number = None
-        match mode:
-            case EqualizerMode.NONE:
-                equalizer_mode_as_number = "0"
-            case EqualizerMode.CLASSIC:
-                equalizer_mode_as_number = "1"
-            case EqualizerMode.POP:
-                equalizer_mode_as_number = "2"
-            case EqualizerMode.JAZZ:
-                equalizer_mode_as_number = "3"
-            case EqualizerMode.VOCAL:
-                equalizer_mode_as_number = "4"
+        equalizer_mode_as_number = equalizer_mode_to_number_mapping(mode)
         if equalizer_mode_as_number is None:
             raise ValueError(
                 f"Invalid equalizer mode {mode}. Allowed equalizer modes are {self.available_equalizer_modes}."
@@ -317,14 +313,24 @@ class LinkPlayPlayer:
     @property
     def equalizer_mode(self) -> EqualizerMode:
         """Returns the current equalizer mode."""
-        if self.bridge.device.manufacturer == MANUFACTURER_WIIM:
-            return EqualizerMode(
-                self.properties.get(PlayerAttribute.EQUALIZER_MODE, EqualizerMode.NONE)
-            )
+        try:
+            if self.bridge.device.manufacturer == MANUFACTURER_WIIM:
+                # WiiM devices have a different equalizer mode handling
+                # and will never ever return what equalizer mode they are in
+                return EqualizerMode(
+                    self.custom_properties.get(
+                        PlayerAttribute.EQUALIZER_MODE, EqualizerMode.NONE
+                    )
+                )
 
-        return EqualizerMode(
-            self.properties.get(PlayerAttribute.EQUALIZER_MODE, EqualizerMode.CLASSIC)
-        )
+            return EqualizerMode(
+                equalizer_mode_from_number_mapping(
+                    self.properties.get(PlayerAttribute.EQUALIZER_MODE)
+                )
+                or EqualizerMode.NONE
+            )
+        except ValueError:
+            return EqualizerMode.NONE
 
     @property
     def available_equalizer_modes(self) -> list[EqualizerMode]:
