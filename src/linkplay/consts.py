@@ -475,7 +475,7 @@ class MultiroomAttribute(StrEnum):
         return self.value
         
         
-class MetaInfo(StrEnum):
+class MetaInfoMetaData(StrEnum):
 
     ALBUM_ART: "albumArtURI"
 
