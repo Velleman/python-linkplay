@@ -19,6 +19,9 @@ from linkplay.consts import (
     PlayingMode,
     PlayingStatus,
     SpeakerType,
+    MetaInfoMetaData,
+    AudioOutputHwMode,
+    AUDIO_OUTPUT_HW_MODE_MAP                  
 )
 from linkplay.endpoint import LinkPlayEndpoint
 from linkplay.exceptions import LinkPlayInvalidDataException
@@ -122,6 +125,7 @@ class LinkPlayPlayer:
     bridge: LinkPlayBridge
     properties: dict[PlayerAttribute, str]
     custom_properties: dict[PlayerAttribute, str]
+    metainfo: dict[str,str]
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
@@ -139,6 +143,9 @@ class LinkPlayPlayer:
         )  # type: ignore[assignment]
 
         self.properties = fixup_player_properties(properties)
+        metainfo: dict[str, str] = await self.bridge.json_request(
+            LinkPlayCommand.META_INFO)
+        self.metainfo = metainfo
 
     async def next(self) -> None:
         """Play the next song in the playlist."""
@@ -255,6 +262,12 @@ class LinkPlayPlayer:
         ):
             await self.bridge.request(LinkPlayCommand.SEEK.format(position))
 
+    async def set_audio_output_hw_mode(self, mode: AudioOutputHwMode) -> None:
+        """Set the play mode."""
+        await self.bridge.request(
+            LinkPlayCommand.AUDIO_OUTPUT_HW_MODE.format(AUDIO_OUTPUT_HW_MODE_MAP[mode])
+        )  # type: ignore[str-format]            
+
     @property
     def muted(self) -> bool:
         """Returns if the player is muted."""
@@ -277,6 +290,13 @@ class LinkPlayPlayer:
     def album(self) -> str:
         """Returns if the currently playing album."""
         return self.properties.get(PlayerAttribute.ALBUM, "")
+        
+    @property
+    def album_art(self) -> dict:
+        """Returns the channel the player is playing on."""
+        _LOGGER.debug("Metainfo: %s", self.metainfo)
+        _LOGGER.debug("Metainfo metadata: %s", self.metainfo.get("metaData",{}))
+        return self.metainfo['metaData'].get(MetaInfoMetaData.ALBUM_ART, "")             
 
     @property
     def volume(self) -> int:
@@ -401,8 +421,7 @@ class LinkPlayPlayer:
             self.properties.get(
                 PlayerAttribute.PLAYLIST_MODE, LoopMode.CONTINUOUS_PLAYBACK
             )
-        )
-
+        )        
 
 class LinkPlayBridge:
     """Represents a LinkPlay bridge to control the device and player attached to it."""
