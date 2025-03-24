@@ -477,7 +477,7 @@ class MultiroomAttribute(StrEnum):
         
 class MetaInfoMetaData(StrEnum):
 
-    ALBUM_ART: "albumArtURI"
+    ALBUM_ART = "albumArtURI"
 
 class AudioOutputHwMode(StrEnum):
     """Defines a output mode for the hardware."""
