@@ -224,6 +224,42 @@ async def test_player_invalid_playmode():
     assert player.play_mode == PlayingMode.IDLE
 
 
+async def test_player_get_equalizer_mode_wiim():
+    """Tests if the player handles an return the equalizer mode correctly."""
+    bridge = AsyncMock()
+    device = LinkPlayDevice(bridge)
+    player = LinkPlayPlayer(bridge)
+    bridge.device = device
+    bridge.player = player
+    bridge.device.properties[DeviceAttribute.PROJECT] = "WiiM_Pro_with_gc4a"
+
+    player.properties[PlayerAttribute.EQUALIZER_MODE] = 0
+
+    await player.set_equalizer_mode(EqualizerMode.JAZZ)
+
+    player.properties[PlayerAttribute.EQUALIZER_MODE] = 0
+
+    assert player.equalizer_mode == EqualizerMode.JAZZ
+
+
+async def test_player_get_equalizer_mode():
+    """Tests if the player handles an return the equalizer mode correctly."""
+    bridge = AsyncMock()
+    player = LinkPlayPlayer(bridge)
+    player.properties[PlayerAttribute.EQUALIZER_MODE] = "1"
+
+    assert player.equalizer_mode == EqualizerMode.CLASSIC
+
+
+async def test_player_get_equalizer_mode_invalid():
+    """Tests if the player handles an return the equalizer mode correctly."""
+    bridge = AsyncMock()
+    player = LinkPlayPlayer(bridge)
+    player.properties[PlayerAttribute.EQUALIZER_MODE] = "invalid"
+
+    assert player.equalizer_mode == EqualizerMode.NONE
+
+
 async def test_player_set_equalizer_mode():
     """Tests if the player set equalizer mode is correctly called."""
     bridge = AsyncMock()

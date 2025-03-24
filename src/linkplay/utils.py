@@ -19,6 +19,7 @@ from linkplay.consts import (
     API_TIMEOUT,
     MTLS_CERTIFICATE_CONTENTS,
     TCP_MESSAGE_LENGTH,
+    EqualizerMode,
     PlayerAttribute,
     PlayingStatus,
 )
@@ -241,3 +242,35 @@ def fixup_player_properties(
         properties[PlayerAttribute.PLAYING_STATUS] = PlayingStatus.STOPPED
 
     return properties
+
+
+def equalizer_mode_to_number_mapping(equalizer_mode: EqualizerMode) -> str | None:
+    """Converts EqualizerMode to a number mapping."""
+    match equalizer_mode:
+        case EqualizerMode.NONE:
+            return "0"
+        case EqualizerMode.CLASSIC:
+            return "1"
+        case EqualizerMode.POP:
+            return "2"
+        case EqualizerMode.JAZZ:
+            return "3"
+        case EqualizerMode.VOCAL:
+            return "4"
+    return None
+
+
+def equalizer_mode_from_number_mapping(value: str | None) -> EqualizerMode | None:
+    """Converts a number mapping to EqualizerMode."""
+    match value:
+        case "0":
+            return EqualizerMode.NONE
+        case "1":
+            return EqualizerMode.CLASSIC
+        case "2":
+            return EqualizerMode.POP
+        case "3":
+            return EqualizerMode.JAZZ
+        case "4":
+            return EqualizerMode.VOCAL
+    return None
