@@ -293,10 +293,8 @@ class LinkPlayPlayer:
         
     @property
     def album_art(self) -> dict:
-        """Returns the channel the player is playing on."""
-        LOGGER.debug("Metainfo: %s", self.metainfo)
-        LOGGER.debug("Metainfo metadata: %s", self.metainfo.get("metaData",{}))
-        return self.metainfo.get("metaData",{}).get(MetaInfoMetaData.ALBUM_ART, "")             
+        """Returns the url to the album art."""
+        return self.metainfo.get("metaData",{}).get(MetaInfoMetaData.ALBUM_ART,"")             
 
     @property
     def volume(self) -> int:

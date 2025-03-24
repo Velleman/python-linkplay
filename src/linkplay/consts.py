@@ -476,8 +476,17 @@ class MultiroomAttribute(StrEnum):
         
         
 class MetaInfoMetaData(StrEnum):
+    """Defines the metadata within the metainfo."""
 
+    ALBUM_TITLE = "album"
+    TRACK_TITLE = "title"
+    TRACK_SUBTITLE = "subtitle"
     ALBUM_ART = "albumArtURI"
+    SAMPLE_RATE = "sampleRate"
+    BIT_DEPTH = "bitDepth"
+    BIT_RATE = "bitRate"
+    TRACK_ID = "trackId"
+    
 
 class AudioOutputHwMode(StrEnum):
     """Defines a output mode for the hardware."""
