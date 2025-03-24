@@ -294,8 +294,8 @@ class LinkPlayPlayer:
     @property
     def album_art(self) -> dict:
         """Returns the channel the player is playing on."""
-        _LOGGER.debug("Metainfo: %s", self.metainfo)
-        _LOGGER.debug("Metainfo metadata: %s", self.metainfo.get("metaData",{}))
+        LOGGER.debug("Metainfo: %s", self.metainfo)
+        LOGGER.debug("Metainfo metadata: %s", self.metainfo.get("metaData",{}))
         return self.metainfo['metaData'].get(MetaInfoMetaData.ALBUM_ART, "")             
 
     @property
