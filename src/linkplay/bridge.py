@@ -296,7 +296,7 @@ class LinkPlayPlayer:
         """Returns the channel the player is playing on."""
         LOGGER.debug("Metainfo: %s", self.metainfo)
         LOGGER.debug("Metainfo metadata: %s", self.metainfo.get("metaData",{}))
-        return self.metainfo['metaData'].get(MetaInfoMetaData.ALBUM_ART, "")             
+        return self.metainfo.get("metaData",{}).get(MetaInfoMetaData.ALBUM_ART, "")             
 
     @property
     def volume(self) -> int:
