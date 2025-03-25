@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+import json
 from typing import Any
 
 from linkplay.consts import (
@@ -303,9 +304,9 @@ class LinkPlayPlayer:
         return self.properties.get(PlayerAttribute.ALBUM, "")
         
     @property
-    def album_art(self) -> str:
+    def album_art(self) -> dict[str,str]:
         """Returns the url to the album art."""
-        return self.metainfo.get(MetaInfo.METADATA,{}).get(MetaInfoMetaData.ALBUM_ART,"") 
+        return json.loads(self.metainfo.get(MetaInfo.METADATA,{}))
 
     @property
     def volume(self) -> int:
