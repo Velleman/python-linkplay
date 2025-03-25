@@ -304,7 +304,7 @@ class LinkPlayPlayer:
     @property
     def album_art(self) -> dict[str,str]:
         """Returns the url to the album art."""
-        return self.metainfo.get("metaData",{})  
+        return json.loads(self.metainfo.get("metaData",{}))
 
     @property
     def volume(self) -> int:
