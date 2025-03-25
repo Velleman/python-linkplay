@@ -487,6 +487,12 @@ class MetaInfoMetaData(StrEnum):
     BIT_RATE = "bitRate"
     TRACK_ID = "trackId"
     
+    def __str__(self):
+        return self.value
+
+    def __repr__(self):
+        return self.value    
+    
 
 class AudioOutputHwMode(StrEnum):
     """Defines a output mode for the hardware."""
