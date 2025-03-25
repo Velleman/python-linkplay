@@ -474,6 +474,16 @@ class MultiroomAttribute(StrEnum):
     def __repr__(self):
         return self.value
         
+
+class MetaInfo(StrEnum):
+
+    METADATA = "metaData"
+    
+    def __str__(self):
+        return self.value
+
+    def __repr__(self):
+        return self.value     
         
 class MetaInfoMetaData(StrEnum):
     """Defines the metadata within the metainfo."""
