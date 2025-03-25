@@ -303,8 +303,7 @@ class LinkPlayPlayer:
     @property
     def album_art(self) -> str:
         """Returns the url to the album art."""
-        metadata = self.metainfo.get("metaData",{})
-        return metadata.get(MetaInfoMetaData.ALBUM_ART,"") 
+        return self.metainfo.get("metaData",{}).get(MetaInfoMetaData.ALBUM_ART,"") 
 
     @property
     def volume(self) -> int:
