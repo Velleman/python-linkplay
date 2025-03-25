@@ -133,7 +133,7 @@ class LinkPlayPlayer:
         self.bridge = bridge
         self.properties = dict.fromkeys(PlayerAttribute.__members__.values(), "")
         self.custom_properties = dict.fromkeys(PlayerAttribute.__members__.values(), "")
-        self.metainfo = dict.fromkeys(MetaInfo.__members__.values(), "")
+        self.metainfo = dict.fromkeys(MetaInfo.__members__.values(), dict[MetaInfoMetaData,str])
 
     def to_dict(self):
         """Return the state of the LinkPlayPlayer."""
