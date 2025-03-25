@@ -146,7 +146,7 @@ class LinkPlayPlayer:
         self.properties = fixup_player_properties(properties)
         if self.bridge.device.manufacturer == MANUFACTURER_WIIM:
             metainfo: dict[MetaInfoMetaData, str] = await self.bridge.json_request(
-                LinkPlayCommand.META_INFO)
+                LinkPlayCommand.META_INFO) # type: ignore[assignment]
             self.metainfo = metainfo
         else:
             self.metainfo = {}
@@ -302,7 +302,7 @@ class LinkPlayPlayer:
         return self.properties.get(PlayerAttribute.ALBUM, "")
         
     @property
-    def album_art(self) -> dict:
+    def album_art(self) -> str:
         """Returns the url to the album art."""
         return self.metainfo.get("metaData",{}).get(MetaInfoMetaData.ALBUM_ART,"")  
 
