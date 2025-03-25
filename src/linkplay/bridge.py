@@ -125,12 +125,13 @@ class LinkPlayPlayer:
     bridge: LinkPlayBridge
     properties: dict[PlayerAttribute, str]
     custom_properties: dict[PlayerAttribute, str]
-    metainfo: dict[str,str]
+    metainfo: dict[MetaInfoMetaData,str]
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
         self.properties = dict.fromkeys(PlayerAttribute.__members__.values(), "")
         self.custom_properties = dict.fromkeys(PlayerAttribute.__members__.values(), "")
+        self.metainfo = dict.fromkeys(MetaInfoMetaData.__members__.values(), "")
 
     def to_dict(self):
         """Return the state of the LinkPlayPlayer."""
@@ -143,9 +144,12 @@ class LinkPlayPlayer:
         )  # type: ignore[assignment]
 
         self.properties = fixup_player_properties(properties)
-        metainfo: dict[str, str] = await self.bridge.json_request(
-            LinkPlayCommand.META_INFO)
-        self.metainfo = metainfo
+        if self.bridge.device.manufacturer == MANUFACTURER_WIIM:
+            metainfo: dict[MetaInfoMetaData, str] = await self.bridge.json_request(
+                LinkPlayCommand.META_INFO)
+            self.metainfo = metainfo
+        else:
+            self.metainfo = {}
 
     async def next(self) -> None:
         """Play the next song in the playlist."""
@@ -263,10 +267,16 @@ class LinkPlayPlayer:
             await self.bridge.request(LinkPlayCommand.SEEK.format(position))
 
     async def set_audio_output_hw_mode(self, mode: AudioOutputHwMode) -> None:
-        """Set the play mode."""
+        """Set the audio hardware output."""
         await self.bridge.request(
-            LinkPlayCommand.AUDIO_OUTPUT_HW_MODE.format(AUDIO_OUTPUT_HW_MODE_MAP[mode])
-        )  # type: ignore[str-format]            
+            LinkPlayCommand.AUDIO_OUTPUT_HW_MODE_SET.format(AUDIO_OUTPUT_HW_MODE_MAP[mode])
+        )      
+
+    async def get_audio_output_hw_mode(self, mode: AudioOutputHwMode) -> None:
+        """Get the audio hardware output."""
+        await self.bridge.json_request(
+            LinkPlayCommand.AUDIO_OUTPUT_HW_MODE)
+        )         
 
     @property
     def muted(self) -> bool:
@@ -294,7 +304,7 @@ class LinkPlayPlayer:
     @property
     def album_art(self) -> dict:
         """Returns the url to the album art."""
-        return self.metainfo.get("metaData",{}).get(MetaInfoMetaData.ALBUM_ART,"")             
+        return self.metainfo.get("metaData",{}).get(MetaInfoMetaData.ALBUM_ART,"")  
 
     @property
     def volume(self) -> int:
