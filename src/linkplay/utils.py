@@ -185,7 +185,7 @@ async def async_create_ssl_context(
     with contextlib.suppress(AttributeError):
         # This only works for OpenSSL >= 1.0.0
         sslcontext.options |= ssl.OP_NO_COMPRESSION
-    sslcontext.set_default_verify_paths()
+    await loop.run_in_executor(executor, sslcontext.set_default_verify_paths)
     return sslcontext
 
 
