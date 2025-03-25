@@ -270,8 +270,9 @@ class LinkPlayPlayer:
 
     async def set_audio_output_hw_mode(self, mode: AudioOutputHwMode) -> None:
         """Set the audio hardware output."""
+        LOGGER("mode: %s", mode)
         await self.bridge.request(
-            LinkPlayCommand.AUDIO_OUTPUT_HW_MODE_SET.format(AUDIO_OUTPUT_HW_MODE_MAP[mode])
+            LinkPlayCommand.AUDIO_OUTPUT_HW_MODE_SET.format(mode)
         )      
 
     async def get_audio_output_hw_mode(self, mode: AudioOutputHwMode) -> None:
