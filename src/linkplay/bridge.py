@@ -302,9 +302,9 @@ class LinkPlayPlayer:
         return self.properties.get(PlayerAttribute.ALBUM, "")
         
     @property
-    def album_art(self) -> None:
+    def album_art(self):
         """Returns the url to the album art."""
-        return str(self.metainfo.get("metaData",{}).get(MetaInfoMetaData.ALBUM_ART,""))  
+        return self.metainfo.get("metaData",{}).get(MetaInfoMetaData.ALBUM_ART,"")  
 
     @property
     def volume(self) -> int:
