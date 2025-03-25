@@ -125,7 +125,7 @@ class LinkPlayPlayer:
     bridge: LinkPlayBridge
     properties: dict[PlayerAttribute, str]
     custom_properties: dict[PlayerAttribute, str]
-    metainfo: dict[str,str]
+    metainfo: dict[MetaInfoMetaData,str]
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
@@ -145,7 +145,7 @@ class LinkPlayPlayer:
 
         self.properties = fixup_player_properties(properties)
         if self.bridge.device.manufacturer == MANUFACTURER_WIIM:
-            metainfo: dict[str, str] = await self.bridge.json_request(
+            metainfo: dict[MetaInfoMetaData, str] = await self.bridge.json_request(
                 LinkPlayCommand.META_INFO) # type: ignore[assignment]
             self.metainfo = metainfo
         else:
