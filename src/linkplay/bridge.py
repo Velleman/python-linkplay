@@ -36,6 +36,8 @@ class LinkPlayDevice:
     bridge: LinkPlayBridge
     properties: dict[DeviceAttribute, str]
 
+    controller: callable | None = None
+
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
         self.properties = dict.fromkeys(DeviceAttribute.__members__.values(), "")
@@ -43,6 +45,10 @@ class LinkPlayDevice:
     def to_dict(self):
         """Return the state of the LinkPlayDevice."""
         return {"properties": self.properties}
+
+    def set_callback(self, controller: callable):
+        """Sets a callback function to notify events."""
+        self.controller = controller
 
     async def update_status(self) -> None:
         """Update the device status."""
@@ -123,6 +129,8 @@ class LinkPlayPlayer:
     properties: dict[PlayerAttribute, str]
     custom_properties: dict[PlayerAttribute, str]
 
+    previous_playing_mode: SpeakerType | None = None
+
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
         self.properties = dict.fromkeys(PlayerAttribute.__members__.values(), "")
@@ -139,6 +147,15 @@ class LinkPlayPlayer:
         )  # type: ignore[assignment]
 
         self.properties = fixup_player_properties(properties)
+
+        # handle multiroom changes
+        if (
+            self.bridge.device.controller
+            and self.previous_playing_mode != PlayingMode.FOLLOWER
+            and self.play_mode == PlayingMode.FOLLOWER
+        ):
+            self.bridge.device.controller(self)
+        self.previous_playing_mode = self.play_mode
 
     async def next(self) -> None:
         """Play the next song in the playlist."""
