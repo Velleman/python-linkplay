@@ -80,6 +80,8 @@ class LinkPlayController:
                     multiroom.leader.multiroom = None
                     removed_multirooms.append(multiroom)
             except LinkPlayInvalidDataException as exc:
+                multiroom.leader.multiroom = None
+                removed_multirooms.append(multiroom)
                 LOGGER.exception(exc)
 
         # Create new multirooms from new bridges

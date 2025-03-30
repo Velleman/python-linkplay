@@ -189,3 +189,33 @@ async def test_discover_multirooms_exception_handling(
             # Assert multiroom is not added to the controller
             assert len(controller.multirooms) == 0
             assert mock_bridge.multiroom is None
+
+
+@pytest.mark.asyncio
+async def test_discover_multirooms_create_new(controller, mock_bridge):
+    """Test discover_multirooms creates a new multiroom from a bridge."""
+    mock_bridge.multiroom = None
+
+    controller.bridges.append(mock_bridge)
+
+    mock_new_multiroom = MagicMock(spec=LinkPlayMultiroom)
+    mock_new_multiroom.followers = [MagicMock(spec=LinkPlayBridge)]
+
+    with patch(
+        "linkplay.controller.LinkPlayMultiroom", return_value=mock_new_multiroom
+    ) as mock_multiroom_class:
+        with patch.object(mock_new_multiroom, "update_status", AsyncMock()):
+            await controller.discover_multirooms()
+
+            # Assert LinkPlayMultiroom was instantiated
+            mock_multiroom_class.assert_called_once_with(mock_bridge)
+
+            # Assert multiroom update_status was called
+            mock_new_multiroom.update_status.assert_called_once_with(controller.bridges)
+
+            # Assert the new multiroom is added to the controller
+            assert len(controller.multirooms) == 1
+            assert controller.multirooms[0] == mock_new_multiroom
+
+            # Assert the bridge's multiroom is updated
+            assert mock_bridge.multiroom == mock_new_multiroom
