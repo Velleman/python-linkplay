@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import Any, Callable
 
 from linkplay.consts import (
     INPUT_MODE_MAP,
@@ -36,7 +36,7 @@ class LinkPlayDevice:
     bridge: LinkPlayBridge
     properties: dict[DeviceAttribute, str]
 
-    controller: callable | None = None
+    controller: Callable | None = None
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
@@ -129,7 +129,7 @@ class LinkPlayPlayer:
     properties: dict[PlayerAttribute, str]
     custom_properties: dict[PlayerAttribute, str]
 
-    previous_playing_mode: SpeakerType | None = None
+    previous_playing_mode: PlayingMode | None = None
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
