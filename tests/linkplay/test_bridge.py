@@ -1,7 +1,7 @@
 """Test bridge functionality."""
 
 from typing import Any
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from linkplay.bridge import (
@@ -478,3 +478,86 @@ async def test_multiroom_set_volume_raises_value_error(volume: int):
 
     with pytest.raises(ValueError):
         await multiroom.set_volume(volume)
+
+
+@pytest.fixture
+def mock_bridge():
+    bridge = Mock(spec=LinkPlayBridge)
+    bridge.device = Mock(spec=LinkPlayDevice)
+    return bridge
+
+
+def test_set_callback_assigns_controller(mock_bridge):
+    """Test that set_callback assigns the controller correctly."""
+    device = LinkPlayDevice(mock_bridge)
+    mock_controller = Mock()
+
+    device.set_callback(mock_controller)
+
+    assert device.controller == mock_controller
+
+
+@pytest.mark.asyncio
+async def test_update_status_triggers_controller_on_mode_change_to_follower(
+    mock_bridge,
+):
+    """Test that update_status triggers the controller when playing mode changes to FOLLOWER."""
+    player = LinkPlayPlayer(mock_bridge)
+    mock_bridge.device.controller = Mock()
+
+    # Simulate initial state
+    player.previous_playing_mode = PlayingMode.IDLE
+    mock_bridge.json_request = AsyncMock(
+        return_value={PlayerAttribute.PLAYBACK_MODE: PlayingMode.FOLLOWER}
+    )
+
+    # Call update_status and verify controller is called
+    await player.update_status()
+
+    mock_bridge.device.controller.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_update_status_triggers_controller_on_mode_change_from_follower(
+    mock_bridge,
+):
+    """Test that update_status triggers the controller when playing mode changes from FOLLOWER."""
+    player = LinkPlayPlayer(mock_bridge)
+    mock_bridge.device.controller = Mock()
+
+    # Simulate initial state
+    player.previous_playing_mode = PlayingMode.FOLLOWER
+    mock_bridge.json_request = AsyncMock(
+        return_value={PlayerAttribute.PLAYBACK_MODE: PlayingMode.IDLE}
+    )
+
+    # Call update_status and verify controller is called
+    await player.update_status()
+
+    mock_bridge.device.controller.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_update_status_does_not_trigger_controller_on_no_mode_change(mock_bridge):
+    """Test that update_status does not trigger the controller when playing mode remains FOLLOWER."""
+    player = LinkPlayPlayer(mock_bridge)
+    mock_bridge.device.controller = Mock()
+
+    # Simulate no change in playing mode
+    player.previous_playing_mode = PlayingMode.FOLLOWER
+    mock_bridge.json_request = AsyncMock(
+        return_value={PlayerAttribute.PLAYBACK_MODE: PlayingMode.FOLLOWER}
+    )
+
+    await player.update_status()
+
+    mock_bridge.device.controller.assert_not_called()
+
+    player.previous_playing_mode = PlayingMode.IDLE
+    mock_bridge.json_request = AsyncMock(
+        return_value={PlayerAttribute.PLAYBACK_MODE: PlayingMode.IDLE}
+    )
+
+    await player.update_status()
+
+    mock_bridge.device.controller.assert_not_called()
