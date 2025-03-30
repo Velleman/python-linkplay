@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from aiohttp import ClientSession
@@ -64,3 +64,37 @@ async def test_remove_bridge_not_exists(controller, mock_bridge):
     await controller.remove_bridge(mock_bridge)
 
     assert mock_bridge not in controller.bridges
+
+
+@pytest.mark.asyncio
+async def test_discover_bridges():
+    """Test the discover_bridges method of LinkPlayController."""
+    mock_session = ClientSession()
+    controller = LinkPlayController(mock_session)
+
+    # Mock the discover_linkplay_bridges function
+    mock_bridge_1 = AsyncMock()
+    mock_bridge_1.device.uuid = "uuid-1"
+    mock_bridge_2 = AsyncMock()
+    mock_bridge_2.device.uuid = "uuid-2"
+
+    with patch(
+        "linkplay.controller.discover_linkplay_bridges",
+        return_value=[mock_bridge_1, mock_bridge_2],
+    ) as mock_discover:
+        # Call discover_bridges
+        await controller.discover_bridges()
+
+        # Assert discover_linkplay_bridges was called
+        mock_discover.assert_called_once_with(mock_session)
+
+        # Assert bridges were added to the controller
+        assert len(controller.bridges) == 2
+        assert controller.bridges[0].device.uuid == "uuid-1"
+        assert controller.bridges[1].device.uuid == "uuid-2"
+
+        # Call discover_bridges again with no new bridges
+        await controller.discover_bridges()
+
+        # Assert no duplicate bridges were added
+        assert len(controller.bridges) == 2
