@@ -36,7 +36,7 @@ class LinkPlayDevice:
     bridge: LinkPlayBridge
     properties: dict[DeviceAttribute, str]
 
-    controller: Callable | None = None
+    controller: Callable[[], None] | None = None
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge

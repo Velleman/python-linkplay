@@ -21,7 +21,7 @@ class LinkPlayController:
     def get_bridge_callback(self):
         """Returns an async callback function for LinkPlayBridge."""
 
-        async def callback():
+        async def callback() -> None:
             """Async callback function to handle events from a LinkPlayBridge."""
             LOGGER.debug("Controller event received")
             await self.discover_multirooms()
