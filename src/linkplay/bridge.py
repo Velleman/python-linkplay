@@ -46,7 +46,7 @@ class LinkPlayDevice:
         """Return the state of the LinkPlayDevice."""
         return {"properties": self.properties}
 
-    def set_callback(self, controller: callable):
+    def set_callback(self, controller: Callable[[], None]) -> None:
         """Sets a callback function to notify events."""
         self.controller = controller
 
@@ -159,7 +159,7 @@ class LinkPlayPlayer:
                 and self.play_mode != PlayingMode.FOLLOWER
             )
         ):
-            self.bridge.device.controller(self)
+            self.bridge.device.controller()
         self.previous_playing_mode = self.play_mode
 
     async def next(self) -> None:
