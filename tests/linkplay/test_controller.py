@@ -114,3 +114,78 @@ async def test_find_bridge_non_existing(controller):
     """Test finding a non-existing bridge by UUID."""
     result = await controller.find_bridge("non-existent-uuid")
     assert result is None
+
+
+@pytest.mark.asyncio
+async def test_discover_multirooms_with_followers(
+    controller, mock_bridge, mock_multiroom
+):
+    """Test discover_multirooms when multirooms with followers exist."""
+    mock_bridge.multiroom = mock_multiroom
+    mock_multiroom.leader = mock_bridge
+    mock_multiroom.followers = [MagicMock(spec=LinkPlayBridge)]
+
+    controller.bridges.append(mock_bridge)
+
+    with patch.object(
+        mock_multiroom, "update_status", AsyncMock()
+    ) as mock_update_status:
+        await controller.discover_multirooms()
+
+        # Assert multiroom update_status was called
+        mock_update_status.assert_called_once_with(controller.bridges)
+
+        # Assert multiroom is added to the controller
+        assert len(controller.multirooms) == 1
+        assert controller.multirooms[0] == mock_multiroom
+
+
+@pytest.mark.asyncio
+async def test_discover_multirooms_no_followers(
+    controller, mock_bridge, mock_multiroom
+):
+    """Test discover_multirooms when multirooms have no followers."""
+    mock_bridge.multiroom = mock_multiroom
+    mock_multiroom.leader = mock_bridge
+    mock_multiroom.followers = []
+
+    controller.bridges.append(mock_bridge)
+
+    with patch.object(
+        mock_multiroom, "update_status", AsyncMock()
+    ) as mock_update_status:
+        await controller.discover_multirooms()
+
+        # Assert multiroom update_status was called
+        mock_update_status.assert_called_once_with(controller.bridges)
+
+        # Assert multiroom is not added to the controller
+        assert len(controller.multirooms) == 0
+        assert mock_bridge.multiroom is None
+
+
+@pytest.mark.asyncio
+async def test_discover_multirooms_exception_handling(
+    controller, mock_bridge, mock_multiroom
+):
+    """Test discover_multirooms handles exceptions during multiroom updates."""
+    mock_bridge.multiroom = mock_multiroom
+    mock_multiroom.leader = mock_bridge
+    mock_multiroom.followers = []
+
+    controller.bridges.append(mock_bridge)
+
+    with patch.object(
+        mock_multiroom,
+        "update_status",
+        AsyncMock(side_effect=LinkPlayInvalidDataException),
+    ):
+        with patch("linkplay.controller.LOGGER.exception") as mock_logger:
+            await controller.discover_multirooms()
+
+            # Assert exception was logged
+            mock_logger.assert_called_once()
+
+            # Assert multiroom is not added to the controller
+            assert len(controller.multirooms) == 0
+            assert mock_bridge.multiroom is None
