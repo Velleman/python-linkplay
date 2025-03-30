@@ -219,3 +219,36 @@ async def test_discover_multirooms_create_new(controller, mock_bridge):
 
             # Assert the bridge's multiroom is updated
             assert mock_bridge.multiroom == mock_new_multiroom
+
+
+@pytest.mark.asyncio
+async def test_discover_multirooms_new_multiroom_no_followers(controller, mock_bridge):
+    """Test discover_multirooms creates a new multiroom but it has no followers."""
+    mock_bridge.multiroom = None
+
+    controller.bridges.append(mock_bridge)
+
+    mock_new_multiroom = MagicMock(spec=LinkPlayMultiroom)
+    mock_new_multiroom.followers = []  # No followers
+
+    with patch(
+        "linkplay.controller.LinkPlayMultiroom", return_value=mock_new_multiroom
+    ) as mock_multiroom_class:
+        with patch.object(
+            mock_new_multiroom,
+            "update_status",
+            AsyncMock(side_effect=LinkPlayInvalidDataException),
+        ):
+            await controller.discover_multirooms()
+
+            # Assert LinkPlayMultiroom was instantiated
+            mock_multiroom_class.assert_called_once_with(mock_bridge)
+
+            # Assert multiroom update_status was called
+            mock_new_multiroom.update_status.assert_called_once_with(controller.bridges)
+
+            # Assert the new multiroom is not added to the controller
+            assert len(controller.multirooms) == 0
+
+            # Assert the bridge's multiroom is set to None
+            assert mock_bridge.multiroom is None
