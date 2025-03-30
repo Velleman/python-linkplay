@@ -98,3 +98,19 @@ async def test_discover_bridges():
 
         # Assert no duplicate bridges were added
         assert len(controller.bridges) == 2
+
+
+@pytest.mark.asyncio
+async def test_find_bridge_existing(controller, mock_bridge):
+    """Test finding an existing bridge by UUID."""
+    controller.bridges.append(mock_bridge)
+
+    result = await controller.find_bridge("mock-uuid")
+    assert result == mock_bridge
+
+
+@pytest.mark.asyncio
+async def test_find_bridge_non_existing(controller):
+    """Test finding a non-existing bridge by UUID."""
+    result = await controller.find_bridge("non-existent-uuid")
+    assert result is None
