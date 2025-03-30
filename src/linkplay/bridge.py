@@ -149,7 +149,7 @@ class LinkPlayPlayer:
         self.properties = fixup_player_properties(properties)
 
         # handle multiroom changes
-        if self.bridge.device.controller and (
+        if self.bridge.device.controller is not None and (
             (
                 self.previous_playing_mode != PlayingMode.FOLLOWER
                 and self.play_mode == PlayingMode.FOLLOWER
