@@ -1,29 +1,27 @@
 from __future__ import annotations
 
 import time
-import json
 from typing import Any, Callable
 
 from linkplay.consts import (
     INPUT_MODE_MAP,
     LOGGER,
     PLAY_MODE_SEND_MAP,
+    AudioOutputHwMode,
     ChannelType,
     DeviceAttribute,
     EqualizerMode,
     InputMode,
     LinkPlayCommand,
     LoopMode,
+    MetaInfo,
+    MetaInfoMetaData,
     MultiroomAttribute,
     MuteMode,
     PlayerAttribute,
     PlayingMode,
     PlayingStatus,
     SpeakerType,
-    MetaInfo,
-    MetaInfoMetaData,
-    AudioOutputHwMode,
-    AUDIO_OUTPUT_HW_MODE_MAP                  
 )
 from linkplay.endpoint import LinkPlayEndpoint
 from linkplay.exceptions import LinkPlayInvalidDataException
@@ -133,7 +131,7 @@ class LinkPlayPlayer:
     bridge: LinkPlayBridge
     properties: dict[PlayerAttribute, str]
     custom_properties: dict[PlayerAttribute, str]
-    metainfo: dict[MetaInfo,dict[MetaInfoMetaData,str]]
+    metainfo: dict[MetaInfo, dict[MetaInfoMetaData, str]]
 
     previous_playing_mode: PlayingMode | None = None
 
@@ -155,9 +153,9 @@ class LinkPlayPlayer:
 
         self.properties = fixup_player_properties(properties)
         if self.bridge.device.manufacturer == MANUFACTURER_WIIM:
-            metainfo: dict[MetaInfo,dict[MetaInfoMetaData,str]] = await self.bridge.json_request(
-                LinkPlayCommand.META_INFO) # type: ignore[assignment]
-            self.metainfo = metainfo
+            self.metainfo: dict[
+                MetaInfo, dict[MetaInfoMetaData, str]
+            ] = await self.bridge.json_request(LinkPlayCommand.META_INFO)  # type: ignore[assignment]
         else:
             self.metainfo = {}
 
@@ -292,16 +290,11 @@ class LinkPlayPlayer:
 
     async def set_audio_output_hw_mode(self, mode: AudioOutputHwMode) -> None:
         """Set the audio hardware output."""
-        LOGGER.debug("mode: %s", mode)
-        await self.bridge.request(
-            LinkPlayCommand.AUDIO_OUTPUT_HW_MODE_SET.format(mode)
-        )      
+        await self.bridge.request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE_SET.format(mode))
 
-    async def get_audio_output_hw_mode(self, mode: AudioOutputHwMode) -> None:
+    async def get_audio_output_hw_mode(self) -> None:
         """Get the audio hardware output."""
-        await self.bridge.json_request(
-            LinkPlayCommand.AUDIO_OUTPUT_HW_MODE
-        )         
+        await self.bridge.json_request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE)
 
     @property
     def muted(self) -> bool:
@@ -325,11 +318,13 @@ class LinkPlayPlayer:
     def album(self) -> str:
         """Returns if the currently playing album."""
         return self.properties.get(PlayerAttribute.ALBUM, "")
-        
+
     @property
     def album_art(self) -> str:
         """Returns the url to the album art."""
-        return self.metainfo.get(MetaInfo.METADATA,{}).get(MetaInfoMetaData.ALBUM_ART,"") 
+        return self.metainfo.get(MetaInfo.METADATA, {}).get(
+            MetaInfoMetaData.ALBUM_ART, ""
+        )
 
     @property
     def volume(self) -> int:
@@ -454,7 +449,8 @@ class LinkPlayPlayer:
             self.properties.get(
                 PlayerAttribute.PLAYLIST_MODE, LoopMode.CONTINUOUS_PLAYBACK
             )
-        )        
+        )
+
 
 class LinkPlayBridge:
     """Represents a LinkPlay bridge to control the device and player attached to it."""
