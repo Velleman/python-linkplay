@@ -18,6 +18,16 @@ class LinkPlayController:
         self.bridges = []
         self.multirooms = []
 
+    def get_bridge_callback(self):
+        """Returns an async callback function for LinkPlayBridge."""
+
+        async def callback() -> None:
+            """Async callback function to handle events from a LinkPlayBridge."""
+            LOGGER.debug("Controller event received")
+            await self.discover_multirooms()
+
+        return callback
+
     async def discover_bridges(self) -> None:
         """Attempts to discover LinkPlay devices on the local network."""
 
@@ -46,6 +56,7 @@ class LinkPlayController:
         # Add bridge
         current_bridges = [bridge.device.uuid for bridge in self.bridges]
         if bridge_to_add.device.uuid not in current_bridges:
+            bridge_to_add.device.set_callback(self.get_bridge_callback())
             self.bridges.append(bridge_to_add)
 
     async def remove_bridge(self, bridge_to_remove: LinkPlayBridge) -> None:
@@ -80,6 +91,8 @@ class LinkPlayController:
                     multiroom.leader.multiroom = None
                     removed_multirooms.append(multiroom)
             except LinkPlayInvalidDataException as exc:
+                multiroom.leader.multiroom = None
+                removed_multirooms.append(multiroom)
                 LOGGER.exception(exc)
 
         # Create new multirooms from new bridges
