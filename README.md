@@ -20,16 +20,18 @@ Welcome to python-linkplay, a powerful and user-friendly Python library designed
 4. Metadata Retrieval: Retrieve essential metadata such as track information, artist details, and album data, enabling you to enhance the user interface and display relevant information in your applications.
 
 ## LinkPlay API documentation
-
-- https://github.com/n4archive/LinkPlayAPI
-- https://github.com/nagyrobi/home-assistant-custom-components-linkplay
-- https://github.com/ramikg/linkplay-cli
 - https://developer.arylic.com/httpapi/
 - http://airscope-audio.net/core2/pdf/airscope-module-http.pdf
 - https://www.wiimhome.com/pdf/HTTP%20API%20for%20WiiM%20Mini.pdf
 - https://www.wiimhome.com/pdf/HTTP%20API%20for%20WiiM%20Products.pdf
+
+## LinkPlay references
+- https://github.com/n4archive/LinkPlayAPI
+- https://github.com/nagyrobi/home-assistant-custom-components-linkplay
+- https://github.com/ramikg/linkplay-cli
 - https://github.com/DanBrezeanu/wiim-extended-http-api
 - https://github.com/cvdlinden/wiim-httpapi
+- https://community.openhab.org/t/linkplay-binding/161995
 
 ## Multiroom
 
