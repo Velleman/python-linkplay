@@ -78,6 +78,10 @@ async def session_call_api_json(
     """
     try:
         result = await session_call_api(endpoint, session, command)
+        try:
+            json.loads(result)
+        except ValueError as e:
+            return {}
         return json.loads(result)  # type: ignore
     except json.JSONDecodeError as jsonexc:
         url = API_ENDPOINT.format(endpoint, command)
