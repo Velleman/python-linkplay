@@ -1,7 +1,7 @@
 """Test bridge functionality."""
 
 from typing import Any
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import pytest
 from linkplay.bridge import (
@@ -22,6 +22,7 @@ from linkplay.consts import (
     PlayingStatus,
 )
 from linkplay.endpoint import LinkPlayApiEndpoint
+from linkplay.manufacturers import MANUFACTURER_WIIM
 
 
 def test_device_name():
@@ -561,3 +562,40 @@ async def test_update_status_does_not_trigger_controller_on_no_mode_change(mock_
     await player.update_status()
 
     mock_bridge.device.controller.assert_not_called()
+
+
+async def test_meta_info_failed_handling():
+    """Test that the player handles a failed META_INFO request correctly."""
+
+    async def mock_session_call_api_json_side_effect(endpoint, session, command):
+        if command == LinkPlayCommand.META_INFO:
+            return "Failed"
+        return "{}"
+
+    # Mock the session_call_api function
+    with patch(
+        "linkplay.utils.session_call_api",
+        new=AsyncMock(side_effect=mock_session_call_api_json_side_effect),
+    ) as mock_api:
+        # Mock the bridge and its device
+        mock_bridge = LinkPlayBridge(
+            endpoint=LinkPlayApiEndpoint(
+                protocol="http", port=80, endpoint="1.2.3.4", session=None
+            )
+        )
+        mock_bridge.device = MagicMock()
+        mock_bridge.device.manufacturer = (
+            MANUFACTURER_WIIM  # Set the manufacturer to WiiM
+        )
+
+        # Create a LinkPlayPlayer instance with the mocked bridge
+        player = LinkPlayPlayer(mock_bridge)
+
+        # Simulate the META_INFO request and exception handling
+        await player.update_status()
+
+        # Verify that metainfo is set to an empty dictionary after the exception
+        assert player.metainfo == {}
+
+        # Verify that the mocked function was called with the correct command
+        mock_api.assert_called_with("http://1.2.3.4", None, LinkPlayCommand.META_INFO)

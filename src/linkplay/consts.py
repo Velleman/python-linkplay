@@ -473,18 +473,18 @@ class MultiroomAttribute(StrEnum):
 
     def __repr__(self):
         return self.value
-        
+
 
 class MetaInfo(StrEnum):
-
     METADATA = "metaData"
-    
+
     def __str__(self):
         return self.value
 
     def __repr__(self):
-        return self.value     
-        
+        return self.value
+
+
 class MetaInfoMetaData(StrEnum):
     """Defines the metadata within the metainfo."""
 
@@ -496,20 +496,22 @@ class MetaInfoMetaData(StrEnum):
     BIT_DEPTH = "bitDepth"
     BIT_RATE = "bitRate"
     TRACK_ID = "trackId"
-    
+
     def __str__(self):
         return self.value
 
     def __repr__(self):
-        return self.value    
-    
+        return self.value
+
 
 class AudioOutputHwMode(StrEnum):
     """Defines a output mode for the hardware."""
+
     OPTICAL = "1"
     LINE_OUT = "2"
     COAXIAL = "3"
     HEADPHONES = "4"
+
 
 # Map between a play mode and how to activate the play mode
 AUDIO_OUTPUT_HW_MODE_MAP: dict[AudioOutputHwMode, str] = {  # case sensitive!
@@ -517,4 +519,4 @@ AUDIO_OUTPUT_HW_MODE_MAP: dict[AudioOutputHwMode, str] = {  # case sensitive!
     AudioOutputHwMode.LINE_OUT: "line-out",
     AudioOutputHwMode.COAXIAL: "co-axial",
     AudioOutputHwMode.HEADPHONES: "headphones",
-}                                                       
+}
