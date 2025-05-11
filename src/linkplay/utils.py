@@ -82,7 +82,7 @@ async def session_call_api_json(
     except json.JSONDecodeError as jsonexc:
         url = API_ENDPOINT.format(endpoint, command)
         raise LinkPlayInvalidDataException(
-            f"Unexpected JSON ({result}) received from '{url}'"
+            message=f"Unexpected JSON ({result}) received from '{url}'", data=result
         ) from jsonexc
 
 

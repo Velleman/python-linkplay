@@ -153,9 +153,15 @@ class LinkPlayPlayer:
 
         self.properties = fixup_player_properties(properties)
         if self.bridge.device.manufacturer == MANUFACTURER_WIIM:
-            self.metainfo: dict[
-                MetaInfo, dict[MetaInfoMetaData, str]
-            ] = await self.bridge.json_request(LinkPlayCommand.META_INFO)  # type: ignore[assignment]
+            try:
+                self.metainfo: dict[
+                    MetaInfo, dict[MetaInfoMetaData, str]
+                ] = await self.bridge.json_request(LinkPlayCommand.META_INFO)  # type: ignore[assignment]
+            except LinkPlayInvalidDataException as exc:
+                if getattr(exc, "data", None) == "Failed":
+                    self.metainfo = {}
+                else:
+                    raise
         else:
             self.metainfo = {}
 
