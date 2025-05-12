@@ -37,7 +37,6 @@ async def linkplay_factory_bridge_endpoint(
 
     bridge: LinkPlayBridge = LinkPlayBridge(endpoint=endpoint)
     await bridge.device.update_status()
-    await bridge.player.update_status()
     return bridge
 
 
