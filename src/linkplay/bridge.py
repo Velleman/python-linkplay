@@ -60,6 +60,10 @@ class LinkPlayDevice:
     async def reboot(self) -> None:
         """Reboot the device."""
         await self.bridge.request(LinkPlayCommand.REBOOT)
+        
+    async def set_audio_output_hw_mode(self, mode: AudioOutputHwMode) -> None:
+        """Set the audio hardware output."""
+        await self.bridge.request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE_SET.format(mode))        
 
     @property
     def uuid(self) -> str:
@@ -153,15 +157,9 @@ class LinkPlayPlayer:
 
         self.properties = fixup_player_properties(properties)
         if self.bridge.device.manufacturer == MANUFACTURER_WIIM:
-            try:
-                self.metainfo: dict[
-                    MetaInfo, dict[MetaInfoMetaData, str]
-                ] = await self.bridge.json_request(LinkPlayCommand.META_INFO)  # type: ignore[assignment]
-            except LinkPlayInvalidDataException as exc:
-                if getattr(exc, "data", None) == "Failed":
-                    self.metainfo = {}
-                else:
-                    raise
+            self.metainfo: dict[
+                MetaInfo, dict[MetaInfoMetaData, str]
+            ] = await self.bridge.json_request(LinkPlayCommand.META_INFO)  # type: ignore[assignment]
         else:
             self.metainfo = {}
 
