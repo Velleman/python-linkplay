@@ -296,9 +296,10 @@ class LinkPlayPlayer:
         """Set the audio hardware output."""
         await self.bridge.request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE_SET.format(mode))
 
+    @property
     def get_audio_output_hw_mode(self) -> None:
         """Get the audio hardware output."""
-        await self.bridge.json_request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE)
+        return self.bridge.json_request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE)
 
     @property
     def muted(self) -> bool:
