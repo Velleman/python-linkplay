@@ -298,7 +298,8 @@ class LinkPlayPlayer:
 
     async def get_audio_output_hw_mode(self) -> None:
         """Get the audio hardware output."""
-        await self.bridge.json_request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE)
+        response await self.bridge.json_request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE)
+        return response
 
     @property
     def muted(self) -> bool:
