@@ -59,11 +59,7 @@ class LinkPlayDevice:
 
     async def reboot(self) -> None:
         """Reboot the device."""
-        await self.bridge.request(LinkPlayCommand.REBOOT)
-        
-    async def set_audio_output_hw_mode(self, mode: AudioOutputHwMode) -> None:
-        """Set the audio hardware output."""
-        await self.bridge.request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE_SET.format(mode))        
+        await self.bridge.request(LinkPlayCommand.REBOOT)    
 
     @property
     def uuid(self) -> str:
@@ -296,10 +292,9 @@ class LinkPlayPlayer:
         """Set the audio hardware output."""
         await self.bridge.request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE_SET.format(mode))
 
-    async def get_audio_output_hw_mode(self) -> None:
+    async def get_audio_output_hw_mode(self) -> dict:
         """Get the audio hardware output."""
-        response = await self.bridge.json_request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE)
-        return response
+        await self.bridge.json_request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE)
 
     @property
     def muted(self) -> bool:
