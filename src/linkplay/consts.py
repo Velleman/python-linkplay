@@ -520,3 +520,12 @@ AUDIO_OUTPUT_HW_MODE_MAP: dict[AudioOutputHwMode, str] = {  # case sensitive!
     AudioOutputHwMode.COAXIAL: "co-axial",
     AudioOutputHwMode.HEADPHONES: "headphones",
 }
+
+
+class AudioOutputModeResponse:
+    """Defines a response for the audio output hardware mode."""
+
+    def __init__(self, hardware: AudioOutputHwMode, source: bool, audiocast: bool):
+        self.hardware = hardware
+        self.bluetooth_source = source
+        self.audiocast = audiocast

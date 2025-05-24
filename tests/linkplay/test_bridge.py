@@ -12,6 +12,7 @@ from linkplay.bridge import (
 )
 from linkplay.consts import (
     PLAY_MODE_SEND_MAP,
+    AudioOutputHwMode,
     DeviceAttribute,
     EqualizerMode,
     LinkPlayCommand,
@@ -599,3 +600,44 @@ async def test_meta_info_failed_handling():
 
         # Verify that the mocked function was called with the correct command
         mock_api.assert_called_with("http://1.2.3.4", None, LinkPlayCommand.META_INFO)
+
+
+async def test_audio_output_control():
+    """Test that the player handles a audio output control correctly."""
+
+    async def mock_session_call_api_json_side_effect(endpoint, session, command):
+        if command == LinkPlayCommand.AUDIO_OUTPUT_HW_MODE:
+            return """{"hardware":"2","source":"0","audiocast":"1"}"""
+        return "{}"
+
+    # Mock the session_call_api function
+    with patch(
+        "linkplay.utils.session_call_api",
+        new=AsyncMock(side_effect=mock_session_call_api_json_side_effect),
+    ) as mock_api:
+        # Mock the bridge and its device
+        mock_bridge = LinkPlayBridge(
+            endpoint=LinkPlayApiEndpoint(
+                protocol="http", port=80, endpoint="1.2.3.4", session=None
+            )
+        )
+        mock_bridge.device = MagicMock()
+        mock_bridge.device.manufacturer = (
+            MANUFACTURER_WIIM  # Set the manufacturer to WiiM
+        )
+
+        # Create a LinkPlayPlayer instance with the mocked bridge
+        player = LinkPlayPlayer(mock_bridge)
+
+        # Simulate the META_INFO request and exception handling
+        resp = await player.get_audio_output_hw_mode()
+
+        # Verify that metainfo is set to an empty dictionary after the exception
+        assert resp.hardware == AudioOutputHwMode.LINE_OUT
+        assert not resp.bluetooth_source
+        assert resp.audiocast
+
+        # Verify that the mocked function was called with the correct command
+        mock_api.assert_called_with(
+            "http://1.2.3.4", None, LinkPlayCommand.AUDIO_OUTPUT_HW_MODE
+        )
