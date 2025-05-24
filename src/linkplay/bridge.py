@@ -8,6 +8,7 @@ from linkplay.consts import (
     LOGGER,
     PLAY_MODE_SEND_MAP,
     AudioOutputHwMode,
+    AudioOutputModeResponse,
     ChannelType,
     DeviceAttribute,
     EqualizerMode,
@@ -298,9 +299,14 @@ class LinkPlayPlayer:
         """Set the audio hardware output."""
         await self.bridge.request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE_SET.format(mode))
 
-    async def get_audio_output_hw_mode(self) -> None:
+    async def get_audio_output_hw_mode(self) -> AudioOutputModeResponse:
         """Get the audio hardware output."""
-        await self.bridge.json_request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE)
+        resp = await self.bridge.json_request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE)
+        return AudioOutputModeResponse(
+            AudioOutputHwMode(resp.get("hardware")),
+            resp.get("source", "") == 1,
+            resp.get("audiocast", "") == 1,
+        )
 
     @property
     def muted(self) -> bool:
