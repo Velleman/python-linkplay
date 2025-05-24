@@ -630,7 +630,7 @@ async def test_audio_output_control():
         player = LinkPlayPlayer(mock_bridge)
 
         # Simulate the META_INFO request and exception handling
-        resp = await player.get_audio_output_mode()
+        resp = await player.get_audio_output_hw_mode()
 
         # Verify that metainfo is set to an empty dictionary after the exception
         assert resp.hardware == AudioOutputHwMode.LINE_OUT

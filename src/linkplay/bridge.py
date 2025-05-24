@@ -303,7 +303,7 @@ class LinkPlayPlayer:
         """Get the audio hardware output."""
         resp = await self.bridge.json_request(LinkPlayCommand.AUDIO_OUTPUT_HW_MODE)
         return AudioOutputModeResponse(
-            AudioOutputHwMode(resp.get("hardware")),
+            AudioOutputHwMode(str(resp.get("hardware"))),
             resp.get("source", "") == 1,
             resp.get("audiocast", "") == 1,
         )
