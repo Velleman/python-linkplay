@@ -607,7 +607,7 @@ async def test_audio_output_control():
 
     async def mock_session_call_api_json_side_effect(endpoint, session, command):
         if command == LinkPlayCommand.AUDIO_OUTPUT_HW_MODE:
-            return """{"hardware":"2","source":"0","audiocast":"0"}"""
+            return """{"hardware":"2","source":"0","audiocast":"1"}"""
         return "{}"
 
     # Mock the session_call_api function
@@ -635,7 +635,7 @@ async def test_audio_output_control():
         # Verify that metainfo is set to an empty dictionary after the exception
         assert resp.hardware == AudioOutputHwMode.LINE_OUT
         assert not resp.bluetooth_source
-        assert not resp.audiocast
+        assert resp.audiocast
 
         # Verify that the mocked function was called with the correct command
         mock_api.assert_called_with(
