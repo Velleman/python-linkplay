@@ -152,6 +152,7 @@ class PlayingMode(StrEnum):
     ALARM = "30"
     SPOTIFY = "31"
     TIDAL = "32"
+    QOBUZ = "36"
     LINE_IN = "40"
     BLUETOOTH = "41"
     OPTICAL = "43"
@@ -187,6 +188,7 @@ PLAY_MODE_SEND_MAP: dict[PlayingMode, str] = {  # case sensitive!
     PlayingMode.ALARM: "Alarm",
     PlayingMode.SPOTIFY: "Spotify",
     PlayingMode.TIDAL: "Tidal",
+    PlayingMode.QOBUZ: "Qobuz",
     PlayingMode.LINE_IN: "line-in",
     PlayingMode.BLUETOOTH: "bluetooth",
     PlayingMode.OPTICAL: "optical",
