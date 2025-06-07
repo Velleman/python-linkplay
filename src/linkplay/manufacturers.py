@@ -75,7 +75,7 @@ def get_info_from_project(project: str) -> tuple[str, str]:
     """Get manufacturer and model info based on given project."""
     if project not in PROJECTID_LOOKUP:
         LOGGER.warning(
-            "The device '%s' is not found in our list. To improve experience, open an issue on GitHub with the project name %s, the manufacturer and the product name.",
+            "The project name '%s' is not found in the manufacturer list. Kindly open an issue at https://github.com/velleman/python-linkplay/issues with the project name %s and mention the manufacturer of this product and the product name.",
             project,
             project,
         )
