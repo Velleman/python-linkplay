@@ -26,7 +26,7 @@ def test_non_existing_project(mock_warning):
     assert manufacturer == MANUFACTURER_GENERIC
     assert model == MODELS_GENERIC
     mock_warning.assert_called_once_with(
-        "The device '%s' is not found in our list. To improve experience, open an issue on GitHub with the project name %s, the manufacturer and the product name.",
+        "The project name '%s' is not found in the manufacturer list. Kindly open an issue at https://github.com/velleman/python-linkplay/issues with the project name %s and mention the manufacturer of this product and the product name.",
         project,
         project,
     )
