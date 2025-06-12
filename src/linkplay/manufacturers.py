@@ -79,10 +79,10 @@ PROJECTID_LOOKUP: Final[dict[str, tuple[str, str]]] = {
 
 def get_info_from_project(project: str) -> tuple[str, str]:
     """Get manufacturer and model info based on given project."""
-#    if project not in PROJECTID_LOOKUP:
-#        LOGGER.warning(
-#            "The project name '%s' is not found in the manufacturer list. Kindly open an issue at https://github.com/velleman/python-linkplay/issues with the project name %s and mention the manufacturer of this product and the product name.",
-#            project,
-#            project,
-#        )
+    #    if project not in PROJECTID_LOOKUP:
+    #        LOGGER.warning(
+    #            "The project name '%s' is not found in the manufacturer list. Kindly open an issue at https://github.com/velleman/python-linkplay/issues with the project name %s and mention the manufacturer of this product and the product name.",
+    #            project,
+    #            project,
+    #        )
     return PROJECTID_LOOKUP.get(project, (MANUFACTURER_GENERIC, MODELS_GENERIC))
