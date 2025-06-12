@@ -70,6 +70,7 @@ PROJECTID_LOOKUP: Final[dict[str, tuple[str, str]]] = {
     "WiiM_Amp_4layer": (MANUFACTURER_WIIM, MODELS_WIIM_AMP),
     "WiiM_Pro_with_gc4a": (MANUFACTURER_WIIM, MODELS_WIIM_PRO),
     "WiiM_Pro_Plus": (MANUFACTURER_WIIM, MODELS_WIIM_PRO_PLUS),
+    "WiiM_AMP": (MANUFACTURER_WIIM, MODELS_WIIM_AMP),
     "Muzo_Mini": (MANUFACTURER_WIIM, MODELS_WIIM_MINI),
     "GGMM_E2A": (MANUFACTURER_GGMM, MODELS_GGMM_GGMM_E2),
     "A16": (MANUFACTURER_MEDION, MODELS_MEDION_MD_43970),
@@ -78,10 +79,10 @@ PROJECTID_LOOKUP: Final[dict[str, tuple[str, str]]] = {
 
 def get_info_from_project(project: str) -> tuple[str, str]:
     """Get manufacturer and model info based on given project."""
-    if project not in PROJECTID_LOOKUP:
-        LOGGER.warning(
-            "The project name '%s' is not found in the manufacturer list. Kindly open an issue at https://github.com/velleman/python-linkplay/issues with the project name %s and mention the manufacturer of this product and the product name.",
-            project,
-            project,
-        )
+#    if project not in PROJECTID_LOOKUP:
+#        LOGGER.warning(
+#            "The project name '%s' is not found in the manufacturer list. Kindly open an issue at https://github.com/velleman/python-linkplay/issues with the project name %s and mention the manufacturer of this product and the product name.",
+#            project,
+#            project,
+#        )
     return PROJECTID_LOOKUP.get(project, (MANUFACTURER_GENERIC, MODELS_GENERIC))
