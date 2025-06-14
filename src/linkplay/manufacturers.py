@@ -10,6 +10,7 @@ MANUFACTURER_IEAST: Final[str] = "iEAST"
 MANUFACTURER_WIIM: Final[str] = "WiiM"
 MANUFACTURER_GGMM: Final[str] = "GGMM"
 MANUFACTURER_MEDION: Final[str] = "Medion"
+MANUFACTURER_AUGUST: Final[str] = "August"
 MANUFACTURER_GENERIC: Final[str] = "Generic"
 MODELS_ARTSOUND_SMART_ZONE4: Final[str] = "Smart Zone 4 AMP"
 MODELS_ARTSOUND_SMART_HYDE: Final[str] = "Smart Hyde"
@@ -35,6 +36,9 @@ MODELS_WIIM_PRO: Final[str] = "WiiM Pro"
 MODELS_WIIM_PRO_PLUS: Final[str] = "WiiM Pro Plus"
 MODELS_GGMM_GGMM_E2: Final[str] = "GGMM E2"
 MODELS_MEDION_MD_43970: Final[str] = "Life P66970 (MD 43970)"
+MODELS_WR320: Final[str] = "WR320"
+MODELS_WS350: Final[str] = "WS350"
+MODELS_WIIM_AMP_PRO: Final[str] = "WiiM Amp Pro"
 MODELS_GENERIC: Final[str] = "Generic"
 
 PROJECTID_LOOKUP: Final[dict[str, tuple[str, str]]] = {
@@ -71,9 +75,12 @@ PROJECTID_LOOKUP: Final[dict[str, tuple[str, str]]] = {
     "WiiM_Pro_with_gc4a": (MANUFACTURER_WIIM, MODELS_WIIM_PRO),
     "WiiM_Pro_Plus": (MANUFACTURER_WIIM, MODELS_WIIM_PRO_PLUS),
     "WiiM_AMP": (MANUFACTURER_WIIM, MODELS_WIIM_AMP),
+    "WiiM_Amp_Pro": (MANUFACTURER_WIIM, MODELS_WIIM_AMP_PRO),
     "Muzo_Mini": (MANUFACTURER_WIIM, MODELS_WIIM_MINI),
     "GGMM_E2A": (MANUFACTURER_GGMM, MODELS_GGMM_GGMM_E2),
     "A16": (MANUFACTURER_MEDION, MODELS_MEDION_MD_43970),
+    "Lanzi_4566": (MANUFACTURER_AUGUST, MODELS_WR320),
+    "WS350": (MANUFACTURER_AUGUST, MODELS_WS350)
 }
 
 
