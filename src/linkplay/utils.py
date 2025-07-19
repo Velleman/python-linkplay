@@ -10,20 +10,25 @@ from http import HTTPStatus
 
 import aiofiles
 import async_timeout
-from aiohttp import ClientError, ClientSession, TCPConnector
+from aiohttp import ClientError, ClientSession, ClientTimeout, TCPConnector
 from appdirs import AppDirs
 from deprecated import deprecated
 
 from linkplay.consts import (
     API_ENDPOINT,
     API_TIMEOUT,
+    LOGGER,
     MTLS_CERTIFICATE_CONTENTS,
     TCP_MESSAGE_LENGTH,
     EqualizerMode,
     PlayerAttribute,
     PlayingStatus,
 )
-from linkplay.exceptions import LinkPlayInvalidDataException, LinkPlayRequestException
+from linkplay.exceptions import (
+    LinkPlayInvalidDataException,
+    LinkPlayRequestCancelledException,
+    LinkPlayRequestException,
+)
 
 
 async def session_call_api(endpoint: str, session: ClientSession, command: str) -> str:
@@ -45,18 +50,29 @@ async def session_call_api(endpoint: str, session: ClientSession, command: str) 
     try:
         async with async_timeout.timeout(API_TIMEOUT):
             response = await session.get(url)
+            if response.status != HTTPStatus.OK:
+                raise LinkPlayRequestException(
+                    f"Unexpected HTTPStatus {response.status} received from '{url}'"
+                )
+            return await response.text()
 
-    except (asyncio.TimeoutError, ClientError, asyncio.CancelledError) as error:
+    except ClientError as error:
+        LOGGER.warning("ClientError for %s: %s", url, error)
         raise LinkPlayRequestException(
             f"{error} error requesting data from '{url}'"
         ) from error
 
-    if response.status != HTTPStatus.OK:
+    except asyncio.TimeoutError as error:
+        LOGGER.warning("Timeout for %s: %s", url, error)
         raise LinkPlayRequestException(
-            f"Unexpected HTTPStatus {response.status} received from '{url}'"
-        )
+            f"{error} error requesting data from '{url}'"
+        ) from error
 
-    return await response.text()
+    except asyncio.CancelledError as error:
+        LOGGER.warning("Cancelled for %s: %s", url, error)
+        raise LinkPlayRequestCancelledException(
+            f"{error} error requesting data from '{url}'"
+        ) from error
 
 
 async def session_call_api_json(
@@ -81,6 +97,7 @@ async def session_call_api_json(
         return json.loads(result)  # type: ignore
     except json.JSONDecodeError as jsonexc:
         url = API_ENDPOINT.format(endpoint, command)
+        LOGGER.warning("Unexpected json for %s: %s", url, jsonexc)
         raise LinkPlayInvalidDataException(
             message=f"Unexpected JSON ({result}) received from '{url}'", data=result
         ) from jsonexc
