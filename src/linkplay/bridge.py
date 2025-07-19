@@ -269,7 +269,7 @@ class LinkPlayPlayer:
     async def play_preset(self, preset_number: int) -> None:
         """Play a preset."""
         max_number_of_presets_allowed = int(
-            self.bridge.player.properties.get(DeviceAttribute.PRESET_KEY) or "10"
+            self.bridge.player.device_properties.get(DeviceAttribute.PRESET_KEY) or "10"
         )
         if not 0 < preset_number <= max_number_of_presets_allowed:
             raise ValueError(
