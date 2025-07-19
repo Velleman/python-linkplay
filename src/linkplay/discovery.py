@@ -36,7 +36,7 @@ async def linkplay_factory_bridge_endpoint(
     Raises LinkPlayRequestException if the device is not an expected LinkPlay device."""
 
     bridge: LinkPlayBridge = LinkPlayBridge(endpoint=endpoint)
-    await bridge.device.update_status()
+    await bridge.player.update_status()
     await bridge.player.update_status()
     return bridge
 
@@ -80,7 +80,7 @@ async def discover_linkplay_bridges(
 
         try:
             bridge = await linkplay_factory_httpapi_bridge(ip_address, session)
-            bridges[bridge.device.uuid] = bridge
+            bridges[bridge.player.uuid] = bridge
         except LinkPlayRequestException:
             pass
 
@@ -93,7 +93,7 @@ async def discover_linkplay_bridges(
         multiroom_discovered_bridges: dict[str, LinkPlayBridge] = {}
         for bridge in bridges.values():
             for new_bridge in await discover_bridges_through_multiroom(bridge, session):
-                multiroom_discovered_bridges[new_bridge.device.uuid] = new_bridge
+                multiroom_discovered_bridges[new_bridge.player.uuid] = new_bridge
 
         bridges = bridges | multiroom_discovered_bridges
 
