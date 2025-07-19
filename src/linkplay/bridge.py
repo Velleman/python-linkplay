@@ -34,29 +34,29 @@ from linkplay.utils import (
 )
 
 
-class LinkPlayDevice:
-    """Represents a LinkPlay device."""
+class LinkPlayPlayer:
+    """Represents a LinkPlay player."""
 
     bridge: LinkPlayBridge
-    properties: dict[DeviceAttribute, str]
+    device_properties: dict[DeviceAttribute, str]
+    properties: dict[PlayerAttribute, str]
+    custom_properties: dict[PlayerAttribute, str]
+    metainfo: dict[MetaInfo, dict[MetaInfoMetaData, str]]
+
+    previous_playing_mode: PlayingMode | None = None
 
     controller: Callable[[], None] | None = None
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
-        self.properties = dict.fromkeys(DeviceAttribute.__members__.values(), "")
-
-    def to_dict(self):
-        """Return the state of the LinkPlayDevice."""
-        return {"properties": self.properties}
+        self.device_properties = dict.fromkeys(DeviceAttribute.__members__.values(), "")
+        self.properties = dict.fromkeys(PlayerAttribute.__members__.values(), "")
+        self.custom_properties = dict.fromkeys(PlayerAttribute.__members__.values(), "")
+        self.metainfo = dict.fromkeys(MetaInfo.__members__.values(), {})
 
     def set_callback(self, controller: Callable[[], None]) -> None:
         """Sets a callback function to notify events."""
         self.controller = controller
-
-    async def update_status(self) -> None:
-        """Update the device status."""
-        self.properties = await self.bridge.json_request(LinkPlayCommand.DEVICE_STATUS)  # type: ignore[assignment]
 
     async def reboot(self) -> None:
         """Reboot the device."""
@@ -65,18 +65,18 @@ class LinkPlayDevice:
     @property
     def uuid(self) -> str:
         """The UUID of the device."""
-        return self.properties.get(DeviceAttribute.UUID, "")
+        return self.device_properties.get(DeviceAttribute.UUID, "")
 
     @property
     def name(self) -> str:
         """The name of the device."""
-        return self.properties.get(DeviceAttribute.DEVICE_NAME, "")
+        return self.device_properties.get(DeviceAttribute.DEVICE_NAME, "")
 
     @property
     def manufacturer(self) -> str:
         """The manufacturer of the device."""
         manufacturer, _ = get_info_from_project(
-            self.properties.get(DeviceAttribute.PROJECT, "")
+            self.device_properties.get(DeviceAttribute.PROJECT, "")
         )
         return manufacturer
 
@@ -84,7 +84,7 @@ class LinkPlayDevice:
     def model(self) -> str:
         """The model of the device."""
         _, model = get_info_from_project(
-            self.properties.get(DeviceAttribute.PROJECT, "")
+            self.device_properties.get(DeviceAttribute.PROJECT, "")
         )
         return model
 
@@ -93,7 +93,7 @@ class LinkPlayDevice:
         """Returns the player playmode support."""
 
         flags = InputMode(
-            int(self.properties[DeviceAttribute.PLAYMODE_SUPPORT], base=16)
+            int(self.device_properties[DeviceAttribute.PLAYMODE_SUPPORT], base=16)
         )
 
         playing_modes = [INPUT_MODE_MAP[flag] for flag in flags]
@@ -103,21 +103,21 @@ class LinkPlayDevice:
     @property
     def mac(self) -> str | None:
         """Returns the mac address."""
-        mac = self.properties.get(DeviceAttribute.ETH_MAC_ADDRESS)
+        mac = self.device_properties.get(DeviceAttribute.ETH_MAC_ADDRESS)
         if mac == "00:00:00:00:00:00" or mac is None:
-            mac = self.properties.get(DeviceAttribute.STA_MAC_ADDRESS)
+            mac = self.device_properties.get(DeviceAttribute.STA_MAC_ADDRESS)
         if mac == "00:00:00:00:00:00" or mac is None:
-            mac = self.properties.get(DeviceAttribute.MAC_ADDRESS)
+            mac = self.device_properties.get(DeviceAttribute.MAC_ADDRESS)
         return mac
 
     @property
     def eth(self) -> str | None:
         """Returns the ethernet address."""
-        eth = self.properties.get(DeviceAttribute.ETH2)
+        eth = self.device_properties.get(DeviceAttribute.ETH2)
         if eth == "0.0.0.0" or eth == "" or eth is None:
-            eth = self.properties.get(DeviceAttribute.ETH0)
+            eth = self.device_properties.get(DeviceAttribute.ETH0)
         if eth == "0.0.0.0" or eth == "" or eth is None:
-            eth = self.properties.get(DeviceAttribute.APCLI0)
+            eth = self.device_properties.get(DeviceAttribute.APCLI0)
         return eth
 
     async def timesync(self) -> None:
@@ -125,35 +125,26 @@ class LinkPlayDevice:
         timestamp = time.strftime("%Y%m%d%H%M%S")
         await self.bridge.request(LinkPlayCommand.TIMESYNC.format(timestamp))
 
-
-class LinkPlayPlayer:
-    """Represents a LinkPlay player."""
-
-    bridge: LinkPlayBridge
-    properties: dict[PlayerAttribute, str]
-    custom_properties: dict[PlayerAttribute, str]
-    metainfo: dict[MetaInfo, dict[MetaInfoMetaData, str]]
-
-    previous_playing_mode: PlayingMode | None = None
-
-    def __init__(self, bridge: LinkPlayBridge):
-        self.bridge = bridge
-        self.properties = dict.fromkeys(PlayerAttribute.__members__.values(), "")
-        self.custom_properties = dict.fromkeys(PlayerAttribute.__members__.values(), "")
-        self.metainfo = dict.fromkeys(MetaInfo.__members__.values(), {})
-
     def to_dict(self):
         """Return the state of the LinkPlayPlayer."""
-        return {"properties": self.properties}
+        return {
+            "device_properties": self.device_properties,
+            "properties": self.properties,
+        }
 
     async def update_status(self) -> None:
         """Update the player status."""
+
+        self.device_properties = await self.bridge.json_request(
+            LinkPlayCommand.DEVICE_STATUS
+        )  # type: ignore[assignment]
+
         properties: dict[PlayerAttribute, str] = await self.bridge.json_request(
             LinkPlayCommand.PLAYER_STATUS
         )  # type: ignore[assignment]
 
         self.properties = fixup_player_properties(properties)
-        if self.bridge.device.manufacturer == MANUFACTURER_WIIM:
+        if self.bridge.player.manufacturer == MANUFACTURER_WIIM:
             try:
                 self.metainfo: dict[
                     MetaInfo, dict[MetaInfoMetaData, str]
@@ -167,7 +158,7 @@ class LinkPlayPlayer:
             self.metainfo = {}
 
         # handle multiroom changes
-        if self.bridge.device.controller is not None and (
+        if self.bridge.player.controller is not None and (
             (
                 self.previous_playing_mode != PlayingMode.FOLLOWER
                 and self.play_mode == PlayingMode.FOLLOWER
@@ -177,7 +168,7 @@ class LinkPlayPlayer:
                 and self.play_mode != PlayingMode.FOLLOWER
             )
         ):
-            self.bridge.device.controller()
+            self.bridge.player.controller()
         self.previous_playing_mode = self.play_mode
 
     async def next(self) -> None:
@@ -233,7 +224,7 @@ class LinkPlayPlayer:
 
     async def set_equalizer_mode(self, mode: EqualizerMode) -> None:
         """Set the equalizer mode."""
-        if self.bridge.device.manufacturer == MANUFACTURER_WIIM:
+        if self.bridge.player.manufacturer == MANUFACTURER_WIIM:
             await self._set_wiim_equalizer_mode(mode)
         else:
             await self._set_normal_equalizer_mode(mode)
@@ -278,7 +269,7 @@ class LinkPlayPlayer:
     async def play_preset(self, preset_number: int) -> None:
         """Play a preset."""
         max_number_of_presets_allowed = int(
-            self.bridge.device.properties.get(DeviceAttribute.PRESET_KEY) or "10"
+            self.bridge.player.device_properties.get(DeviceAttribute.PRESET_KEY) or "10"
         )
         if not 0 < preset_number <= max_number_of_presets_allowed:
             raise ValueError(
@@ -374,7 +365,7 @@ class LinkPlayPlayer:
     def equalizer_mode(self) -> EqualizerMode:
         """Returns the current equalizer mode."""
         try:
-            if self.bridge.device.manufacturer == MANUFACTURER_WIIM:
+            if self.bridge.player.manufacturer == MANUFACTURER_WIIM:
                 # WiiM devices have a different equalizer mode handling
                 # and will never ever return what equalizer mode they are in
                 return EqualizerMode(
@@ -395,7 +386,7 @@ class LinkPlayPlayer:
     @property
     def available_equalizer_modes(self) -> list[EqualizerMode]:
         """Returns the available equalizer modes."""
-        if self.bridge.device.manufacturer == MANUFACTURER_WIIM:
+        if self.bridge.player.manufacturer == MANUFACTURER_WIIM:
             return [
                 EqualizerMode.NONE,
                 EqualizerMode.FLAT,
@@ -468,27 +459,24 @@ class LinkPlayBridge:
     """Represents a LinkPlay bridge to control the device and player attached to it."""
 
     endpoint: LinkPlayEndpoint
-    device: LinkPlayDevice
     player: LinkPlayPlayer
     multiroom: LinkPlayMultiroom | None
 
     def __init__(self, *, endpoint: LinkPlayEndpoint):
         self.endpoint = endpoint
-        self.device = LinkPlayDevice(self)
         self.player = LinkPlayPlayer(self)
         self.multiroom = None
 
     def __str__(self) -> str:
-        if self.device.name == "":
+        if self.player.name == "":
             return f"{self.endpoint}"
 
-        return self.device.name
+        return self.player.name
 
     def to_dict(self):
         """Return the state of the LinkPlayBridge."""
         return {
             "endpoint": self.endpoint.to_dict(),
-            "device": self.device.to_dict(),
             "player": self.player.to_dict(),
             "multiroom": self.multiroom.to_dict() if self.multiroom else None,
         }
@@ -541,7 +529,7 @@ class LinkPlayMultiroom:
                 for follower in properties[MultiroomAttribute.FOLLOWER_LIST]
             ]
             new_followers = [
-                bridge for bridge in bridges if bridge.device.uuid in follower_uuids
+                bridge for bridge in bridges if bridge.player.uuid in follower_uuids
             ]
             self.followers.extend(new_followers)
         except LinkPlayInvalidDataException as exc:
@@ -557,7 +545,7 @@ class LinkPlayMultiroom:
     async def add_follower(self, follower: LinkPlayBridge) -> None:
         """Adds a follower to the multiroom group."""
         await follower.request(
-            LinkPlayCommand.MULTIROOM_JOIN.format(self.leader.device.eth)
+            LinkPlayCommand.MULTIROOM_JOIN.format(self.leader.player.eth)
         )  # type: ignore[str-format]
         if follower not in self.followers:
             follower.multiroom = self
@@ -566,7 +554,7 @@ class LinkPlayMultiroom:
     async def remove_follower(self, follower: LinkPlayBridge) -> None:
         """Removes a follower from the multiroom group."""
         await self.leader.request(
-            LinkPlayCommand.MULTIROOM_KICK.format(follower.device.eth)
+            LinkPlayCommand.MULTIROOM_KICK.format(follower.player.eth)
         )  # type: ignore[str-format]
         if follower in self.followers:
             follower.multiroom = None

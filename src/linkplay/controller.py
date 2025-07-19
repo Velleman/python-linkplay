@@ -33,11 +33,11 @@ class LinkPlayController:
 
         # Discover new bridges
         discovered_bridges = await discover_linkplay_bridges(self.session)
-        current_bridges = [bridge.device.uuid for bridge in self.bridges]
+        current_bridges = [bridge.player.uuid for bridge in self.bridges]
         new_bridges = [
             discovered_bridge
             for discovered_bridge in discovered_bridges
-            if discovered_bridge.device.uuid not in current_bridges
+            if discovered_bridge.player.uuid not in current_bridges
         ]
         self.bridges.extend(new_bridges)
 
@@ -45,7 +45,7 @@ class LinkPlayController:
         """Find a LinkPlay device by its bridge uuid."""
 
         for bridge in self.bridges:
-            if bridge.device.uuid == bridge_uuid:
+            if bridge.player.uuid == bridge_uuid:
                 return bridge
 
         return None
@@ -54,17 +54,17 @@ class LinkPlayController:
         """Add given LinkPlay device if not already added."""
 
         # Add bridge
-        current_bridges = [bridge.device.uuid for bridge in self.bridges]
-        if bridge_to_add.device.uuid not in current_bridges:
-            bridge_to_add.device.set_callback(self.get_bridge_callback())
+        current_bridges = [bridge.player.uuid for bridge in self.bridges]
+        if bridge_to_add.player.uuid not in current_bridges:
+            bridge_to_add.player.set_callback(self.get_bridge_callback())
             self.bridges.append(bridge_to_add)
 
     async def remove_bridge(self, bridge_to_remove: LinkPlayBridge) -> None:
         """Remove given LinkPlay device if not already deleted."""
 
         # Remove bridge
-        current_bridges = [bridge.device.uuid for bridge in self.bridges]
-        if bridge_to_remove.device.uuid in current_bridges:
+        current_bridges = [bridge.player.uuid for bridge in self.bridges]
+        if bridge_to_remove.player.uuid in current_bridges:
             self.bridges.remove(bridge_to_remove)
 
     async def discover_multirooms(self) -> None:

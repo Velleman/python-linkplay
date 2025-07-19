@@ -1,12 +1,11 @@
 """Test bridge functionality."""
 
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, Mock, call, patch
 
 import pytest
 from linkplay.bridge import (
     LinkPlayBridge,
-    LinkPlayDevice,
     LinkPlayMultiroom,
     LinkPlayPlayer,
 )
@@ -34,7 +33,7 @@ def test_device_name():
     bridge: LinkPlayBridge = LinkPlayBridge(endpoint=endpoint)
     assert f"{bridge}" == "http://1.2.3.4"
 
-    bridge.device.properties[DeviceAttribute.DEVICE_NAME] = "TestDevice"
+    bridge.player.device_properties[DeviceAttribute.DEVICE_NAME] = "TestDevice"
     assert f"{bridge}" == "TestDevice"
 
 
@@ -42,18 +41,23 @@ async def test_device_update_status():
     """Tests if the device update status is correctly called."""
     bridge = AsyncMock()
     bridge.json_request.return_value = {DeviceAttribute.UUID: "1234"}
-    device = LinkPlayDevice(bridge)
+    device = LinkPlayPlayer(bridge)
 
     await device.update_status()
 
-    bridge.json_request.assert_called_once_with(LinkPlayCommand.DEVICE_STATUS)
+    bridge.json_request.assert_has_calls(
+        [
+            call(LinkPlayCommand.DEVICE_STATUS),
+            call(LinkPlayCommand.PLAYER_STATUS),
+        ]
+    )
     assert device.uuid == "1234"
 
 
 async def test_device_reboot():
     """Tests if the device update is correctly called."""
     bridge = AsyncMock()
-    device = LinkPlayDevice(bridge)
+    device = LinkPlayPlayer(bridge)
 
     await device.reboot()
 
@@ -63,7 +67,7 @@ async def test_device_reboot():
 async def test_deserialize_device():
     """Test the device to deserialize correctly."""
     bridge = AsyncMock()
-    device = LinkPlayDevice(bridge)
+    device = LinkPlayPlayer(bridge)
 
     device.to_dict()
 
@@ -76,7 +80,12 @@ async def test_player_update_status():
 
     await player.update_status()
 
-    bridge.json_request.assert_called_once_with(LinkPlayCommand.PLAYER_STATUS)
+    bridge.json_request.assert_has_calls(
+        [
+            call(LinkPlayCommand.DEVICE_STATUS),
+            call(LinkPlayCommand.PLAYER_STATUS),
+        ]
+    )
 
 
 async def test_player_update_status_calls_fixup_player_properties():
@@ -229,11 +238,9 @@ async def test_player_invalid_playmode():
 async def test_player_get_equalizer_mode_wiim():
     """Tests if the player handles an return the equalizer mode correctly."""
     bridge = AsyncMock()
-    device = LinkPlayDevice(bridge)
     player = LinkPlayPlayer(bridge)
-    bridge.device = device
     bridge.player = player
-    bridge.device.properties[DeviceAttribute.PROJECT] = "WiiM_Pro_with_gc4a"
+    bridge.player.device_properties[DeviceAttribute.PROJECT] = "WiiM_Pro_with_gc4a"
 
     player.properties[PlayerAttribute.EQUALIZER_MODE] = 0
 
@@ -319,12 +326,12 @@ async def test_player_set_play_mode():
 async def test_player_play_preset_when_max_key_empty(preset_number: int):
     """Tests if a player is able to play a preset."""
     bridge = AsyncMock()
-    device = LinkPlayDevice(bridge)
+    device = LinkPlayPlayer(bridge)
     player = LinkPlayPlayer(bridge)
     bridge.device = device
     bridge.player = player
 
-    bridge.device.properties[DeviceAttribute.PRESET_KEY] = ""
+    bridge.player.properties[DeviceAttribute.PRESET_KEY] = ""
 
     await player.play_preset(preset_number)
 
@@ -337,7 +344,7 @@ async def test_player_play_preset_when_max_key_empty(preset_number: int):
 async def test_player_play_preset(preset_number: int):
     """Tests if a player is able to play a preset."""
     bridge = AsyncMock()
-    device = LinkPlayDevice(bridge)
+    device = LinkPlayPlayer(bridge)
     player = LinkPlayPlayer(bridge)
     bridge.device = device
     bridge.player = player
@@ -359,7 +366,7 @@ async def test_player_play_preset(preset_number: int):
 async def test_player_play_preset_raises_value_error(preset_number: int):
     """Tests that a player fails in an expected way if play preset input is incorrect."""
     bridge = AsyncMock()
-    device = LinkPlayDevice(bridge)
+    device = LinkPlayPlayer(bridge)
     player = LinkPlayPlayer(bridge)
     bridge.device = device
     bridge.player = player
@@ -413,14 +420,14 @@ async def test_multiroom_ungroup():
 async def test_multiroom_add_follower():
     """Tests if multiroom add follower is correctly called on the follower."""
     leader = AsyncMock()
-    leader.device.eth = "1.2.3.4"
+    leader.player.eth = "1.2.3.4"
     follower = AsyncMock()
     multiroom = LinkPlayMultiroom(leader)
 
     await multiroom.add_follower(follower)
 
     follower.request.assert_called_once_with(
-        LinkPlayCommand.MULTIROOM_JOIN.format(leader.device.eth)
+        LinkPlayCommand.MULTIROOM_JOIN.format(leader.player.eth)
     )
     assert multiroom.followers == [follower]
 
@@ -429,14 +436,14 @@ async def test_multiroom_remove_follower():
     """Tests if multiroom remove folllower is correctly called on the leader."""
     leader = AsyncMock()
     follower = AsyncMock()
-    follower.device.eth = "1.2.3.4"
+    follower.player.eth = "1.2.3.4"
     multiroom = LinkPlayMultiroom(leader)
     multiroom.followers = [follower]
 
     await multiroom.remove_follower(follower)
 
     leader.request.assert_called_once_with(
-        LinkPlayCommand.MULTIROOM_KICK.format(follower.device.eth)
+        LinkPlayCommand.MULTIROOM_KICK.format(follower.player.eth)
     )
     assert not multiroom.followers
 
@@ -485,13 +492,13 @@ async def test_multiroom_set_volume_raises_value_error(volume: int):
 @pytest.fixture
 def mock_bridge():
     bridge = Mock(spec=LinkPlayBridge)
-    bridge.device = Mock(spec=LinkPlayDevice)
+    bridge.player = Mock(spec=LinkPlayPlayer)
     return bridge
 
 
 def test_set_callback_assigns_controller(mock_bridge):
     """Test that set_callback assigns the controller correctly."""
-    device = LinkPlayDevice(mock_bridge)
+    device = LinkPlayPlayer(mock_bridge)
     mock_controller = Mock()
 
     device.set_callback(mock_controller)
@@ -505,7 +512,7 @@ async def test_update_status_triggers_controller_on_mode_change_to_follower(
 ):
     """Test that update_status triggers the controller when playing mode changes to FOLLOWER."""
     player = LinkPlayPlayer(mock_bridge)
-    mock_bridge.device.controller = Mock()
+    mock_bridge.player.controller = Mock()
 
     # Simulate initial state
     player.previous_playing_mode = PlayingMode.IDLE
@@ -516,7 +523,7 @@ async def test_update_status_triggers_controller_on_mode_change_to_follower(
     # Call update_status and verify controller is called
     await player.update_status()
 
-    mock_bridge.device.controller.assert_called_once()
+    mock_bridge.player.controller.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -525,7 +532,7 @@ async def test_update_status_triggers_controller_on_mode_change_from_follower(
 ):
     """Test that update_status triggers the controller when playing mode changes from FOLLOWER."""
     player = LinkPlayPlayer(mock_bridge)
-    mock_bridge.device.controller = Mock()
+    mock_bridge.player.controller = Mock()
 
     # Simulate initial state
     player.previous_playing_mode = PlayingMode.FOLLOWER
@@ -536,14 +543,14 @@ async def test_update_status_triggers_controller_on_mode_change_from_follower(
     # Call update_status and verify controller is called
     await player.update_status()
 
-    mock_bridge.device.controller.assert_called_once()
+    mock_bridge.player.controller.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_update_status_does_not_trigger_controller_on_no_mode_change(mock_bridge):
     """Test that update_status does not trigger the controller when playing mode remains FOLLOWER."""
     player = LinkPlayPlayer(mock_bridge)
-    mock_bridge.device.controller = Mock()
+    mock_bridge.player.controller = Mock()
 
     # Simulate no change in playing mode
     player.previous_playing_mode = PlayingMode.FOLLOWER
@@ -553,7 +560,7 @@ async def test_update_status_does_not_trigger_controller_on_no_mode_change(mock_
 
     await player.update_status()
 
-    mock_bridge.device.controller.assert_not_called()
+    mock_bridge.player.controller.assert_not_called()
 
     player.previous_playing_mode = PlayingMode.IDLE
     mock_bridge.json_request = AsyncMock(
@@ -562,7 +569,7 @@ async def test_update_status_does_not_trigger_controller_on_no_mode_change(mock_
 
     await player.update_status()
 
-    mock_bridge.device.controller.assert_not_called()
+    mock_bridge.player.controller.assert_not_called()
 
 
 async def test_meta_info_failed_handling():
@@ -584,8 +591,8 @@ async def test_meta_info_failed_handling():
                 protocol="http", port=80, endpoint="1.2.3.4", session=None
             )
         )
-        mock_bridge.device = MagicMock()
-        mock_bridge.device.manufacturer = (
+        mock_bridge.player = MagicMock()
+        mock_bridge.player.manufacturer = (
             MANUFACTURER_WIIM  # Set the manufacturer to WiiM
         )
 
@@ -621,8 +628,8 @@ async def test_audio_output_control():
                 protocol="http", port=80, endpoint="1.2.3.4", session=None
             )
         )
-        mock_bridge.device = MagicMock()
-        mock_bridge.device.manufacturer = (
+        mock_bridge.player = MagicMock()
+        mock_bridge.player.manufacturer = (
             MANUFACTURER_WIIM  # Set the manufacturer to WiiM
         )
 

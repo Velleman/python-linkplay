@@ -2,7 +2,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from aiohttp import ClientSession
-from linkplay.bridge import LinkPlayBridge, LinkPlayDevice, LinkPlayMultiroom
+from linkplay.bridge import LinkPlayBridge, LinkPlayMultiroom, LinkPlayPlayer
 from linkplay.controller import LinkPlayController
 from linkplay.exceptions import LinkPlayInvalidDataException
 
@@ -20,8 +20,8 @@ def controller(mock_session):
 @pytest.fixture
 def mock_bridge():
     bridge = MagicMock(spec=LinkPlayBridge)
-    bridge.device = MagicMock(spec=LinkPlayDevice)
-    bridge.device.uuid = "mock-uuid"
+    bridge.player = MagicMock(spec=LinkPlayPlayer)
+    bridge.player.uuid = "mock-uuid"
     return bridge
 
 
@@ -74,9 +74,9 @@ async def test_discover_bridges():
 
     # Mock the discover_linkplay_bridges function
     mock_bridge_1 = AsyncMock()
-    mock_bridge_1.device.uuid = "uuid-1"
+    mock_bridge_1.player.uuid = "uuid-1"
     mock_bridge_2 = AsyncMock()
-    mock_bridge_2.device.uuid = "uuid-2"
+    mock_bridge_2.player.uuid = "uuid-2"
 
     with patch(
         "linkplay.controller.discover_linkplay_bridges",
@@ -90,8 +90,8 @@ async def test_discover_bridges():
 
         # Assert bridges were added to the controller
         assert len(controller.bridges) == 2
-        assert controller.bridges[0].device.uuid == "uuid-1"
-        assert controller.bridges[1].device.uuid == "uuid-2"
+        assert controller.bridges[0].player.uuid == "uuid-1"
+        assert controller.bridges[1].player.uuid == "uuid-2"
 
         # Call discover_bridges again with no new bridges
         await controller.discover_bridges()
