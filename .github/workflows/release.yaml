@@ -24,7 +24,7 @@ jobs:
       - name: Update version
         run: |
           echo "__version__ = '${{ github.event.inputs.version }}'" > src/linkplay/__version__.py
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: 3.13
       - name: Install dependencies
