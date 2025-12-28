@@ -78,6 +78,7 @@ class LinkPlayCommand(StrEnum):
     MUTE = "setPlayerCmd:mute:1"
     RESUME = "setPlayerCmd:resume"
     PLAY = "setPlayerCmd:play:{}"
+    ANNOUNCE = "playPromptUrl:{}"
     SEEK = "setPlayerCmd:seek:{}"
     VOLUME = "setPlayerCmd:vol:{}"
     PLAYLIST = "setPlayerCmd:playlist:uri:{}"

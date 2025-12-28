@@ -192,6 +192,10 @@ class LinkPlayPlayer:
         """Start playing the selected track."""
         await self.bridge.request(LinkPlayCommand.PLAY.format(value))  # type: ignore[str-format]
 
+    async def announce(self, value: str) -> None:
+        """Announcing the selected track."""
+        await self.bridge.request(LinkPlayCommand.ANNOUNCE.format(value))  # type: ignore[str-format]
+
     async def resume(self) -> None:
         """Resume playing the current track."""
         await self.bridge.request(LinkPlayCommand.RESUME)

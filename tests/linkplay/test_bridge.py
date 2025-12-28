@@ -121,6 +121,16 @@ async def test_player_play():
     bridge.request.assert_called_once_with(LinkPlayCommand.PLAY.format("test"))
 
 
+async def test_player_announce():
+    """Tests if the player announce is correctly called."""
+    bridge = AsyncMock()
+    player = LinkPlayPlayer(bridge)
+
+    await player.announce("test")
+
+    bridge.request.assert_called_once_with(LinkPlayCommand.ANNOUNCE.format("test"))
+
+
 async def test_player_resume():
     """Tests if the player resume is correctly called."""
     bridge = AsyncMock()
