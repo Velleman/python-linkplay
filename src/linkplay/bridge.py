@@ -24,9 +24,10 @@ from linkplay.consts import (
     PlayingStatus,
     SpeakerType,
 )
-from linkplay.endpoint import LinkPlayEndpoint
+from linkplay.endpoint import LinkPlayApiEndpoint, LinkPlayEndpoint
 from linkplay.exceptions import LinkPlayInvalidDataException
 from linkplay.manufacturers import MANUFACTURER_WIIM, get_info_from_project
+from linkplay.upnp import LinkPlayUPnP
 from linkplay.utils import (
     equalizer_mode_from_number_mapping,
     equalizer_mode_to_number_mapping,
@@ -135,6 +136,7 @@ class LinkPlayPlayer:
     metainfo: dict[MetaInfo, dict[MetaInfoMetaData, str]]
 
     previous_playing_mode: PlayingMode | None = None
+    _upnp: LinkPlayUPnP | None = None
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
@@ -166,6 +168,12 @@ class LinkPlayPlayer:
         else:
             self.metainfo = {}
 
+        # Fall back to UPnP for album art when the HTTP API doesn't provide it
+        # (most non-WiiM devices, and some WiiM devices that occasionally omit
+        # it). The album art is injected into the existing metainfo structure.
+        if not self.album_art:
+            await self._update_album_art_from_upnp()
+
         # handle multiroom changes
         if self.bridge.device.controller is not None and (
             (
@@ -179,6 +187,23 @@ class LinkPlayPlayer:
         ):
             self.bridge.device.controller()
         self.previous_playing_mode = self.play_mode
+
+    async def _update_album_art_from_upnp(self) -> None:
+        """Fetch album art from the UPnP AVTransport service as a fallback."""
+        endpoint = self.bridge.endpoint
+        if not isinstance(endpoint, LinkPlayApiEndpoint):
+            return
+
+        if self._upnp is None:
+            self._upnp = LinkPlayUPnP(endpoint.host, endpoint.session)
+
+        metadata = await self._upnp.async_get_metadata()
+        if metadata is None or not metadata.album_art_uri:
+            return
+
+        self.metainfo.setdefault(MetaInfo.METADATA, {})[MetaInfoMetaData.ALBUM_ART] = (
+            metadata.album_art_uri
+        )
 
     async def next(self) -> None:
         """Play the next song in the playlist."""

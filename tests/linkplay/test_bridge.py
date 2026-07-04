@@ -17,6 +17,8 @@ from linkplay.consts import (
     EqualizerMode,
     LinkPlayCommand,
     LoopMode,
+    MetaInfo,
+    MetaInfoMetaData,
     MuteMode,
     PlayerAttribute,
     PlayingMode,
@@ -24,6 +26,7 @@ from linkplay.consts import (
 )
 from linkplay.endpoint import LinkPlayApiEndpoint
 from linkplay.manufacturers import MANUFACTURER_WIIM
+from linkplay.upnp import LinkPlayUPnPMetadata
 
 
 def test_device_name():
@@ -48,6 +51,44 @@ async def test_device_update_status():
 
     bridge.json_request.assert_called_once_with(LinkPlayCommand.DEVICE_STATUS)
     assert device.uuid == "1234"
+
+
+async def test_player_update_status_album_art_upnp_fallback():
+    """A device without album art over HTTP falls back to UPnP."""
+    bridge = AsyncMock()
+    bridge.json_request.return_value = {PlayerAttribute.PLAYING_STATUS: "play"}
+    bridge.device.manufacturer = "Arylic"
+    bridge.device.controller = None
+    bridge.endpoint = LinkPlayApiEndpoint(
+        protocol="http", port=80, endpoint="1.2.3.4", session=AsyncMock()
+    )
+    player = LinkPlayPlayer(bridge)
+
+    metadata = LinkPlayUPnPMetadata(album_art_uri="https://art.example/cover.jpg")
+    with patch("linkplay.bridge.LinkPlayUPnP") as upnp_cls:
+        upnp_cls.return_value.async_get_metadata = AsyncMock(return_value=metadata)
+        await player.update_status()
+
+    upnp_cls.assert_called_once()
+    assert player.album_art == "https://art.example/cover.jpg"
+
+
+async def test_player_update_status_no_upnp_when_art_present():
+    """UPnP is not queried when the HTTP API already provides album art."""
+    bridge = AsyncMock()
+    bridge.json_request.side_effect = [
+        {PlayerAttribute.PLAYING_STATUS: "play"},
+        {MetaInfo.METADATA: {MetaInfoMetaData.ALBUM_ART: "http://art/from-wiim.jpg"}},
+    ]
+    bridge.device.manufacturer = MANUFACTURER_WIIM
+    bridge.device.controller = None
+    player = LinkPlayPlayer(bridge)
+
+    with patch("linkplay.bridge.LinkPlayUPnP") as upnp_cls:
+        await player.update_status()
+
+    upnp_cls.assert_not_called()
+    assert player.album_art == "http://art/from-wiim.jpg"
 
 
 async def test_device_reboot():
@@ -486,6 +527,8 @@ async def test_multiroom_set_volume_raises_value_error(volume: int):
 def mock_bridge():
     bridge = Mock(spec=LinkPlayBridge)
     bridge.device = Mock(spec=LinkPlayDevice)
+    # A non-LinkPlayApiEndpoint keeps update_status from attempting a UPnP call.
+    bridge.endpoint = Mock()
     return bridge
 
 
@@ -592,8 +635,11 @@ async def test_meta_info_failed_handling():
         # Create a LinkPlayPlayer instance with the mocked bridge
         player = LinkPlayPlayer(mock_bridge)
 
-        # Simulate the META_INFO request and exception handling
-        await player.update_status()
+        # Simulate the META_INFO request and exception handling. Patch UPnP as
+        # the empty album art would otherwise trigger the UPnP fallback.
+        with patch("linkplay.bridge.LinkPlayUPnP") as mock_upnp:
+            mock_upnp.return_value.async_get_metadata = AsyncMock(return_value=None)
+            await player.update_status()
 
         # Verify that metainfo is set to an empty dictionary after the exception
         assert player.metainfo == {}
