@@ -41,9 +41,20 @@ class LinkPlayApiEndpoint(LinkPlayEndpoint):
             protocol == "https" and port != 443
         )
         port_suffix = f":{port}" if include_port else ""
+        self._host: str = endpoint
         self._endpoint: str = f"{protocol}://{endpoint}{port_suffix}"
 
         self._session: ClientSession = session
+
+    @property
+    def host(self) -> str:
+        """Return the host of the endpoint."""
+        return self._host
+
+    @property
+    def session(self) -> ClientSession:
+        """Return the aiohttp session of the endpoint."""
+        return self._session
 
     def to_dict(self):
         """Return the state of the LinkPlayEndpoint"""
