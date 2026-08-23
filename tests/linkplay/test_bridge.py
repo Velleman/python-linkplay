@@ -602,6 +602,32 @@ async def test_meta_info_failed_handling():
         mock_api.assert_called_with("http://1.2.3.4", None, LinkPlayCommand.META_INFO)
 
 
+async def test_meta_info_empty_response_handling():
+    """Test that the player handles an empty META_INFO response correctly."""
+
+    async def mock_session_call_api_json_side_effect(endpoint, session, command):
+        if command == LinkPlayCommand.META_INFO:
+            return ""
+        return "{}"
+
+    with patch(
+        "linkplay.utils.session_call_api",
+        new=AsyncMock(side_effect=mock_session_call_api_json_side_effect),
+    ):
+        mock_bridge = LinkPlayBridge(
+            endpoint=LinkPlayApiEndpoint(
+                protocol="http", port=80, endpoint="1.2.3.4", session=None
+            )
+        )
+        mock_bridge.device = MagicMock()
+        mock_bridge.device.manufacturer = MANUFACTURER_WIIM
+
+        player = LinkPlayPlayer(mock_bridge)
+        await player.update_status()
+
+        assert player.metainfo == {}
+
+
 async def test_audio_output_control():
     """Test that the player handles a audio output control correctly."""
 
