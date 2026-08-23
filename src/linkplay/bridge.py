@@ -159,8 +159,8 @@ class LinkPlayPlayer:
                     MetaInfo, dict[MetaInfoMetaData, str]
                 ] = await self.bridge.json_request(LinkPlayCommand.META_INFO)  # type: ignore[assignment]
             except LinkPlayInvalidDataException as exc:
-                raw = getattr(exc, "data", None) or ""
-                if raw.strip() in ("", "Failed"):
+                raw = getattr(exc, "data", None)
+                if isinstance(raw, str) and raw.strip() in ("", "Failed"):
                     self.metainfo = {}
                 else:
                     raise
