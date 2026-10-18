@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import time
-from typing import Any, Callable
+from typing import Any, Awaitable, Callable
 
 from linkplay.consts import (
     INPUT_MODE_MAP,
@@ -40,7 +40,7 @@ class LinkPlayDevice:
     bridge: LinkPlayBridge
     properties: dict[DeviceAttribute, str]
 
-    controller: Callable[[], None] | None = None
+    controller: Callable[[], Awaitable[None]] | None = None
 
     def __init__(self, bridge: LinkPlayBridge):
         self.bridge = bridge
@@ -50,7 +50,7 @@ class LinkPlayDevice:
         """Return the state of the LinkPlayDevice."""
         return {"properties": self.properties}
 
-    def set_callback(self, controller: Callable[[], None]) -> None:
+    def set_callback(self, controller: Callable[[], Awaitable[None]]) -> None:
         """Sets a callback function to notify events."""
         self.controller = controller
 
@@ -177,7 +177,7 @@ class LinkPlayPlayer:
                 and self.play_mode != PlayingMode.FOLLOWER
             )
         ):
-            self.bridge.device.controller()
+            await self.bridge.device.controller()
         self.previous_playing_mode = self.play_mode
 
     async def next(self) -> None:
