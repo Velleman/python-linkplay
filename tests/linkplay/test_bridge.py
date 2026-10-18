@@ -505,7 +505,7 @@ async def test_update_status_triggers_controller_on_mode_change_to_follower(
 ):
     """Test that update_status triggers the controller when playing mode changes to FOLLOWER."""
     player = LinkPlayPlayer(mock_bridge)
-    mock_bridge.device.controller = Mock()
+    mock_bridge.device.controller = AsyncMock()
 
     # Simulate initial state
     player.previous_playing_mode = PlayingMode.IDLE
@@ -513,10 +513,10 @@ async def test_update_status_triggers_controller_on_mode_change_to_follower(
         return_value={PlayerAttribute.PLAYBACK_MODE: PlayingMode.FOLLOWER}
     )
 
-    # Call update_status and verify controller is called
+    # Call update_status and verify controller is awaited
     await player.update_status()
 
-    mock_bridge.device.controller.assert_called_once()
+    mock_bridge.device.controller.assert_awaited_once()
 
 
 @pytest.mark.asyncio
@@ -525,7 +525,7 @@ async def test_update_status_triggers_controller_on_mode_change_from_follower(
 ):
     """Test that update_status triggers the controller when playing mode changes from FOLLOWER."""
     player = LinkPlayPlayer(mock_bridge)
-    mock_bridge.device.controller = Mock()
+    mock_bridge.device.controller = AsyncMock()
 
     # Simulate initial state
     player.previous_playing_mode = PlayingMode.FOLLOWER
@@ -533,17 +533,17 @@ async def test_update_status_triggers_controller_on_mode_change_from_follower(
         return_value={PlayerAttribute.PLAYBACK_MODE: PlayingMode.IDLE}
     )
 
-    # Call update_status and verify controller is called
+    # Call update_status and verify controller is awaited
     await player.update_status()
 
-    mock_bridge.device.controller.assert_called_once()
+    mock_bridge.device.controller.assert_awaited_once()
 
 
 @pytest.mark.asyncio
 async def test_update_status_does_not_trigger_controller_on_no_mode_change(mock_bridge):
     """Test that update_status does not trigger the controller when playing mode remains FOLLOWER."""
     player = LinkPlayPlayer(mock_bridge)
-    mock_bridge.device.controller = Mock()
+    mock_bridge.device.controller = AsyncMock()
 
     # Simulate no change in playing mode
     player.previous_playing_mode = PlayingMode.FOLLOWER
@@ -553,7 +553,7 @@ async def test_update_status_does_not_trigger_controller_on_no_mode_change(mock_
 
     await player.update_status()
 
-    mock_bridge.device.controller.assert_not_called()
+    mock_bridge.device.controller.assert_not_awaited()
 
     player.previous_playing_mode = PlayingMode.IDLE
     mock_bridge.json_request = AsyncMock(
@@ -562,7 +562,7 @@ async def test_update_status_does_not_trigger_controller_on_no_mode_change(mock_
 
     await player.update_status()
 
-    mock_bridge.device.controller.assert_not_called()
+    mock_bridge.device.controller.assert_not_awaited()
 
 
 async def test_meta_info_failed_handling():
